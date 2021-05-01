@@ -1,5 +1,5 @@
-const tsImportPluginFactory = require("ts-import-plugin");
-const { merge } = require("webpack-merge");
+// const tsImportPluginFactory = require("ts-import-plugin");
+// const { merge } = require("webpack-merge");
 const path = require("path");
 
 module.exports = {
