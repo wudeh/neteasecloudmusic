@@ -37,7 +37,7 @@ module.exports = {
   // devServer: {
   //   proxy: {
   //     "/api": {
-  //       target: "https://netease-cloud-music-api-jet.vercel.app/", // 访问的后台地址
+  //       target: "http://passport.bilibili.com/web/sms/general/v2/send", // 访问的后台地址
   //       changeOrigin: true,
   //       pathRewrite: {
   //         // 重写地址 你的接口地址是'http://10.10.1.10/login' 你请求得时候地址只需要写'/api/login'

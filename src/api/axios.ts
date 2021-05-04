@@ -25,7 +25,7 @@ axios.interceptors.request.use((config) => {
       config.url = config.url + `?timestamp=${timestamp}`;
     }
     config.data = Object.assign({}, config.data);
-    // config.data.timestamp = timestamp;
+    config.data.timestamp = timestamp;
     // // 手动传cookie
     const cookieDD = localStorage.getItem("cookieMusic");
     if (cookieDD) {

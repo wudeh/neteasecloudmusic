@@ -21,3 +21,21 @@ export function deleteCookie(): void {
     cookieExpire +
     " ;path=/;domain=localhost:8080";
 }
+
+// 计算歌曲时长
+export function getTime(time: number): string {
+  let i = Math.floor(time);
+  let hour = Math.floor(i / 3600);
+  // console.log("计算后的小时" + hour);
+
+  let min = Math.floor(i / 60);
+  // console.log("计算后的分钟" + min);
+  
+  let h = `${hour}`.padStart(2, '0');
+  let m = `${min}`.padStart(2, '0');
+  let sec = Math.floor(i % 60);
+  // console.log("计算后的秒" + sec);
+  let s = `${sec}`.padStart(2, '0');
+  if(hour>0) return h + m +':' + s;
+  return m +':' + s;
+}

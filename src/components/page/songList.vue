@@ -1,0 +1,454 @@
+<template>
+  <div class="top">
+    <div class="img_blur">
+      <img :src="img" alt="">
+    </div>
+    <div class="nav">
+      <div class="left_arrow">
+        <img src="../../../public/img/icons/left_arrow.svg" alt="">
+      </div>
+      <div class="title">歌单</div>
+      <div class="search">
+        <img src="../../../public/img/icons/search.svg" alt="">
+      </div>
+    </div>
+    <div class="info">
+      <div class="avatar">
+        <van-image radius="8" class="img" :src="img" />
+      </div>
+      <div class="detail">
+        <div class="title">{{title}}</div>
+        <div class="person">
+          <img :src="author.avatar" alt="">
+          <span class="name">{{author.nickname}}</span>
+          <span class="Follow" v-if="author.followed">></span>
+          <span class="notFollow" v-else>+</span>
+        </div>
+        <div class="des">
+          <div class="text">{{description}}</div>
+          <img src="../../../public/img/icons/more.svg" alt="">
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 收藏 评论 分享 -->
+  <div class="count">
+    <div class="sub item">
+        <img :src="subscribed?subedIcon:subIcon" alt="">
+        <span>{{numFilter(subscribedCount)}}</span>
+    </div>
+    <div class="line"></div>
+    <div class="comment item">
+      <img src="../../../public/img/icons/comment.svg" alt="">
+        <span>{{numFilter(commentCount)}}</span>
+    </div>
+    <div class="line"></div>
+    <div class="share item">
+      <img src="../../../public/img/icons/share.svg" alt="">
+        <span>{{numFilter(shareCount)}}</span>
+    </div>
+  </div>
+  <!-- 全部播放 -->
+  <div class="playAll">
+    <div class="icon">
+      <img src="../../../public/img/icons/playAll.svg" alt="">
+    </div>
+    <div class="text">
+      <div class="play_all_title">播放全部</div>
+    </div>
+    <div class="play_count">({{songListInfo.length}})</div>
+  </div>
+  <!-- 歌曲列表 -->
+  <div class="songList">
+    <div class="song_item" v-for="(item,index) in songListInfo" :key="index">
+      <div class="index">{{index + 1}}</div>
+      <div class="song_info">
+        <div class="info_top">
+          <div class="song_name">{{item.name}}</div>
+          <div class="song_TV">{{item.Tv}}</div>
+        </div>
+        <div class="info_bottom">
+          <span class="vip" v-if="item.vip">vip</span>
+          <span class="hear_try" v-if="item.vip">试听</span>
+          <span class="dujia" v-if="item.dujia">独家</span>
+          <span class="sq" v-if="item.sq">SQ</span>
+          {{item.author}}
+          -
+          {{item.des}}
+        </div>
+      </div>
+      <div class="more">
+        <img src="../../../public/img/icons/songInfo.svg" alt="">
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref, toRefs, onBeforeMount,reactive } from "vue";
+import { useRouter } from "vue-router"
+import {getSongListInfo,getSongInfo,getSongUrl} from "../../api/song"
+import { numFilter } from "../../utils/num";
+
+
+// 歌单
+interface songList {
+  numFilter: any,
+  title: string,
+  img: string,
+  description: string,
+  subscribed: boolean, // 是否收藏
+  songListInfo: Array<song>,
+  shareCount:number,
+  subscribedCount:number,
+  commentCount:number,
+  subedIcon: string,
+  subIcon: string,
+}
+
+// 歌曲
+interface song {
+  id: string | number,
+  name: string,
+  Tv: string, // 歌曲可能会有剧名
+  author: string,
+  des: string,
+  sq: boolean, 
+  vip: boolean,
+  dujia: boolean
+}
+
+// 作者
+interface author {
+  avatar: string,
+  nickname:string,
+  userId: string,
+  followed: false // 是否关注
+}
+
+  export default defineComponent({
+    name: "songList",
+    setup() {
+      //实例化路由
+    const router = useRouter();
+    const img = ref<string>()
+    const data = reactive<songList>({
+      numFilter:numFilter,
+      title: '',
+      img: '',
+      description: '',
+      subscribed: false,
+      songListInfo: [],
+      shareCount: 0,
+      subscribedCount: 0,
+      commentCount: 0,
+      subedIcon: require('../../../public/img/icons/subed.svg'),
+      subIcon: require('../../../public/img/icons/sub.svg'),
+    })
+    const author = reactive<author>({
+      avatar: '',
+      nickname: '',
+      userId: '',
+      followed: false // 是否关注
+    })
+    const id: any=  router.currentRoute.value.query.id;//获取参数
+    onBeforeMount(async () => {
+      // 得到歌单数据
+      const songList = await getSongListInfo(id);
+      console.log(songList);
+      // 组装歌单数据
+      data.title = songList.playlist.name;
+      data.img = songList.playlist.coverImgUrl;
+      data.description = songList.playlist.description;
+      data.subscribed = songList.playlist.subscribed;
+      console.log(data.subscribed);
+      
+      data.subscribedCount = songList.playlist.subscribedCount;
+      data.commentCount = songList.playlist.commentCount;
+      data.shareCount = songList.playlist.shareCount;
+
+      author.avatar = songList.playlist.creator.avatarUrl;
+      author.userId = songList.playlist.creator.userId;
+      author.nickname = songList.playlist.creator.nickname;
+      author.followed = songList.playlist.creator.followed;
+
+      let allId = songList.playlist.trackIds.map((item: { id: string; }) => {
+        return item.id
+      });
+      // 得到歌单里的全部歌曲信息
+      const songListInfo:any = await getSongInfo(allId.join(","));
+      console.log(songListInfo);
+
+      data.songListInfo = songListInfo.songs.map((item: any) => {
+
+        return {
+          id: item.id,
+          name: item.name,
+          Tv: item.alia.join("/"), // 歌曲可能会有剧名
+          author: item.ar.map((item:any) => item.name).join("/"),
+          des: item.al.name,
+          // sq: item.maxbr >= 999000, 
+          // vip: item.fee == 1,
+          // dujia: item.flag == 1092
+        }
+      })
+
+      songListInfo.privileges.forEach((item:any,index:number) => {
+        data.songListInfo[index].sq = (item.maxbr >= 999000);
+        data.songListInfo[index].vip = (item.fee == 1);
+        data.songListInfo[index].dujia = (item.flag == 1092);
+      })
+      
+    })
+    return {
+      ...toRefs(data),
+      author,
+    }
+
+    }
+    
+  })
+</script>
+
+<style lang="less" scoped>
+.top {
+  padding: 0 8px;
+  height: 200px;
+  position: relative;
+  .img_blur {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    filter: blur(50px);
+    z-index: -1;
+    img {
+      // width: 100vw;
+      height: 100vh;
+    }
+  }
+  .nav {
+    margin-top: 10px;
+    height: 50px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    z-index: 1;
+    .left_arrow {
+      margin-right: 20px;
+      img {
+        width: 20px;
+      }
+    }
+    .title {
+      color: #fff;
+      font-size: 25px;
+      margin-right: 250px;
+    }
+    .search {
+      .img {
+        width: 20 !important;
+      }
+    }
+  }
+  .info {
+    display: flex;
+    z-index: 1;
+    .avatar {
+      margin-right: 8px;
+      .img {
+        width: 110px;
+        height: 110px;
+      }
+    }
+    .detail {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 110px;
+      width: 220px;
+      .title {
+        color: #fff;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+      .person {
+        display: flex;
+        align-items: center;
+        img {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+        }
+        .name {
+          font-size: 12px;
+          margin: 0 3px;
+          color: #fff;
+          opacity: 0.5;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .notFollow {
+          padding: 2px 10px;
+          border-radius: 10px;
+          background-color: #fff;
+          opacity: 0.3;
+        }
+        .follow {
+          opacity: 0.3;
+        }
+      }
+      .des {
+        width: 200px;
+        font-size: 12px;
+        color: #fff;
+        opacity: 0.5;
+        display: flex;
+        .text {
+          width: 180px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        img {
+          width: 10px;
+        }
+      }
+    }
+  }
+}
+.count {
+  margin: 0 auto;
+  padding: 0 20px;
+  background-color: #fff;
+  width: 300px;
+  height: 40px;
+  border-radius: 50px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  font-size: 15px;
+  opacity: 0.3;
+  white-space: nowrap;
+  .line {
+    height: 30px;
+    border-left: 1px solid #ccc;
+  }
+  img {
+    width: 18px;
+    margin-right: 8px;
+  }
+  .item {
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+.playAll {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  .icon {
+    width: 40px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 25px;
+    }
+  }
+  .text {
+    display: flex;
+    .play_all_title {
+      font-size: 15px;
+      font-weight: bold;
+      // color: #fff;
+      margin-right: 8px;
+    }
+  }
+  .play_count {
+      // color: #fff;
+      font-size: 12px;
+      opacity: 0.5;
+    }
+}
+.songList {
+  height: 300px;
+  overflow: scroll;
+  .song_item {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    margin-bottom: 8px;
+    .index {
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+      text-align: center;
+      line-height: 40px;
+    }
+    .song_info {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 300px;
+      justify-content: space-between;
+      .info_top {
+        // color: #fff;
+        font-size: 18px;
+        overflow: hidden;
+        display: flex;
+        .song_name {
+          white-space: nowrap;
+        }
+        .song_TV {
+          color: #fff;
+          opacity: 0.5;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+      .info_bottom {
+        // color: #fff;
+        opacity: 0.5;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        .vip {
+          color: red;
+          border: 1px solid red;
+          padding: 1px;
+          border-radius: 3px;
+          opacity: 0.6;
+        }
+        .dujia {
+          .vip
+        }
+        .sq {
+          .vip
+        }
+        .hear_try {
+          color: rgb(0, 217, 255);
+          border: 1px solid rgb(0, 153, 255);
+          padding: 1px;
+          border-radius: 3px;
+          opacity: 0.6;
+        }
+      }
+    }
+    .more {
+      img {
+        width: 20px;
+      }
+    }
+  }
+}
+</style>

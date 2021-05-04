@@ -91,7 +91,7 @@ export default defineComponent({
     function initScroll() {
       data.bs = new BScroll("." + props.name, {
         probeType: 3,
-        click: true,
+        click: false,
         scrollX: props.scrollX,
         scrollY: props.scrollY,
         disableMouse: false,

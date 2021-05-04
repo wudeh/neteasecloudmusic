@@ -38,6 +38,11 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: "/songList",
+    name: "songList",
+    component: () => import(/* webpackChunkName: "login" */ "@/components/page/songList.vue"),
+  }
 ];
 
 const router = createRouter({
