@@ -7,6 +7,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "login" */ "@/views/Home.vue"),
     children: [
       {
+        path: "/songList",
+        name: "songList",
+        component: () => import(/* webpackChunkName: "login" */ "@/components/page/songList.vue"),
+      },
+      {
         path: "/",
         name: "discover",
         component: () =>
@@ -38,11 +43,6 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-  {
-    path: "/songList",
-    name: "songList",
-    component: () => import(/* webpackChunkName: "login" */ "@/components/page/songList.vue"),
-  }
 ];
 
 const router = createRouter({

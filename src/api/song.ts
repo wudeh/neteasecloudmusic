@@ -15,3 +15,8 @@ export function getSongUrl(id: string): any {
 export function getSongInfo(ids: string): any {
   return axios.post("/song/detail",{ids});
 }
+
+// 获取歌词
+export function getLyric(id: string): any {
+  return axios.post("/lyric",{id});
+}

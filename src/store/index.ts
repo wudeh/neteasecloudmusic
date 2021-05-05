@@ -9,7 +9,7 @@ export default createStore({
       img: localStorage.getItem("songImg") || '',
       url: localStorage.getItem("songUrl") || '',
       isPlaying: false,
-      lyrics: [],
+      lyric: [],
       playTime: localStorage.getItem("songPlayTime") || 0, // 当前播放时间
       duration: localStorage.getItem("songDuration") || 0,
       commentcount: 0, // 评论数量

@@ -5,7 +5,7 @@
       <!-- 导航栏 -->
       <div class="nav" @click="login()">
         <div class="pop">
-          <van-icon name="chat-o" badge="9" />
+          <van-icon name="chat-o" badge="" />
         </div>
         <div class="search">
           <van-icon name="search" />
