@@ -153,6 +153,8 @@ interface author {
     })
     const id: any=  router.currentRoute.value.query.id;//获取参数
     onBeforeMount(async () => {
+      console.log(router.currentRoute.value);
+      
       // 得到歌单数据
       const songList = await getSongListInfo(id);
       console.log(songList);

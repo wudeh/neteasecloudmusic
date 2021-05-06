@@ -7,11 +7,13 @@ export default createStore({
       name: localStorage.getItem("songName") || '',
       author: localStorage.getItem("songAuthor") || '',
       img: localStorage.getItem("songImg") || '',
-      url: localStorage.getItem("songUrl") || '',
+      url: '',
       isPlaying: false,
       lyric: [],
-      playTime: localStorage.getItem("songPlayTime") || 0, // 当前播放时间
-      duration: localStorage.getItem("songDuration") || 0,
+      currentTime: localStorage.getItem("songPlayTime") || 0, // 当前播放时间
+      progressTime: 0, // 进度条拖动时间
+      duration: 0,
+      buffered: 0, // 缓冲时间
       commentcount: 0, // 评论数量
       playList: [], // 播放列表
       playMode: '', // 播放模式
@@ -30,20 +32,32 @@ export default createStore({
       localStorage.setItem("songName",state.song_info.name);
       localStorage.setItem("songAuthor",state.song_info.author);
       localStorage.setItem("songImg",state.song_info.img);
-      localStorage.setItem("songUrl",state.song_info.url);
+      // localStorage.setItem("songUrl",state.song_info.url);
     },
     // 控制播放暂停
     play(state,play) {
       state.song_info.isPlaying = play;
     },
+    // 设置播放链接
+    set_song_url(state,url) {
+      state.song_info.url = url;
+    },
     // 设置歌曲时长
     set_song_allTime(state, time) {
       state.song_info.duration = Math.floor(time);
-      localStorage.setItem("songDuration",`${Math.floor(time)}`)
+      // localStorage.setItem("songDuration",`${Math.floor(time)}`)
     },
     // 设置歌曲现在播放时间
     set_song_time(state, time) {
-      state.song_info.playTime = Math.floor(time);
+      state.song_info.currentTime = Math.floor(time);
+    },
+    // 设置歌曲拖动进度条的时间
+    set_progress_time(state, time) {
+      state.song_info.progressTime = time;
+    },
+    // 设置歌曲缓冲时间
+    set_song_buffered(state, time) {
+      state.song_info.buffered = time;
     },
   },
   actions: {

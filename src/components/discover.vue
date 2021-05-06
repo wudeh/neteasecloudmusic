@@ -872,61 +872,6 @@ export default defineComponent({
       })
       
       }
-      
-      // // 轮播图
-      // info["swiper"] = discoverInfo.data.blocks[0].extInfo.banners;
-      
-      // // 推荐歌单
-      // info.recommend.arrData = discoverInfo.data.blocks[1].creatives;
-      // info.recommend.titleTex = discoverInfo.data.blocks[1].uiElement.subTitle.title;
-      // info.recommend.button = discoverInfo.data.blocks[1].uiElement.button;
-      // // 较长的推荐区域
-      // info.long = discoverInfo.data.blocks[2];
-
-      // // 精选音乐视频
-      // info.HOMEPAGE_MUSIC_MLOG = discoverInfo.data.blocks[3];
-
-      // // 雷达歌单
-      // info.HOMEPAGE_BLOCK_MGC_PLAYLIST = discoverInfo.data.blocks[4];
-
-      // // 音乐日历
-      // info.HOMEPAGE_MUSIC_CALENDAR = discoverInfo.data.blocks[5];
-
-      // // 专属场景歌单
-      // info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST = discoverInfo.data.blocks[6];
-
-      // // 新歌，新碟，数字专辑
-      // info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri =
-      //   discoverInfo.data.blocks[7].creatives;
-      // info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri.map(
-      //   (item: { creativeType: string }) => {
-      //     // 如果是新歌
-      //     if (item.creativeType == "NEW_SONG_HOMEPAGE") {
-      //       info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].push(item);
-      //     }
-      //     // 新碟
-      //     if (item.creativeType == "NEW_ALBUM_HOMEPAGE") {
-      //       info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[1].push(item);
-      //     }
-      //     // 数字专辑
-      //     if (item.creativeType == "DIGITAL_ALBUM_HOMEPAGE") {
-      //       info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[2].push(item);
-      //     }
-      //   }
-      // );
-
-      // // 推荐新歌云贝广告
-      // info.HOMEPAGE_YUNBEI_NEW_SONG = discoverInfo.data.blocks[8];
-
-      // // 播客合辑
-      // info.HOMEPAGE_VOICELIST_RCMD = discoverInfo.data.blocks[9];
-
-      // // 24 小时播客
-      // info.HOMEPAGE_PODCAST24 = discoverInfo.data.blocks[10];
-
-      // // 视频合集
-      // info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = discoverInfo.data.blocks[11];
-      // console.log(info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST);
     });
 
     // 获取 top 的dom 元素, 根据轮播图轮播事件动态改变背景图片模糊

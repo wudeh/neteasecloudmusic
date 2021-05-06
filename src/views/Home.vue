@@ -1,15 +1,15 @@
 <template>
   <div class="home">
       <router-view v-slot="{ Component }">
-        <keep-alive include="discover">
-          <component :is="Component" />
+        <keep-alive include="discover,song">
+              <component :is="Component"/>
         </keep-alive>
       </router-view>
     <!-- 用来撑开底部的盒子 -->
     <div class="songDiv" v-if="store.state.song_info.id"></div>
-    <div class="song" :class="{fixed_out: !store.state.song_info.id}" @click="showPopup">
-      <div class="song_img">
-        <img  ref="img" :src="store.state.song_info.img" alt="">
+    <div class="song" :class="{fixed_out: !store.state.song_info.id}" @click="goSong()">
+      <div class="song_img rotate"  :style="{animationPlayState: store.state.song_info.isPlaying ? 'running' : 'paused'}">
+        <img :src="store.state.song_info.img" alt="">
       </div>
       <div class="song_name">{{store.state.song_info.name}}</div>
       <div class="song_author">-{{store.state.song_info.author}}</div>
@@ -19,76 +19,6 @@
       <img src="../../public/img/icons/list_icon.svg" alt="">
     </div>
     <audio id="audio" ref="audio" :src="store.state.song_info.url"></audio>
-    <!-- <van-popup
-      v-model:show="show"
-      closeable
-      close-icon="arrow-down"
-      close-icon-position="top-left"
-      position="bottom"
-      :style="{ height: '100%' }"
-    > -->
-    <div class="popup" :class="{pop_down: !show}">
-      <div class="song_pop">
-        <div class="bg_blur">
-          <img :src="store.state.song_info.img" alt="">
-        </div>
-        <!-- 顶部 -->
-        <div class="nav">
-          <div class="back">
-            <img src="../../public/img/icons/arrow_down.svg" @click="show = false" alt="">
-          </div>
-          <div class="title">
-            <div class="name">{{store.state.song_info.name}}</div>
-            <div class="author">{{store.state.song_info.author}}</div>
-          </div>
-          <div class="share">
-            <img src="../../public/img/icons/share.svg" alt="">
-          </div>
-        </div>
-        <img class="needle" :class="{needle_play: store.state.song_info.isPlaying,hidden: showLyric}" src="../../public/img/player/needle.png" alt="">
-        <!-- 旋转唱片 -->
-        <div class="rotate" :class="{hidden: showLyric}" @click="showAllLyric()"> 
-          <div class="middle">
-            <img ref="img_pop" :src="store.state.song_info.img" alt="">
-          </div>
-        </div>
-        <!-- 歌词 -->
-        <div class="lyric_wrapper" :class="{show_all_lyric: showLyric}" @click="showAllLyric()">
-            <div class="lyric_div" :class="{lyric_div_show: showLyric}"></div>
-            <div class="lyric" :class="{lyric_show: showLyric}">
-              <div>
-                <div v-for="(item,index) in lyric" ref="lyricRef" :key="index" :id=" `s` + index" :class="{lyric_base:true,lyric_white: item.time <= current_song_time && current_song_time <= lyric[index+1].time}">{{item.lyric}}</div>
-                <div style="height:1000px"></div>
-              </div>
-            </div>
-        </div>
-        <!-- 收藏，评论 -->
-        <div class="icon_top">
-          <img src="../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../public/img/icons/comment_white.svg" alt="">
-        </div>
-        <!-- 进度条 -->
-        <div class="progress">
-          <div class="current_time">{{getTime(store.state.song_info.playTime)}}</div>
-          <div class="line">
-            <div class="past" ref="linePast"></div>
-            <div class="circle_point"></div>
-          </div>
-          <div class="durasion">{{getTime(store.state.song_info.duration)}}</div>
-        </div>
-        <!-- 播放图标 -->
-        <div class="bottom_icon">
-          <img @click="scroll" src="../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../public/img/icons/comment_white.svg" alt="">
-          <img class="bigPlay" @click.stop="change_play()" :src="store.state.song_info.isPlaying ? stopWhite : playWhite" alt="">
-          <img src="../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../public/img/icons/comment_white.svg" alt="">
-        </div>
-      </div>
-    </div>
      
     <!-- </van-popup> -->
     <!-- <van-tabbar
@@ -108,11 +38,12 @@
 
 <script lang="ts">
 import { defineComponent, ref,onMounted,watch, onBeforeUnmount,reactive,nextTick } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter,useRoute } from "vue-router";
 import { useStore } from 'vuex'
 import { getTime } from "../utils/num"
-import { getLyric } from "../api/song"
+import { getLyric, getSongUrl } from "../api/song"
 import BScroll from "@better-scroll/core";
+import { Toast } from "vant";
 interface info {
   bs: any;
 }
@@ -124,6 +55,8 @@ export default defineComponent({
     const store = useStore();
     const audio = ref();
     const linePast = ref();
+    const point = ref();
+    const line = ref();
     const img = ref();
     const img_pop = ref();
     const stopIcon = require('../../public/img/icons/stop_icon.svg')
@@ -133,11 +66,14 @@ export default defineComponent({
     let timer = ref();  // 控制头像旋转
     let timerSong = ref(); // 定时计算当前播放时间
     let current_song_time = ref('00:00.00');
+    const tempCurrentTime = ref(0); // 临时时间，用来计算手动点击进度条的时间
     let num = ref(0);
     let lyric: Array<{time:string,lyric:string}> = reactive([]);
     let lyricTime: Array<string> = reactive([]);
+    let lyricRef = ref()
     const show = ref(false);  // 控制歌词页面展出
     const showLyric = ref(false);  // 控制是否显示全部歌词
+    const autoMovePoint = ref(true); // 是否自动随歌曲播放自动移动圆点，为了实现手动移动进度条，在点击进度条时置为 false，
     let lyricScorll = reactive<info>({
       bs: ''
     });
@@ -145,7 +81,13 @@ export default defineComponent({
     // 控制歌词页面展出
     const showPopup = () => {
       show.value = true;
-      window.addEventListener('popstate', back, false)
+      // console.log(lyricRef);
+      console.log(audio.value.buffered);
+      console.log(audio.value.buffered.end(audio.value.buffered.length - 1));
+      
+      
+      
+      // window.addEventListener('popstate', back, false)
     };
 
     // 控制是否显示全部歌词
@@ -153,112 +95,31 @@ export default defineComponent({
       showLyric.value = !showLyric.value;
     }
 
-    const scroll = () => {
-       lyricScorll.bs.scrollToElement("#s12",300)
-    }
-
     function change_play():void {
       store.commit("play",!store.state.song_info.isPlaying);
-      audio.value.progress = function () {
-        console.log("在播放中");
-        
-      }
     }
 
+    const goSong = () => {
+      router.push({path: "/song"});
+    }
+
+    // 定时方法，用来设置歌词滚动和圆点移动
     function interval(): void {
       timer.value = setInterval(() => {
-            img.value.style.transform = `rotate(${num.value}deg)`;
-            img_pop.value.style.transform = `rotate(${num.value}deg)`;
-            num.value >= 360 && (num.value = 0);
-            num.value ++;
-            current_song_time.value = getTime(audio.value.currentTime.toString().split(".")[0]) + audio.value.currentTime.toString().split(".")[1];
-            lyricScorll.bs.refresh();
-            lyric.forEach((i:any,index,arr) => {
-              if(current_song_time.value >= i.time && current_song_time.value <= arr[index+1].time) {
-                lyricScorll.bs.scrollToElement(`#s${index}`,300)
-              }
-            })
+            store.commit("set_song_time",audio.value.currentTime);
           },70)
 
           timerSong.value = setInterval(() => {
             console.log(audio.value.currentTime);
-            
-            store.commit("set_song_allTime",audio.value.duration);
-            store.commit("set_song_time",audio.value.currentTime);
-            linePast.value.style.width = `${audio.value.currentTime / audio.value.duration * 100}%`
-            console.log(audio.value.ended);
-            
-            if(audio.value.ended) {
-              store.commit("play",!store.state.song_info.isPlaying);
-            }
-            
-            
+            store.commit("set_song_allTime",audio.value.duration);               
           },1000)
     }
 
-    watch(() => show.value, (value,pre) => {
-      if(value) {
-        window.addEventListener('popstate', back, false)
-      }else {
-        window.removeEventListener('popstate', back, false);
-      }
-    })
-
-    // 在首页监听播放状态的变化
-    watch(() => store.state.song_info.isPlaying,(value,pre) => {
-      console.log("监听到播放变化");
-      if(value) {
-        console.log(store.state.song_info.url);
-        console.log(img.value);
-        
-          // 本来想用 css 的 keyframe 动画 来写 头像的旋转动画
-          // 用了之后发现暂停之后不会停在当前旋转的角度，会变回 0deg ，只好自己用定时器写了
-          audio.value.autoplay = true;
-          audio.value.play();
-          console.log("总时长");
-          console.log(audio.value.duration); // 这是总时长
-          store.commit("set_song_allTime",audio.value.duration);
-          console.log(store.state.song_info.duration);
-
-          interval();
-          
-          
-      }else {
-        audio.value.pause();
-        clearInterval(timer.value);
-        clearInterval(timerSong.value);
-      }
-    })
-
-    watch(() => lyric.length, () => {
-      nextTick(() => {
-        lyricScorll.bs.refresh();
-      })
-      
-      
-    })
-
-
-    // 监听后退的时候关闭歌词弹出页
-    function back(): void {
-      console.log("监听到后退事件");
-      
-      if(show.value) {
-        show.value = false;
-      }
-    }
-
-    onMounted(async () => {
-      console.log(img);
-      img.value.style.transform = `rotate(90deg)`;
-      
-      if (window.history) {
-				history.pushState(null, '', document.URL)
-				window.addEventListener('popstate', back, false)
-			}
-
-      if(!store.state.song_info.lyric.length){
-        const data = await getLyric(store.state.song_info.id);
+    // id 变化，请求新的歌曲信息
+    watch(() => store.state.song_info.id, async () => {
+      lyric.splice(0);
+      lyricTime.splice(0);
+      const data = await getLyric(store.state.song_info.id);
         console.log(data);
         console.log(data.lrc.lyric.split("["));
         let i = data.lrc.lyric.split("[");
@@ -287,6 +148,10 @@ export default defineComponent({
 
         nextTick(() => {
           lyricScorll.bs.refresh();
+          console.log("歌词ref");
+          
+          console.log(lyricRef);
+          
         })
         
         console.log(x);
@@ -297,14 +162,186 @@ export default defineComponent({
         x.forEach((item: any) => {
           lyricTime.push(item.time)
         })
+    })
+
+    // 在首页监听播放状态的变化
+    watch(() => store.state.song_info.isPlaying,(value,pre) => {
+      console.log("监听到播放变化");
+      if(value) {
+        console.log(store.state.song_info.url);
+          audio.value.autoplay = true;
+          audio.value.play();
+          console.log("总时长");
+          console.log(audio.value.duration); // 这是总时长
+          store.commit("set_song_allTime",audio.value.duration);
+          console.log(store.state.song_info.duration);
+          interval();
+      }else {
+        console.log("监听到false");
+        
+        audio.value.pause();
+        clearInterval(timer.value);
+        clearInterval(timerSong.value);
+      }
+    })
+
+    // 监听歌词页面拖动进度条的变化
+    watch(() => store.state.song_info.progressTime, () => {
+      audio.value.currentTime = store.state.song_info.progressTime;
+    })
+
+    onMounted(async () => {
+      console.log(router.currentRoute.value);
+      if(store.state.song_info.id) {
+        // 请求URL
+        const info = await getSongUrl(store.state.song_info.id);
+        store.commit("set_song_url",info.data[0].url);
       }
 
+      // if(!store.state.song_info.lyric.length){
+      //   const data = await getLyric(store.state.song_info.id);
+      //   console.log(data);
+      //   console.log(data.lrc.lyric.split("["));
+      //   let i = data.lrc.lyric.split("[");
+      //   let x:Array<{}> = [];
+      //   i.forEach((item:any) => {
+      //     lyric.push({
+      //       // time: item.split("]")[0].split(".")[0],
+      //       time: item.split("]")[0],
+      //       lyric: item.split("]")[1] || '',
+      //     })
+      //   });
+      //   // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
+      //   lyric.push({
+      //     time: '99:99:99.9999',
+      //     lyric: ''
+      //   })
+        
+
+      //   lyricScorll.bs = new BScroll(".lyric", {
+      //     scrollX: false,
+      //     scrollY: true,
+      //     click: true,
+      //     mouseWheel: false,
+      //     // disableMouse: true
+      //   })
+
+      //   nextTick(() => {
+      //     lyricScorll.bs.refresh();
+      //     console.log("歌词ref");
+          
+      //     console.log(lyricRef);
+          
+      //   })
+        
+      //   console.log(x);
+      //   // lyric = x;
+      //   console.log(lyric);
+      //   console.log("这是歌词");
+        
+      //   x.forEach((item: any) => {
+      //     lyricTime.push(item.time)
+      //   })
+      // }
+
+      audio.value.addEventListener('progress', () => {
+        console.log('<-- 请求缓冲数据 ing -->')
+        // store.commit("play",false);
+        let currentBuffered = audio.value.buffered.end(audio.value.buffered.length - 1)
+        console.log(currentBuffered);
+        store.commit("set_song_buffered",currentBuffered);
+      });
+      audio.value.addEventListener('loadstart', () => {
+        console.log('<-- 开始请求数据 -->')
+        console.log(audio.value.networkState);
+        
+        // store.commit("play",false);
+        // this.SET_PAGE_DATA(['audio', 'isLoading', true])
+      })
+      audio.value.addEventListener('error', () => {
+        console.log('<-- 请求失败 -->')
+        console.log(audio.value.networkState);
+        // store.commit("play",false);
+        Toast.fail('数据缓冲失败');
+        // this.SET_PAGE_DATA(['audio', 'isLoading', false])
+        // if (!window.navigator.onLine) this.$toast('歌曲请求失败，请检查网络')
+      })
+      audio.value.addEventListener('stalled', () => {
+        console.log('<-- 网络失速 -->')
+        console.log(audio.value.networkState);
+        // store.commit("play",false);
+        if(!store.state.song_info.duration) {
+          store.commit("set_song_allTime",0);
+        }
+        Toast('网络失速')
+      })
+     audio.value.addEventListener('waiting', () => {
+        console.log('<-- 等待数据 ing -->')
+        // store.commit("play",false);
+        // this.SET_PAGE_DATA(['audio', 'isLoading', true])
+      })
+      audio.value.addEventListener('canplaythrough', () => {
+        console.log('<-- 加载完毕，可以播放 -->')
+        console.log(audio.value.networkState);
+        store.commit("set_song_allTime",audio.value.duration);
+        // if (getGLOBAL('trigger').currentTime !== 0) {
+        //   this.audio.currentTime = getGLOBAL('trigger').currentTime
+        //   this.SET_PAGE_DATA(['trigger', 'currentTime', 0])
+        // }
+        // this.SET_PAGE_DATA(['audio', 'isLoading', false])
+        // this.audio.volume = 0.5
+        // this.audio.play()
+      })
+      
+      audio.value.addEventListener('networkState', (e:any) => {
+        console.log('<-- 当前音频网络状态为 -->')
+        console.log(e);
+        
+        // this.SET_PAGE_DATA(['audio', 'isPlaying', true])
+        // this.sendCurrentTime('set')
+      })
+      audio.value.addEventListener('play', () => {
+        console.log('<-- 播放 -->')
+        // this.SET_PAGE_DATA(['audio', 'isPlaying', true])
+        // this.sendCurrentTime('set')
+      })
+     audio.value.addEventListener('pause', () => {
+        console.log('<-- 暂停 -->')
+        // this.sendCurrentTime('clear')
+      })
+      audio.value.addEventListener('ended', () => {
+        console.log('<-- 播放结束 -->')
+        store.commit("play",false);
+        // let nextMusicIndex = null
+        // let tempLoopType = getGLOBAL('audio').loopType
+        // if (tempLoopType === 0) {
+        //   if (getGLOBAL('playIndex') === getGLOBAL('musicList').length - 1) {
+        //     this.SET_PAGE_DATA(['audio', 'isPlaying', false])
+        //     this.sendCurrentTime('clear')
+        //     this.SET_PAGE_DATA(['audio', 'currentTime', 0])
+        //     this.SET_PAGE_DATA(['player', 'lyricTarget', 0])
+        //     return
+        //   }
+        //   nextMusicIndex = getGLOBAL('playIndex') + 1
+        // } else if (tempLoopType === 1) {
+        //   nextMusicIndex = Math.floor(Math.random() * getGLOBAL('musicList').length)
+        // }
+        // if (/player/.test(this.$route.path)) {
+        //   this.SET_PAGE_DATA(['trigger', 'autoNext', !getGLOBAL('trigger').autoNext])
+        // } else {
+        //   this.requestMusic(getMusicList(nextMusicIndex).song.id)
+        // }
+      })
+
     })
+
+    const route = useRoute();
+    const animation = ref('slide');
+    animation.value = 'slide-left'
 
     onBeforeUnmount(() => {
       clearInterval(timer.value);
       clearInterval(timerSong.value);
-      window.removeEventListener('popstate', back, false);
     })
     
     // const onChange = (index: number) => {
@@ -315,7 +352,7 @@ export default defineComponent({
     //   index === 4 && router.push({ path: "/cloud" });
     // };
     return {
-      scroll,
+      animation,
       active,
       audio,
       img,
@@ -328,10 +365,14 @@ export default defineComponent({
       show,
       showPopup,
       linePast,
+      point,
       img_pop,
       lyric,
       lyricTime,
+      lyricRef,
       getTime,
+      line,
+      goSong,
       current_song_time,
       showAllLyric,
       showLyric
@@ -340,18 +381,44 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="less">
-// @keyframes rotate_img {
-//   0% {
-//     transform: rotate(0deg);
-//   }
-//   100% {
-//     transform: rotate(360deg);
-//   }
-// }
-// .rotate {
-//   animation: rotate_img 5s linear infinite forwards;
-// }
+<style lang="less" scoped>
+.slide-right-enter-active,
+.slide-right-leave-active,
+.slide-left-enter-active,
+.slide-left-leave-active{
+    height: 100%;
+    will-change: transform;
+    transition: all 500ms cubic-bezier(.55,0,.1,1);
+    position: absolute;
+    backface-visibility: hidden;
+}
+.slide-right-enter-active{
+    opacity: 0;
+    transform: translate3d(-100%, 0, 0);
+}
+.slide-right-leave-active{
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+}
+.slide-left-enter-active{
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
+}
+.slide-left-leave-active{
+    opacity: 0;
+    transform: translate3d(-100%, 0, 0);
+}
+@keyframes rotate_img {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.rotate {
+  animation: rotate_img 5s linear infinite forwards;
+}
 .songDiv {
   height: 50px;
 }
@@ -399,183 +466,5 @@ export default defineComponent({
 }
 .fixed_out {
   bottom: -50px;
-}
-.popup {
-  background-color: rgba(0, 0, 0);
-  position: fixed;
-  width: 100vw;
-  height: 100vh;
-  bottom: 0;
-  z-index: 2222;
-  transition: all 0.3s;
-}
-.pop_down {
-  bottom: -100vh;
-}
-.song_pop {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  .bg_blur {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    filter: blur(100px);
-    z-index: -1;
-  }
-  .nav {
-    width: 100vw;
-    height: 40px;
-    box-sizing: border-box;
-    padding: 0 8px;
-    display: flex;
-    justify-content: space-between;
-    .back {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    img {
-      width: 30px;
-    }
-    .title {
-      color: #fff;
-      text-align: center;
-      .name {
-        font-size: 20px;
-      }
-      .author {
-        font-size: 12px;
-        opacity: 0.5;
-      }
-    }
-    img {
-      width: 30px;
-    }
-  }
-  .needle {
-    width: 150px;
-    // transform: translate(28%);
-    margin-left: 50px;
-    margin-bottom: -90px;
-    margin-top: -10px;
-    transform-origin:0% 0%;
-    transition: all 0.3s;
-    transform: rotate(-20deg);
-    z-index: 1;
-  }
-  .needle_play {
-    transform: rotate(-5deg);
-  }
-  .rotate {
-    width: 300px;
-    height: 300px;
-    opacity: 1;
-    .middle {
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      background-image: url("../../public/img/player/cover-bg-in.png");
-      background-size: cover;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      img {
-        width: 210px;
-        height: 210px;
-        border-radius: 50%;
-      }
-    }
-  }
-  .hidden {
-    opacity: 0;
-  }
-
-  .lyric_wrapper {
-    position: absolute;
-    width: 300px;
-    height: 35px;
-    top: 75%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    text-align: center;
-    font-size: 12px;
-    overflow: hidden;
-    box-sizing: border-box;
-    padding-top: 0;
-    color: rgba(255, 255, 255, 0.5);
-    .lyric_div {
-      height: 0;
-    }
-    .lyric_div_show {
-      height: 50%;
-    }
-    .lyric {
-      height: 35px;
-      .lyric_base {
-        transition: all 0.3s;
-      }
-      .lyric_white {
-        color: #fff;
-        font-size: 15px;
-      }
-    }
-    .lyric_show {
-      height: 50%;
-    }
-  }
-  .show_all_lyric {
-    height: 410px;
-    top: 40%;
-  }
-  .icon_top {
-    display: flex;
-    justify-content: space-between;
-    width: 280px;
-    margin-top: 50px;
-    margin-bottom: 20px;
-    img {
-      width: 30px;
-    }
-  }
-  .progress {
-    font-size: 12px;
-    color: #fff;
-    opacity: 0.5;
-    display: flex;
-    align-items: center;
-    .line {
-      width: 280px;
-      height: 2px;
-      margin: 0 8px;
-      display: flex;
-      align-items: center;
-      background-color: rgba(255, 255, 255, 0.2);
-      .past {
-        background-color: rgba(255, 255, 255, 0.8);
-        height: 100%;
-      }
-      .circle_point {
-        background-color: #fff;
-        border-radius: 50%;
-        width: 4px;
-        height: 4px;
-      }
-    }
-  }
-  .bottom_icon {
-    .icon_top;
-    margin-top: 10px;
-    .bigPlay {
-      width: 40px;
-    }
-  }
 }
 </style>
