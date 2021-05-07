@@ -3,15 +3,16 @@ import App from "./App.vue";
 import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
-// import {
-//   Button,
-//   Tabbar,
-//   TabbarItem,
-//   Icon,
-//   Swipe,
-//   SwipeItem,
-//   Image as VanImage,
-// } from "vant";
+import {
+  Button,
+  Tabbar,
+  TabbarItem,
+  Icon,
+  Swipe,
+  SwipeItem,
+  Toast,
+  Image as VanImage,
+} from "vant";
 import Vant from "vant";
 import "vant/lib/index.css";
 
@@ -22,5 +23,7 @@ const app = createApp(App);
 // app.use(Swipe);
 // app.use(SwipeItem);
 // app.use(VanImage);
+// app.use(VanImage);
+app.use(Toast);
 app.use(Vant);
 app.use(store).use(router).mount("#app");
