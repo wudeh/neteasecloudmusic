@@ -49,7 +49,7 @@ export default createStore({
     },
     // 设置歌曲现在播放时间
     set_song_time(state, time) {
-      state.song_info.currentTime = Math.floor(time);
+      state.song_info.currentTime = time;
     },
     // 设置歌曲拖动进度条的时间
     set_progress_time(state, time) {

@@ -141,11 +141,10 @@
                   }"
                   v-if="subItem.uiElement.subTitle"
                 >
-                  <span
-                    class="SQ"
-                    v-if="subItem.resourceExtInfo.songPrivilege.maxbr >= 999000"
-                    >SQ</span
-                  >
+                  <span class="SQ" v-if="subItem.resourceExtInfo.songPrivilege.maxbr >= 999000">SQ</span>
+                  <span class="vip" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">vip</span>
+                  <span class="hear_try" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">试听</span>
+                  <span class="dujia" v-if="subItem.resourceExtInfo.songPrivilege.flag == 1092">独家</span>
                   {{ subItem.uiElement.subTitle.title }}
                 </div>
               </div>
@@ -801,17 +800,6 @@ export default defineComponent({
           info.HOMEPAGE_MUSIC_MLOG = item;
           info.HOMEPAGE_MUSIC_MLOG.extInfo.map((i: any) => {
             console.log('开始处理');
-            
-            // axios({
-            //   method: 'get',
-            //   url: i.resource.mlogBaseData.coverUrl,
-            //   responseType: 'blob'
-            // }).then(res => {
-            //   console.log(res);
-            //   console.log(222222222);
-            //   i.img =  window.URL.createObjectURL(res);
-            // })
-            // i.img =  window.URL.createObjectURL(i.resource.mlogBaseData.coverUrl);
           })
         }
         if(item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
@@ -1212,11 +1200,25 @@ export default defineComponent({
             .song_subTitle {
               font-size: 12px;
               color: rgb(182, 182, 182);
-              .SQ {
+              .vip {
+                color: red;
                 border: 1px solid red;
-                color: #d70e19;
-                border-radius: 5px;
                 padding: 1px;
+                border-radius: 3px;
+                opacity: 0.6;
+              }
+              .dujia {
+                .vip
+              }
+              .SQ {
+                .vip
+              }
+              .hear_try {
+                color: rgb(0, 217, 255);
+                border: 1px solid rgb(0, 153, 255);
+                padding: 1px;
+                border-radius: 3px;
+                opacity: 0.6;
               }
             }
             .percent {
@@ -1332,7 +1334,7 @@ export default defineComponent({
       }
       .mirror {
         width: 100px;
-        height: 70px;
+        height: 65px;
         position: absolute;
         top: 50%;
         left: 50%;

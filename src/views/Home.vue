@@ -18,7 +18,7 @@
       </div>
       <img src="../../public/img/icons/list_icon.svg" alt="">
     </div>
-    <audio id="audio" ref="audio" :src="store.state.song_info.url"></audio>
+    <!-- <audio id="audio" ref="audio" :src="store.state.song_info.url"></audio> -->
      
     <!-- </van-popup> -->
     <!-- <van-tabbar
@@ -53,7 +53,7 @@ export default defineComponent({
     const router = useRouter();
     const active = ref(0);
     const store = useStore();
-    const audio = ref();
+    const audio = ref(new Audio());
     const linePast = ref();
     const point = ref();
     const line = ref();
@@ -63,37 +63,12 @@ export default defineComponent({
     const playIcon = require('../../public/img/icons/play_icon.svg')
     const playWhite = require('../../public/img/icons/play_white.svg')
     const stopWhite = require('../../public/img/icons/stop_white.svg')
-    let timer = ref();  // 控制头像旋转
     let timerSong = ref(); // 定时计算当前播放时间
     let current_song_time = ref('00:00.00');
-    const tempCurrentTime = ref(0); // 临时时间，用来计算手动点击进度条的时间
-    let num = ref(0);
     let lyric: Array<{time:string,lyric:string}> = reactive([]);
     let lyricTime: Array<string> = reactive([]);
     let lyricRef = ref()
-    const show = ref(false);  // 控制歌词页面展出
-    const showLyric = ref(false);  // 控制是否显示全部歌词
-    const autoMovePoint = ref(true); // 是否自动随歌曲播放自动移动圆点，为了实现手动移动进度条，在点击进度条时置为 false，
-    let lyricScorll = reactive<info>({
-      bs: ''
-    });
-
-    // 控制歌词页面展出
-    const showPopup = () => {
-      show.value = true;
-      // console.log(lyricRef);
-      console.log(audio.value.buffered);
-      console.log(audio.value.buffered.end(audio.value.buffered.length - 1));
-      
-      
-      
-      // window.addEventListener('popstate', back, false)
-    };
-
-    // 控制是否显示全部歌词
-    const showAllLyric = () => {
-      showLyric.value = !showLyric.value;
-    }
+  
 
     function change_play():void {
       store.commit("play",!store.state.song_info.isPlaying);
@@ -105,69 +80,20 @@ export default defineComponent({
 
     // 定时方法，用来设置歌词滚动和圆点移动
     function interval(): void {
-      timer.value = setInterval(() => {
-            store.commit("set_song_time",audio.value.currentTime);
-          },70)
-
           timerSong.value = setInterval(() => {
             console.log(audio.value.currentTime);
+            store.commit("set_song_time",audio.value.currentTime);
             store.commit("set_song_allTime",audio.value.duration);               
           },1000)
     }
-
-    // id 变化，请求新的歌曲信息
-    watch(() => store.state.song_info.id, async () => {
-      lyric.splice(0);
-      lyricTime.splice(0);
-      const data = await getLyric(store.state.song_info.id);
-        console.log(data);
-        console.log(data.lrc.lyric.split("["));
-        let i = data.lrc.lyric.split("[");
-        let x:Array<{}> = [];
-        i.forEach((item:any) => {
-          lyric.push({
-            // time: item.split("]")[0].split(".")[0],
-            time: item.split("]")[0],
-            lyric: item.split("]")[1] || '',
-          })
-        });
-        // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
-        lyric.push({
-          time: '99:99:99.9999',
-          lyric: ''
-        })
-        
-
-        lyricScorll.bs = new BScroll(".lyric", {
-          scrollX: false,
-          scrollY: true,
-          click: true,
-          mouseWheel: false,
-          // disableMouse: true
-        })
-
-        nextTick(() => {
-          lyricScorll.bs.refresh();
-          console.log("歌词ref");
-          
-          console.log(lyricRef);
-          
-        })
-        
-        console.log(x);
-        // lyric = x;
-        console.log(lyric);
-        console.log("这是歌词");
-        
-        x.forEach((item: any) => {
-          lyricTime.push(item.time)
-        })
-    })
 
     // 在首页监听播放状态的变化
     watch(() => store.state.song_info.isPlaying,(value,pre) => {
       console.log("监听到播放变化");
       if(value) {
+        if(!audio.value.src) {
+          audio.value.src = store.state.song_info.url;
+        }
         console.log(store.state.song_info.url);
           audio.value.autoplay = true;
           audio.value.play();
@@ -176,13 +102,18 @@ export default defineComponent({
           store.commit("set_song_allTime",audio.value.duration);
           console.log(store.state.song_info.duration);
           interval();
-      }else {
-        console.log("监听到false");
-        
+      }else {        
         audio.value.pause();
-        clearInterval(timer.value);
         clearInterval(timerSong.value);
       }
+    })
+
+    // 在首页监听播放状态的变化
+    watch(() => store.state.song_info.id,(value,pre) => {
+      console.log("监听到播放歌曲变更");
+      audio.value.pause();
+      audio.value.src = store.state.song_info.url;
+      audio.value.play();
     })
 
     // 监听歌词页面拖动进度条的变化
@@ -197,52 +128,6 @@ export default defineComponent({
         const info = await getSongUrl(store.state.song_info.id);
         store.commit("set_song_url",info.data[0].url);
       }
-
-      // if(!store.state.song_info.lyric.length){
-      //   const data = await getLyric(store.state.song_info.id);
-      //   console.log(data);
-      //   console.log(data.lrc.lyric.split("["));
-      //   let i = data.lrc.lyric.split("[");
-      //   let x:Array<{}> = [];
-      //   i.forEach((item:any) => {
-      //     lyric.push({
-      //       // time: item.split("]")[0].split(".")[0],
-      //       time: item.split("]")[0],
-      //       lyric: item.split("]")[1] || '',
-      //     })
-      //   });
-      //   // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
-      //   lyric.push({
-      //     time: '99:99:99.9999',
-      //     lyric: ''
-      //   })
-        
-
-      //   lyricScorll.bs = new BScroll(".lyric", {
-      //     scrollX: false,
-      //     scrollY: true,
-      //     click: true,
-      //     mouseWheel: false,
-      //     // disableMouse: true
-      //   })
-
-      //   nextTick(() => {
-      //     lyricScorll.bs.refresh();
-      //     console.log("歌词ref");
-          
-      //     console.log(lyricRef);
-          
-      //   })
-        
-      //   console.log(x);
-      //   // lyric = x;
-      //   console.log(lyric);
-      //   console.log("这是歌词");
-        
-      //   x.forEach((item: any) => {
-      //     lyricTime.push(item.time)
-      //   })
-      // }
 
       audio.value.addEventListener('progress', () => {
         console.log('<-- 请求缓冲数据 ing -->')
@@ -261,7 +146,7 @@ export default defineComponent({
       audio.value.addEventListener('error', () => {
         console.log('<-- 请求失败 -->')
         console.log(audio.value.networkState);
-        // store.commit("play",false);
+        store.commit("play",false);
         Toast.fail('数据缓冲失败');
         // this.SET_PAGE_DATA(['audio', 'isLoading', false])
         // if (!window.navigator.onLine) this.$toast('歌曲请求失败，请检查网络')
@@ -292,14 +177,6 @@ export default defineComponent({
         // this.audio.volume = 0.5
         // this.audio.play()
       })
-      
-      audio.value.addEventListener('networkState', (e:any) => {
-        console.log('<-- 当前音频网络状态为 -->')
-        console.log(e);
-        
-        // this.SET_PAGE_DATA(['audio', 'isPlaying', true])
-        // this.sendCurrentTime('set')
-      })
       audio.value.addEventListener('play', () => {
         console.log('<-- 播放 -->')
         // this.SET_PAGE_DATA(['audio', 'isPlaying', true])
@@ -312,25 +189,6 @@ export default defineComponent({
       audio.value.addEventListener('ended', () => {
         console.log('<-- 播放结束 -->')
         store.commit("play",false);
-        // let nextMusicIndex = null
-        // let tempLoopType = getGLOBAL('audio').loopType
-        // if (tempLoopType === 0) {
-        //   if (getGLOBAL('playIndex') === getGLOBAL('musicList').length - 1) {
-        //     this.SET_PAGE_DATA(['audio', 'isPlaying', false])
-        //     this.sendCurrentTime('clear')
-        //     this.SET_PAGE_DATA(['audio', 'currentTime', 0])
-        //     this.SET_PAGE_DATA(['player', 'lyricTarget', 0])
-        //     return
-        //   }
-        //   nextMusicIndex = getGLOBAL('playIndex') + 1
-        // } else if (tempLoopType === 1) {
-        //   nextMusicIndex = Math.floor(Math.random() * getGLOBAL('musicList').length)
-        // }
-        // if (/player/.test(this.$route.path)) {
-        //   this.SET_PAGE_DATA(['trigger', 'autoNext', !getGLOBAL('trigger').autoNext])
-        // } else {
-        //   this.requestMusic(getMusicList(nextMusicIndex).song.id)
-        // }
       })
 
     })
@@ -340,7 +198,8 @@ export default defineComponent({
     animation.value = 'slide-left'
 
     onBeforeUnmount(() => {
-      clearInterval(timer.value);
+      console.log("onBeforeUnmount");
+      
       clearInterval(timerSong.value);
     })
     
@@ -362,8 +221,6 @@ export default defineComponent({
       playWhite,
       stopWhite,
       store,
-      show,
-      showPopup,
       linePast,
       point,
       img_pop,
@@ -374,8 +231,6 @@ export default defineComponent({
       line,
       goSong,
       current_song_time,
-      showAllLyric,
-      showLyric
       // onChange,
     };
   },
@@ -437,13 +292,12 @@ export default defineComponent({
       width: 30px;
     }
   .song_img {
-    border-radius: 50%;
-    overflow: hidden;
     width: 40px;
     height: 40px;
     margin-bottom: 20px;
     img {
       width: 40px;
+      border-radius: 50%;
     }
   }
   .song_name {
