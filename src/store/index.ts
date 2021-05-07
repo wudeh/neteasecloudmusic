@@ -58,7 +58,7 @@ export default createStore({
     // 设置歌曲缓冲时间
     set_song_buffered(state, time) {
       state.song_info.buffered = time;
-    },
+    }
   },
   actions: {
     // 请求歌曲信息

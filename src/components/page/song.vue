@@ -36,11 +36,14 @@
         </div>
         <!-- 收藏，评论 -->
         <div class="icon_top">
-          <img src="../../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../../public/img/icons/comment_white.svg" alt="">
+          <img src="../../../public/img/icons/like_white.svg" alt="">
+          <img src="../../../public/img/icons/download.svg" @click="download()" alt="">
+          <img src="../../../public/img/icons/sing.svg" alt="">
+          <div class="comment">
+            <img src="../../../public/img/icons/comment_num.svg" alt="">
+            <div class="comment_num">{{commentNum}}</div>
+          </div>
+          <img src="../../../public/img/icons/songInfo.svg" alt="">
         </div>
         <!-- 进度条 -->
         <div class="progress">
@@ -53,11 +56,11 @@
         </div>
         <!-- 播放图标 -->
         <div class="bottom_icon">
-          <img src="../../../public/img/icons/comment_white.svg" alt="" @click="test">
-          <img src="../../../public/img/icons/comment_white.svg" alt="">
+          <img src="../../../public/img/icons/circulate.svg" alt="">
+          <img src="../../../public/img/icons/last_song.svg" alt="">
           <img class="bigPlay" @click.stop="change_play()" :src="store.state.song_info.isPlaying ? stopWhite : playWhite" alt="">
-          <img src="../../../public/img/icons/comment_white.svg" alt="">
-          <img src="../../../public/img/icons/comment_white.svg" alt="">
+          <img src="../../../public/img/icons/last_song.svg" style="transform:rotate(180deg)" alt="">
+          <img src="../../../public/img/icons/list_white.svg" alt="">
         </div>
       </div>
     </div>
@@ -68,8 +71,9 @@ import { defineComponent, ref,onBeforeMount,onMounted,watch,onBeforeUnmount,reac
 import { useRouter } from "vue-router";
 import { useStore } from 'vuex'
 import { getTime } from "../../utils/num"
+import downloadFile from "../../utils/download"
 import BScroll from "@better-scroll/core";
-import { getLyric, getSongUrl } from "../../api/song"
+import { getLyric, getSongUrl,getSongComment } from "../../api/song"
 interface info {
   bs: any;
 }
@@ -90,6 +94,7 @@ export default defineComponent({
 
     const tempCurrentTime = ref(0); // 临时时间，用来计算手动点击进度条的时间
     let current_song_time = ref('00:00.00');
+    const commentNum = ref("")
 
     const linePast = ref();
     const point = ref();
@@ -100,6 +105,10 @@ export default defineComponent({
 
     const back = () => {
       router.go(-1);
+    }
+
+    const download = () => {
+      downloadFile(store.state.song_info.url,store.state.song_info.name)
     }
 
     const lyricRequest = async () => {
@@ -143,11 +152,24 @@ export default defineComponent({
         });
       }
     }
-
-    onBeforeMount(() => {
-      console.log("onbeforMount");
-      
-    })
+    // 获取评论
+    const commentRequest = async () => {
+      const info = await getSongComment(store.state.song_info.id)
+      let total = info.total
+        if (total >= 100 && total < 1000) {
+          commentNum.value = '99+'
+        } else if (total >= 1000 && total < 10000) {
+          commentNum.value = '999+'
+        } else if (total === 10000) {
+          commentNum.value = '1w'
+        } else if (total > 10000 && total < 100000) {
+          commentNum.value = '1w+'
+        } else if (total >= 100000) {
+          commentNum.value = '10w+'
+        }else {
+          commentNum.value = commentNum.value.toString();
+        }
+    }
 
     onMounted(async () => {
       lyricScorll.bs = new BScroll(".lyric", {
@@ -166,6 +188,11 @@ export default defineComponent({
       if(store.state.song_info.id && !lyric.length) {
         lyricRequest();
       }
+      
+      // 如果有歌曲id 而没有评论数量就请求评论
+      if(store.state.song_info.id && !commentNum.value) {
+        commentRequest();
+      }
     })
 
     // 歌词变更重新计算滚动高度
@@ -175,10 +202,11 @@ export default defineComponent({
       })
     })
 
-    // 歌曲变更重新请求歌词
+    // 歌曲变更重新请求歌词，评论
     watch(() => store.state.song_info.id, () => {
       lyric.length = 0;
       lyricRequest();
+      commentRequest();
     })
 
     // 不在歌词页面不让滚动
@@ -296,6 +324,7 @@ export default defineComponent({
       point,
       lyric,
       lyricRef,
+      commentNum,
       getTime,
       line,
       processControlStart,
@@ -303,6 +332,7 @@ export default defineComponent({
       processControlEnd,
       current_song_time,
       showAllLyric,
+      download,
       showLyric
     }
   }
@@ -346,7 +376,7 @@ export default defineComponent({
     top: 0;
     bottom: 0;
     right: 0;
-    filter: blur(100px);
+    filter: blur(150px);
     z-index: -1;
   }
   .nav {
@@ -467,6 +497,19 @@ export default defineComponent({
     margin-bottom: 20px;
     img {
       width: 30px;
+    }
+    .comment {
+      position: relative;
+      display: flex;
+      align-items: center;
+      .comment_num {
+        position: absolute;
+        top: -25%;
+        left: 22%;
+        color: #fff;
+        font-size: 12px;
+        padding: 2px;
+      }
     }
   }
   .progress {

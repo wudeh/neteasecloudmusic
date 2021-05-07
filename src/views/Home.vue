@@ -99,7 +99,6 @@ export default defineComponent({
           audio.value.play();
           console.log("总时长");
           console.log(audio.value.duration); // 这是总时长
-          store.commit("set_song_allTime",audio.value.duration);
           console.log(store.state.song_info.duration);
           interval();
       }else {        
@@ -131,6 +130,7 @@ export default defineComponent({
 
       audio.value.addEventListener('progress', () => {
         console.log('<-- 请求缓冲数据 ing -->')
+        store.commit("set_song_allTime",audio.value.duration);
         // store.commit("play",false);
         let currentBuffered = audio.value.buffered.end(audio.value.buffered.length - 1)
         console.log(currentBuffered);

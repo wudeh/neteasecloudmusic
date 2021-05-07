@@ -154,7 +154,7 @@
       </bsscroll>
     </div>
     <!-- 精选音乐视频 -->
-    <div class="recommend" v-if="HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title">
+    <div class="recommend MUSIC_MLOG" v-if="HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title">
       <div class="rec_title">
         <div class="rec_des">
           {{ HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title }}
@@ -177,7 +177,7 @@
             @click="show(item.creativeId)"
           >
             <van-image
-              class="img"
+              class="item_img"
               show-loading
               radius="8"
               :src="item.resource.mlogBaseData.coverUrl"
@@ -1227,6 +1227,18 @@ export default defineComponent({
             }
           }
         }
+      }
+    }
+  }
+  .MUSIC_MLOG {
+    .item_img {
+      width: 110px;
+      height: 151px;
+      display: flex;
+      background-color: rgba(0,0,0,0.8);
+      align-items: center;
+      .van-image__img {
+        height: auto !important;
       }
     }
   }
