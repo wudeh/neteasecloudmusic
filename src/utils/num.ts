@@ -36,6 +36,45 @@ export function getTime(time: number): string {
   let sec = Math.floor(i % 60);
   // console.log("计算后的秒" + sec);
   let s = `${sec}`.padStart(2, '0');
+  if(Number.isNaN(min)) return "00:00"
   if(hour>0) return h + m +':' + s;
   return m +':' + s;
+}
+
+/**
+ * 评论发送日期转换
+ * @param {Number} t 时间戳
+ */
+ export function sendTimeConversion(t: any) {
+  let nowDate = null
+  let todayLast = null
+  if (nowDate === null || todayLast === null) {
+    // 当前 Unix 时间戳
+    nowDate = new Date().getTime()
+    // 今天 23:59:59.999 时间戳
+    todayLast = new Date(new Date().setHours(23, 59, 59, 999)).getTime()
+  }
+  if ((nowDate - t) <= 60000) {
+    return '刚刚'
+  } else if ((nowDate - t) > 60000 && (nowDate - t) <= 3600000) {
+    let pastTimeUnix = nowDate - t
+    let pastTime = new Date(Number(pastTimeUnix))
+    return `${pastTime.getMinutes()}分钟前`
+  } else if ((todayLast - t) > 3600000 && (todayLast - t) <= 86400000) {
+    let userDate = new Date(Number(t))
+    let UH = userDate.getHours() < 10 ? `0${userDate.getHours()}` : userDate.getHours()
+    let Um = userDate.getMinutes() < 10 ? `0${userDate.getMinutes()}` : userDate.getMinutes()
+    return `${UH}:${Um}`
+  } else if ((todayLast - t) > 86400000 && (todayLast - t) <= 172800000) {
+    let userDate = new Date(Number(t))
+    let UH = userDate.getHours() < 10 ? `0${userDate.getHours()}` : userDate.getHours()
+    let Um = userDate.getMinutes() < 10 ? `0${userDate.getMinutes()}` : userDate.getMinutes()
+    return `昨天${UH}:${Um}`
+  } else if ((todayLast - t) > 172800000 && (todayLast - t) <= 31557600000) {
+    let userDate = new Date(Number(t))
+    return `${userDate.getMonth() + 1}月${userDate.getDate()}日`
+  } else {
+    let userDate = new Date(Number(t))
+    return `${userDate.getFullYear()}年${userDate.getMonth() + 1}月${userDate.getDate()}日`
+  }
 }

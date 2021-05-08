@@ -33,3 +33,34 @@ export function getLyric(id: string): any {
 export function getSongComment(id: string,limit=20,offset?: number,before?: any): any {
   return axios.post("/comment/music",{id,limit,offset,before});
 }
+
+// 获取评论
+/**
+ * 
+ * @param id 资源id
+ * @param type 0: 歌曲 1: mv 2: 歌单 3: 专辑 4: 电台 5: 视频 6: 动态
+ * @param pageNo 分页参数,第N页,默认为1
+ * @param pageSize 分页参数,每页多少条数据,默认20
+ * @param sortType 排序方式,1:按推荐排序,2:按热度排序,3:按时间排序
+ * @param cursor 当sortType为3时且页数不是第一页时需传入,值为上一条数据的time
+ * @returns 
+ */
+export function getComment(id: number,type: number,pageNo: number,pageSize=20,sortType: number,cursor?: any): any {
+  return axios.post("/comment/new",{id,type,pageNo,pageSize,sortType,cursor});
+  // return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}&cursor=${cursor}&timestamp=1620481585789`);
+}
+
+// 获取楼层评论
+/**
+ * 
+ * @param id 资源id
+ * @param parentCommentId 楼层评论 id
+ * @param tpye 0: 歌曲 1: mv 2: 歌单 3: 专辑 4: 电台 5: 视频 6: 动态
+ * @param time 分页参数,取上一页最后一项的 time 获取下一页数据
+ * @param limit 取出评论数量 , 默认为 20
+ * @returns 
+ */
+export function getFloorComment(id: number,parentCommentId: number,type: number,time?: any,limit?:number): any {
+  return axios.post("/comment/floor",{id,parentCommentId,type,time,limit});
+  // return axios.get(`/comment/floor?parentCommentId=${parentCommentId}&id=${id}&type=${type}`);
+}

@@ -24,6 +24,6 @@ const app = createApp(App);
 // app.use(SwipeItem);
 // app.use(VanImage);
 // app.use(VanImage);
-app.use(Toast);
+// app.use(Toast);
 app.use(Vant);
 app.use(store).use(router).mount("#app");

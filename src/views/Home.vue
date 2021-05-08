@@ -6,8 +6,8 @@
         </keep-alive>
       </router-view>
     <!-- 用来撑开底部的盒子 -->
-    <div class="songDiv" v-if="store.state.song_info.id"></div>
-    <div class="song" :class="{fixed_out: !store.state.song_info.id}" @click="goSong()">
+    <div class="songDiv" v-if="store.state.song_info.id && router.currentRoute.value.name != 'song'"></div>
+    <div class="song" :class="{fixed_out: !store.state.song_info.id}" @click="goSong()" v-if="router.currentRoute.value.name != 'song'">
       <div class="song_img rotate"  :style="{animationPlayState: store.state.song_info.isPlaying ? 'running' : 'paused'}">
         <img :src="store.state.song_info.img" alt="">
       </div>
@@ -231,6 +231,7 @@ export default defineComponent({
       line,
       goSong,
       current_song_time,
+      router
       // onChange,
     };
   },

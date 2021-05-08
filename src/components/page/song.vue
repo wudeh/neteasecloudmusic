@@ -26,11 +26,11 @@
         </div>
         <!-- 歌词 -->
         <div class="lyric_wrapper" :class="{show_all_lyric: showLyric}" @click="showAllLyric()">
-            <!-- <div class="lyric_div" :class="{lyric_div_show: showLyric}"></div> -->
-            <div class="lyric" :class="{lyric_show: showLyric}">
+            <div class="lyric_line_time" :class="{lyric_lineTime_show: showLyricLine}">{{getTime(current_song_time)}}</div>
+            <div class="lyric" :class="{lyric_show: showLyric,lyric_line:showLyricLine}">
               <div  ref="lyricRef">
-                <div v-for="(item,index) in lyric" :key="index" :id=" `s` + index" :class="{lyric_base:true,lyric_white: item.time <= current_song_time && current_song_time <= lyric[index+1].time}" v-html="item.lyric"></div>
-                <div style="height:1000px"></div>
+                <div v-for="(item,index) in lyric" :key="index" :id=" `s` + index" :class="{lyric_base:true,lyric_white: item.time <= current_song_time && current_song_time < lyric[index+1].time}" v-html="item.lyric"></div>
+                <div class="lyric_bottom"></div>
               </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
           <img src="../../../public/img/icons/like_white.svg" alt="">
           <img src="../../../public/img/icons/download.svg" @click="download()" alt="">
           <img src="../../../public/img/icons/sing.svg" alt="">
-          <div class="comment">
+          <div class="comment" @click="goComment()">
             <img src="../../../public/img/icons/comment_num.svg" alt="">
             <div class="comment_num">{{commentNum}}</div>
           </div>
@@ -73,6 +73,7 @@ import { useStore } from 'vuex'
 import { getTime } from "../../utils/num"
 import downloadFile from "../../utils/download"
 import BScroll from "@better-scroll/core";
+import {Toast} from "vant"
 import { getLyric, getSongUrl,getSongComment } from "../../api/song"
 interface info {
   bs: any;
@@ -87,13 +88,14 @@ export default defineComponent({
     const stopWhite = require('../../../public/img/icons/stop_white.svg')
 
     const showLyric = ref(false);  // 控制是否显示全部歌词
+    const showLyricLine = ref(false)
     const autoMovePoint = ref(true); // 是否自动随歌曲播放自动移动圆点，为了实现手动移动进度条，在点击进度条时置为 false，
-    let lyric: Array<{time:string,lyric:string}> = reactive([]);
+    let lyric: Array<{time:number,lyric:string}> = reactive([]);
     const scroll = ref(true)
     let lyricRef = ref()
 
     const tempCurrentTime = ref(0); // 临时时间，用来计算手动点击进度条的时间
-    let current_song_time = ref('00:00.00');
+    let current_song_time = ref(0);
     const commentNum = ref("")
 
     const linePast = ref();
@@ -118,14 +120,14 @@ export default defineComponent({
       let i = data.lrc.lyric.split("[");
       i.forEach((item:any,index: number) => {
         let temp = {
-          time: item.split("]")[0].split(":").join(""),
+          time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 ,
           lyric: item.split("]")[1] || i[index+1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
         };
-        if(temp.lyric != "\n") lyric.push(temp);           
+        if(temp.lyric != "\n" && !Number.isNaN(temp.time)) lyric.push(temp);           
       });
       // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
       lyric.push({
-        time: '9999999999',
+        time: 9999,
         lyric: 'wudeh'
       })
       
@@ -140,7 +142,7 @@ export default defineComponent({
         let i = data.tlyric.lyric.split("[");
         i.forEach((item:any,index: number) => {
           let temp = {
-            time: item.split("]")[0].split(":").join(""),
+            time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 || 0,
             lyric: item.split("]")[1] || i[index+1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
           };
           lyric.forEach((item: any,index: number) => {
@@ -171,15 +173,12 @@ export default defineComponent({
         }
     }
 
+    // 去评论区
+    const goComment = () => {
+      router.push({path: "/comment",query: {id: store.state.song_info.id}})
+    }
+
     onMounted(async () => {
-      lyricScorll.bs = new BScroll(".lyric", {
-        scrollX: false,
-        scrollY: true,
-        click: true,
-        // bounce: false,
-        // mouseWheel: false,
-        // disableMouse: true
-      })
       console.log("mounted");
       // 可能会出现首页已经缓冲好了导致vuex中的缓冲时间不变化，进而导致缓冲进度条监听不执行，所以一进来就设置一下
       linePast.value.style.width = `${store.state.song_info.buffered / store.state.song_info.duration * 100}%`
@@ -188,6 +187,40 @@ export default defineComponent({
       if(store.state.song_info.id && !lyric.length) {
         lyricRequest();
       }
+
+      lyricScorll.bs = new BScroll(".lyric", {
+        probeType: 2, // 2 代表仅当用户手指滑动的时候触发 scroll 事件，3 的话 srollto 事件也会触发 scroll 事件
+        momentum: false, // 不允许惯性滑动
+        scrollX: false,
+        scrollY: true,
+        click: true,
+        disableTouch: false
+        // bounce: false,
+        // mouseWheel: false,
+        // disableMouse: true
+      })
+      lyricScorll.bs.on('beforeScrollStart', () => {
+        // showLyricLine.value = true;
+        // scroll.value = false;
+      })
+      lyricScorll.bs.on('scroll', (position: any) => {
+        // 用户滑动歌词显示指示线
+        showLyricLine.value = true;
+        // console.log(position.x, position.y)
+        // console.log(lyricScorll.bs.maxScrollY);
+        // console.log(lyricRef.value.children[0].offsetHeight);
+        let index = Math.abs(position.y) / lyricRef.value.children[0].offsetHeight
+        console.log(`当前拖动为第${Math.ceil(index)}句歌词`);
+        
+        current_song_time.value = lyric[Math.ceil(index) - 1].time;
+        console.log(current_song_time.value);
+      })
+      lyricScorll.bs.on("scrollEnd", () => {
+        showLyricLine.value = false;
+        // 设置拖动进度条时间
+      store.commit("set_progress_time",current_song_time.value)
+      })
+      lyricScorll.bs.disable();
       
       // 如果有歌曲id 而没有评论数量就请求评论
       if(store.state.song_info.id && !commentNum.value) {
@@ -216,16 +249,16 @@ export default defineComponent({
         scroll.value = false
       }else {
         console.log("可以滚动");
-        scroll.value =true;
+        scroll.value = true;
       }
     })
 
 
     // 监听歌曲时间，用来设置歌词滚动和圆点移动
     watch(() => store.state.song_info.currentTime, () => {
-      
-      current_song_time.value = (getTime(store.state.song_info.currentTime.toString().split(".")[0])).split(":").join("") + "."+ store.state.song_info.currentTime.toString().split(".")[1];
-      if(scroll.value) {
+      // 不在歌词页面 和 展示指示线的情况下不能自动滚动歌词
+      if(scroll.value && !showLyricLine.value) {
+        current_song_time.value = store.state.song_info.currentTime;
         // 歌词滚动
         lyric.forEach((i:any,index,arr) => {
           if(current_song_time.value >= i.time && current_song_time.value <= arr[index+1].time) {
@@ -261,6 +294,13 @@ export default defineComponent({
       nextTick(() => {
         lyricScorll.bs.refresh();
       })
+      // 不显示全部歌词时候不让用户手指可以滑动
+      if(!showLyric.value) {
+        lyricScorll.bs.disable();
+        showLyricLine.value = false;
+      }else {
+        lyricScorll.bs.enable();
+      }
     }
 
     // 进度条拖动部分，ev 是事件对象，用来获取点击的位置
@@ -314,6 +354,7 @@ export default defineComponent({
     };
 
     return {
+      goComment,
       back,
       playWhite,
       stopWhite,
@@ -324,6 +365,7 @@ export default defineComponent({
       point,
       lyric,
       lyricRef,
+      showLyricLine,
       commentNum,
       getTime,
       line,
@@ -356,7 +398,7 @@ export default defineComponent({
   width: 100vw;
   height: 100vh;
   bottom: 0;
-  z-index: 2222;
+  z-index: 222;
   transition: all 0.3s;
 }
 .pop_down {
@@ -472,17 +514,40 @@ export default defineComponent({
       .lyric_base {
         transition: all 0.3s;
         height: 30px;
-        margin-bottom: 10px;
+        padding-bottom: 10px;
+        box-sizing: border-box;
         font-size: 13px;
       }
       .lyric_white {
         color: #fff;
         font-size: 15px;
       }
+      .lyric_bottom {
+        height: 180px;
+      }
     }
     .lyric_show {
       height: 50%;
-      margin-top: 65%;
+      width: 80%;
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      right: 0;
+      transform: translate(-50%);
+    }
+    .lyric_line {
+      border-top: 1px solid #fff;
+    }
+    .lyric_line_time {
+      position: absolute;
+      left: 90%;
+      top: 48.4%;
+      font-size: 12px;
+      color: #fff;
+      opacity: 0;
+    }
+    .lyric_lineTime_show {
+      opacity: 1;
     }
   }
   .show_all_lyric {

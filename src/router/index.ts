@@ -37,33 +37,19 @@ const routes: Array<RouteRecordRaw> = [
         component: () =>
           import(/* webpackChunkName: "login" */ "@/components/discover.vue"),
       },
-      {
-        path: "/boke",
-        name: "boke",
-        component: () =>
-          import(/* webpackChunkName: "login" */ "@/components/boke.vue"),
-      },
-      {
-        path: "/person",
-        name: "person",
-        component: () =>
-          import(/* webpackChunkName: "login" */ "@/components/person.vue"),
-      },
-      {
-        path: "/Ksing",
-        name: "Ksing",
-        component: () =>
-          import(/* webpackChunkName: "login" */ "@/components/Ksing.vue"),
-      },
-      {
-        path: "/cloud",
-        name: "cloud",
-        component: () =>
-          import(/* webpackChunkName: "login" */ "@/components/cloud.vue"),
-      },
+      
     ],
   },
-  
+    {
+      path: "/comment",
+      name: "comment",
+      component: () => import(/* webpackChunkName: "login" */ "@/components/page/comment.vue"),
+      meta: {
+        keepAlive: true,
+        level: 2,
+        transitionName: ""
+      }
+    }
 ];
 
 const router = createRouter({
