@@ -1,10 +1,10 @@
 // 过滤播放量函数
 export function numFilter(num: number): number | string {
   if (num >= 100000 && num < 100000000) {
-    const i = Math.floor(num / 10000);
+    const i = (num / 10000).toFixed(1);
     return i + "万";
   } else if (num >= 100000000) {
-    const i = Math.floor(num / 100000000);
+    const i = (num / 100000000).toFixed(1);
     return i + "亿";
   }
   return num;

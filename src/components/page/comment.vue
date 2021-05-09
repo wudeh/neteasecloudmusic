@@ -1,33 +1,45 @@
 <template>
-  <!-- 导航 -->
-
+<van-list
+  v-model:loading="requestLoading"
+  v-model:error="error"
+  :finished="finish"
+  :immediate-check="false"
+  error-text="请求失败，点击重新加载"
+  finished-text="已经到底啦"
+  @load="onLoad"
+>
+<!-- 导航 -->
+<van-sticky>
   <div class="nav">
-    <div class="back">
-      <img style="transform: translate(180deg)" src="../../../public/img/icons/play.svg" alt="" />
+    <div class="back" @click="router.go(-1)">
+      <img src="../../../public/img/icons/left_arrow_black.svg" alt="" />
     </div>
     <div class="comment_count">评论({{ commentTotal }})</div>
   </div>
-
+</van-sticky>
   <!-- 音乐信息 -->
-  <!-- <van-skeleton title :row="3" :loading="loading"> -->
   <div class="song_info">
     <div class="img">
-      <van-image width="90" height="90" :src="img" />
+      <van-image class="song_img" :src="img" />
     </div>
-    <div class="info">
+    <van-skeleton title :row="3" :loading="name == ``" />
+    <div class="info" v-if="name">
       <div class="title">{{ name }}</div>
       <div class="singer">{{ singer }}</div>
     </div>
   </div>
   <!-- </van-skeleton> -->
   <!-- 评论选择区 -->
-  <van-sticky>
+  <van-sticky :offset-top="50">
     <div class="comment_choose">
       <div class="title">评论区</div>
-      <div class="choose">
-        <span class="choosed">推荐</span>
-        <span>最热</span>
-        <span>最新</span>
+      <div class="choose" v-show="!arrloading">
+        <!-- <span :class="{choosed: sortType == 1}" @click="change_sortType(1)">推荐</span>
+        <span :class="{choosed: sortType == 2}" @click="change_sortType(2)">最热</span>
+        <span :class="{choosed: sortType == 3}" @click="change_sortType(3)">最新</span> -->
+        <van-dropdown-menu >
+          <van-dropdown-item @change="change_sortType()" v-model="sortType" :options="sortTypeList" />
+        </van-dropdown-menu>
       </div>
     </div>
   </van-sticky>
@@ -50,7 +62,7 @@
               </div>
             </div>
             <div class="like_count">
-              <span class="count">{{ item.likedCount }}</span>
+              <span class="count">{{ numFilter(item.likedCount) }}</span>
               <img v-if="item.liked" src="../../../public/img/icons/liked.svg" alt="" />
               <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
             </div>
@@ -61,18 +73,57 @@
       </div>
     </div>
   </van-skeleton>
+  <van-skeleton title avatar :row="3" :loading="arrloading" />
+  <van-skeleton title avatar :row="3" :loading="arrloading" />
+  <van-skeleton title avatar :row="3" :loading="arrloading" />
+</van-list>
+
   <!-- 楼层弹出评论 -->
   <van-popup
     v-model:show="showFloor"
     closeable
     close-icon-position="top-left"
     position="bottom"
-    :style="{ height: '60%' }"
+    :style="{ height: '80%' }"
+  >
+    
+  <van-list
+    v-model:loading="floorLoading"
+    v-model:error="floorError"
+    :immediate-check="false"
+    :finished="floorFinish"
+    error-text="请求失败，点击重新加载"
+    finished-text="已经到底啦"
+    @load="onLoadFloor"
   >
     <div class="floor">
+      <div class="reply_count">回复({{floorArr.length}})</div>
+      <div class="comment_item floor_top">
+        <div class="avatar">
+          <van-image round width="30" height="30" :src="floorTopComment.user.avatarUrl" />
+        </div>
+        <div class="info">
+          <div class="top">
+            <div class="top_left">
+              <div class="name">{{ floorTopComment.user.nickname }}</div>
+              <div class="time">
+                <span class="time">{{ sendTimeConversion(floorTopComment.time) }}</span>
+                <!-- <span v-if="item.tag.datas" style="margin: 0 2px">-</span> -->
+                <!-- <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span> -->
+              </div>
+            </div>
+            <div class="like_count">
+              <span class="count">{{ numFilter(floorTopComment.likedCount) }}</span>
+              <img v-if="floorTopComment.liked" src="../../../public/img/icons/liked.svg" alt="" />
+              <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
+            </div>
+          </div>
+          <div class="text">{{ floorTopComment.content }}</div>
+        </div>
+      </div>
+      <div class="all_reply">全部回复</div>
       <div class="comment_item" v-for="item in floorArr" :key="item.commentId">
         <div class="avatar">
-          <!-- <img :src="item.user.avatarUrl" alt=""> -->
           <van-image round width="30" height="30" :src="item.user.avatarUrl" />
         </div>
         <div class="info">
@@ -86,7 +137,7 @@
               </div>
             </div>
             <div class="like_count">
-              <span class="count">{{ item.likedCount }}</span>
+              <span class="count">{{ numFilter(item.likedCount) }}</span>
               <img v-if="item.liked" src="../../../public/img/icons/liked.svg" alt="" />
               <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
             </div>
@@ -100,15 +151,17 @@
         </div>
       </div>
     </div>
-  
+  </van-list>
   </van-popup>
+  
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, reactive, onBeforeMount, toRefs } from "vue";
 import { getComment, getSongInfo, getFloorComment } from "../../api/song";
 import { useRouter } from "vue-router";
-import { sendTimeConversion } from "../../utils/num";
+import { sendTimeConversion, numFilter } from "../../utils/num";
+
 interface info {
   img: string;
   name: string;
@@ -118,13 +171,21 @@ interface info {
   pageNo: number;
   floorPageNo: any;
   sortType: number;
+  sortTypeName: string,
+  sortTypeList: Array<any>,
   cursor: any; // 当sortType为3时且页数不是第一页时需传入,值为上一条数据的time
   arr: Array<any>;
   floorArr: Array<any>;
   floorTopComment: any,
   showFloor: boolean,
+  floorLoading: boolean,
+  floorFinish: boolean,
+  floorError: false,
   imgloading: boolean;
   arrloading: boolean;
+  requestLoading: boolean, // 请求是否完成
+  error: boolean,
+  finish: boolean // 是否没有更多数据了
 }
 export default defineComponent({
   name: "comment",
@@ -140,13 +201,21 @@ export default defineComponent({
       pageNo: 1,
       floorPageNo: 1,
       sortType: 1,
+      sortTypeName: "",
+      sortTypeList: [],
       cursor: "",
       arr: [],
       floorArr: [],
-      floorTopComment: {},
+      floorTopComment: {user: {avatarUrl:""}},
+      floorLoading: false,
+      floorError: false,
+      floorFinish: false,
       showFloor: false,
       imgloading: true,
       arrloading: true,
+      requestLoading: false,
+      error: false,
+      finish: false
     });
     onBeforeMount(async () => {
       // 获取音乐图片，标题，歌手
@@ -161,10 +230,24 @@ export default defineComponent({
           data.singer += `/${item.name}`;
         }
       });
-      info = await getComment(id, 0, data.pageNo, 20, 0, data.cursor);
+      info = await getComment(id, 0, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
       data.commentTotal = info.data.totalCount;
       data.arr = info.data.comments;
+      info.data.sortTypeList.forEach((item: any,index: number) => {
+        data.sortTypeList.push({
+          text: item.sortTypeName,
+          value: item.sortType
+        })
+      })
+      data.sortType = data.sortTypeList[0].value;
+      console.log(data.sortTypeList);
+      
       data.arrloading = false;
+      data.pageNo +=1;
+
+      if(!info.data.hasMore) {
+        data.finish = true
+      }
       console.log("这是评论");
       console.log(info);
 
@@ -173,15 +256,67 @@ export default defineComponent({
 
     // 获取楼层评论
     const floorRequest = async (topComment: any,parentCommentId: number) => {
-      data.showFloor = true;
-      let info = await getFloorComment(id,parentCommentId,0,data.floorPageNo);
       data.floorTopComment = topComment;
+      data.showFloor = true;
+      data.floorArr = [];
+      data.floorFinish = false;
+      data.floorLoading = true;
+      let info = await getFloorComment(id,parentCommentId,0,data.floorPageNo);
+      console.log(data.floorTopComment);
       data.floorArr = info.data.comments;
+      data.floorPageNo +=1;
+      data.floorPageNo = info.data.time;
+      if(!info.data.hasMore) {
+        data.floorFinish = true;
+      }
+      data.floorLoading = false;
+    }
+
+    // 加载更多楼层评论
+    const onLoadFloor = async () => {
+      data.floorLoading = true;
+      let info = await getFloorComment(id,data.floorTopComment.commentId,0,data.floorPageNo);
+      data.floorArr = data.floorArr.concat(info.data.comments);
+      data.floorPageNo +=1;
+      data.floorLoading = false;
+      data.floorPageNo = info.data.time;
+      if(!info.data.hasMore) {
+        data.floorFinish = true;
+      }
+    }
+
+    // 加载更多评论
+    const onLoad = async () => {
+      data.requestLoading = true;
+      let info = await getComment(id, 0, data.pageNo, 20, data.sortType, data.cursor);
+      data.requestLoading = false;
+      data.commentTotal = info.data.totalCount;
+      data.cursor = info.data.cursor;
+      data.arr = data.arr.concat(info.data.comments);
+      data.arrloading = false;
+      data.pageNo +=1;
+      if(!info.data.hasMore) {
+        data.finish = true
+      }
+    }
+
+    const change_sortType = async (index: any) => {
+      // data.sortType = index;
+      console.log(data.sortType);
+      
+      data.pageNo = 1;
+      data.arr = [];
+      onLoad();
     }
 
     return {
       ...toRefs(data),
       sendTimeConversion,
+      numFilter,
+      onLoad,
+      onLoadFloor,
+      router,
+      change_sortType,
       floorRequest
     };
   },
@@ -197,10 +332,19 @@ export default defineComponent({
   display: flex;
   padding: 8px;
   background-color: #fff;
+  .back {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    img {
+      width: 30px;
+    }
+  }
   .comment_count {
-    font-size: 25px;
+    font-size: 20px;
     font-weight: bold;
     margin-left: 10px;
+    line-height: 50px;
   }
 }
 
@@ -211,11 +355,12 @@ export default defineComponent({
   display: flex;
   .img {
     padding: 8px;
+    // width: 90px;
+    // height: 90px;
     border-radius: 8px;
-    img {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
+    .song_img {
+      width: 80px;
+      height: 80px;
     }
   }
   .info {
@@ -240,6 +385,11 @@ export default defineComponent({
   justify-content: space-between;
   padding: 8px;
   height: 30px;
+  .van-dropdown-menu__bar {
+      height: auto !important;
+      box-shadow: 0;
+      background-color: red;
+    }
   .choose {
     width: 120px;
     display: flex;
@@ -277,6 +427,11 @@ export default defineComponent({
             .time;
           }
         }
+        .like_count {
+          span {
+            margin-right: 2px;
+          }
+        }
       }
       .text {
         margin: 3px 0;
@@ -289,9 +444,29 @@ export default defineComponent({
 }
 .floor {
   .comment_area;
-  padding-top: 30px;
+  background-color: rgba(0,0,0,0.1);
+  .reply_count {
+    height: 52px;
+    line-height: 52px;
+    // font-size: 18px;
+    padding-left: 50px;
+    background-color: #fff;
+  }
+  .all_reply {
+    .reply_count;
+  }
+  .floor_top {
+    margin-bottom: 8px;
+  }
+  .comment_item {
+    background-color: #fff;
+    .avatar {
+      padding-left: 1vw;
+    }
+  }
   .beReplied_item {
     padding: 8px;
+    background-color: #fff;
     .beReplied_name {
       color: rgb(0, 153, 255);
     }
@@ -299,5 +474,13 @@ export default defineComponent({
       color: #ccc;
     }
   }
+}
+:deep(.van-dropdown-menu__bar) {
+  box-shadow: 0 0 0 0;
+  height: auto;
+}
+
+:deep(.van-popup__close-icon--top-left) {
+  left: 3.0667vw;
 }
 </style>

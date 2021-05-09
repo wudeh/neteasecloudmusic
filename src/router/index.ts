@@ -49,7 +49,17 @@ const routes: Array<RouteRecordRaw> = [
         level: 2,
         transitionName: ""
       }
-    }
+    },
+    {
+      path: "/search",
+      name: "search",
+      component: () => import(/* webpackChunkName: "login" */ "@/components/page/search.vue"),
+      meta: {
+        keepAlive: true,
+        level: 2,
+        transitionName: ""
+      }
+    },
 ];
 
 const router = createRouter({

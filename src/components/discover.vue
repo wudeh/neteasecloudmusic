@@ -3,13 +3,13 @@
     
     <div class="top">
       <!-- 导航栏 -->
-      <div class="nav" @click="login()">
+      <div class="nav" @click="goSearch()">
         <div class="pop">
           <van-icon name="chat-o" badge="" />
         </div>
         <div class="search">
           <van-icon name="search" />
-          <p>大家都在搜 想说</p>
+          <p>{{ searchWord }}</p>
         </div>
       </div>
       <!-- 轮播图 -->
@@ -566,7 +566,7 @@ import {
   watch,
   nextTick,
 } from "vue";
-import { getDiscoverInfo, getIconInfo } from "../api/discover";
+import { getDiscoverInfo, getIconInfo, getSearchWord } from "../api/discover";
 import { getSongUrl } from "../api/song";
 import { useRouter } from "vue-router";
 import { recentcontact, loginByPhoneAndPassword, logout } from "../api/user";
@@ -598,6 +598,7 @@ export default defineComponent({
     const info = reactive<any>({
       cursor: {},  // 首页在登录状态下需要带上上一次请求回来的 cursor，作用相当于分页的页数
       numFilter: numFilter,// 播放量过滤函数
+      searchWord: "",
       swiper: [], // 轮播图
       icon: [], // 圆形图标数据
       // 推荐歌单
@@ -860,6 +861,8 @@ export default defineComponent({
       })
       
       }
+      let word = await getSearchWord();
+      info.searchWord = word.data.showKeyword;
     });
 
     // 获取 top 的dom 元素, 根据轮播图轮播事件动态改变背景图片模糊
@@ -926,6 +929,10 @@ export default defineComponent({
       localStorage.setItem("tokenMusic", info.token);
     }
 
+    const goSearch = () => {
+      router.push({path: "/search"})
+    }
+
     // 退出登录
     function logoutDD(): void {
       localStorage.removeItem("cookieMusic");
@@ -945,6 +952,7 @@ export default defineComponent({
       active,
       show,
       login,
+      goSearch,
       logoutDD,
       onChange,
       topBg,
