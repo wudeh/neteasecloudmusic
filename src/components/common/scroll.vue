@@ -1,6 +1,6 @@
 <template>
   <div :class="name" style="width: 100%; height: 100%">
-    <div class="scrollDiv">
+    <div :class="{scrollDiv: props.scrollX}">
       <slot></slot>
     </div>
   </div>
@@ -61,7 +61,7 @@ export default defineComponent({
     // 列表的数据
     scrollData: {
       type: Array,
-      default: null,
+      default: [],
     },
     // 是否派发滚动到底部的事件，用于上拉加载
     pullup: {
@@ -94,22 +94,25 @@ export default defineComponent({
         click: false,
         scrollX: props.scrollX,
         scrollY: props.scrollY,
-        disableMouse: false,
-        disableTouch: false,
-        eventPassthrough: "vertical",
+        // pullDownRefresh: true
+        // disableMouse: false,
+        // disableTouch: false,
+        // eventPassthrough: "vertical",
       });
 
-      console.log(props.scrollX);
+      // console.log(props.scrollX);
       // data.bs.on("scrollEnd", () => {
 
       // })
     }
 
     // watch(
-    //   () => props.scrollData,
+    //   () => props.scrollData.length,
     //   () => {
     //     nextTick(() => {
     //       data.bs.refresh();
+    //       console.log("数据改变了");
+          
     //     });
     //   }
     // );
@@ -117,10 +120,10 @@ export default defineComponent({
     onMounted(() => {
       // 在 DOM 渲染完毕后初始化 better-scroll
       initScroll();
-      // window.addEventListener("resize", () => {
-      //   data.bs.refresh();
-      //   console.log("window resize");
-      // });
+      // data.bs.on("pullingDown",() => {
+      //   console.log("下拉了");
+        
+      // })
     });
 
     onBeforeUnmount(() => {
@@ -136,6 +139,7 @@ export default defineComponent({
 
     return {
       initScroll,
+      props,
       ...toRefs(data),
     };
   },

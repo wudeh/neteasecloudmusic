@@ -8,6 +8,13 @@
   finished-text="已经到底啦"
   @load="onLoad"
 >
+ <template v-slot:loading>
+      <div style="display:flex;align-items:center;justify-content:center;">
+        <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+        <span>加载中...</span>
+      </div>
+ </template>
+
 <!-- 导航 -->
 <van-sticky>
   <div class="nav">
@@ -96,6 +103,12 @@
     finished-text="已经到底啦"
     @load="onLoadFloor"
   >
+    <template v-slot:loading>
+      <div style="display:flex;align-items:center;justify-content:center;">
+        <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+        <span>加载中...</span>
+      </div>
+    </template>
     <div class="floor">
       <div class="reply_count">回复({{floorArr.length}})</div>
       <div class="comment_item floor_top">

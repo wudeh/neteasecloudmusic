@@ -18,9 +18,14 @@ export default createStore({
       playList: [], // 播放列表
       playMode: '', // 播放模式
       timer: null // 定时器
-    }
+    },
+    showLoading: true
   },
   mutations: {
+    // 设置加载中
+    set_load(state, i) {
+      state.showLoading = i;
+    },
     // 设置歌曲信息
     setSongInfo(state, song) {
       state.song_info.id = song.id;

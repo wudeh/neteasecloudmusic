@@ -1,17 +1,17 @@
 <template>
-  <div class="discover">
-    
-    <div class="top">
-      <!-- 导航栏 -->
-      <div class="nav" @click="goSearch()">
-        <div class="pop">
-          <van-icon name="chat-o" badge="" />
-        </div>
-        <div class="search">
-          <van-icon name="search" />
-          <p>{{ searchWord }}</p>
-        </div>
-      </div>
+<!-- 导航栏 -->
+  <div class="nav" @click="goSearch()">
+    <div class="pop">
+      <van-icon name="chat-o" badge="" />
+    </div>
+    <div class="search">
+      <van-icon name="search" />
+      <p>{{ searchWord }}</p>
+    </div>
+  </div>
+  <div class="discover" v-if="swiper.length">
+    <bsscroll :scrollY="true" name="discover_scroll" :scrollData="swiper" :pulldown="true">
+      <div class="top">
       <!-- 轮播图 -->
       <div class="swiper">
         <van-swipe
@@ -177,7 +177,7 @@
             @click="show(item.creativeId)"
           >
             <van-image
-              class="item_img"
+              class="img"
               show-loading
               radius="8"
               :src="item.resource.mlogBaseData.coverUrl"
@@ -552,6 +552,8 @@
         </div>
       </bsscroll>
     </div>
+    </bsscroll>
+    
   </div>
 </template>
 
@@ -688,10 +690,12 @@ export default defineComponent({
 
     // 数据请求
     onBeforeMount(async () => {
+      store.commit("set_load", true)
       let discoverInfo = await getDiscoverInfo(info.cursor);
       const iconInfo = await getIconInfo();
       // 圆形图标
       info.icon = iconInfo.data;
+      store.commit("set_load", false)
       // 分页数据
       info.cursor = discoverInfo.data.cursor;
       discoverInfo.data.blocks.map((item: any) => {
@@ -967,10 +971,7 @@ export default defineComponent({
 </script>
 
 <style lang="less" scoped>
-.discover {
-  overflow: hidden;
-  // padding-bottom: 100px;
-  .nav {
+.nav {
     position: fixed;
     z-index: 1111;
     top: 0;
@@ -1001,6 +1002,11 @@ export default defineComponent({
       }
     }
   }
+.discover {
+  // overflow: hidden;
+  width: 100vw;
+  height: 617px;
+  
   
   .top {
     position: relative;
@@ -1238,18 +1244,18 @@ export default defineComponent({
       }
     }
   }
-  .MUSIC_MLOG {
-    .item_img {
-      width: 110px;
-      height: 151px;
-      display: flex;
-      background-color: rgba(0,0,0,0.8);
-      align-items: center;
-      .van-image__img {
-        height: auto !important;
-      }
-    }
-  }
+  // .MUSIC_MLOG {
+  //   .item_img {
+  //     width: 110px;
+  //     height: 151px;
+  //     display: flex;
+  //     background-color: rgba(0,0,0,0.8);
+  //     align-items: center;
+  //     .van-image__img {
+  //       height: auto !important;
+  //     }
+  //   }
+  // }
   // 音乐日历
   .calendar {
     .recommend;

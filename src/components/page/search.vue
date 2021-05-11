@@ -5,6 +5,7 @@
         v-model="word"
         @update:model-value="suggest()"
         placeholder="请输入搜索关键词"
+        @search="onSearch"
       />
     </form>
     <!-- 历史搜索 -->
@@ -15,10 +16,10 @@
        </div>
      </div>
      <!-- 热搜 -->
-    <div class="hot">
+    <div class="hot" v-if="hotWord.length">
       <div class="title">热搜榜</div>
       <div class="list">
-        <div class="item" v-for="(item, index) in hotWord" :key="index">
+        <div class="item" v-for="(item, index) in hotWord" :key="index" @click="onSearch(item.searchWord)">
           <span :class="{three_color: index < 3,index: true}">{{index + 1}}</span>
          <span :class="{three_text: index < 3}">{{ item.searchWord}}</span> 
          <van-image class="img" v-if="item.iconUrl"  :src="item.iconUrl" />
@@ -35,6 +36,8 @@
 <script lang="ts">
   import {defineComponent, onBeforeMount,reactive, toRefs} from 'vue'
   import { getSearchHot, getSuggest } from "../../api/discover"
+  import { useStore } from 'vuex'
+  import { useRouter,useRoute } from "vue-router";
   interface info {
     word: string,
     hotWord: Array<any>,
@@ -45,6 +48,8 @@
   export default defineComponent({
     name: "search",
     setup: () => {
+      const store = useStore();
+      const router = useRouter();
       const data = reactive<info>({
         word: "",
         hotWord: [],
@@ -54,8 +59,10 @@
       })
 
       onBeforeMount(async () => {
+        store.commit("set_load", true)
         let info = await getSearchHot();
         data.hotWord = info.data;
+        store.commit("set_load", false)
       })
 
       const suggest = async (i: string) => {
@@ -72,8 +79,17 @@
         }, 500);
       }
 
+      const onSearch = (i: string) => {
+        if(i) {
+          router.push({path: "/searchResult", query: {word: i}})
+        }else {
+          router.push({path: "/searchResult", query: {word: data.word}})
+        }
+      }
+
       return {
         suggest,
+        onSearch,
         ...toRefs(data)
       }
     }

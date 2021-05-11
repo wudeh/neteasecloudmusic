@@ -26,3 +26,21 @@ export function getSearchHot(): any {
 export function getSuggest(word: string): any {
   return axios.get(`/search/suggest?keywords=${word}&type=mobile`);
 }
+
+// 搜索
+
+/**
+ * 
+ * @param keywords 关键词
+ * @param type 搜索种类
+ * @param offset 分页
+ * @param limit 返回数量
+ * @returns 
+ */
+export function getsearchResult(keywords: string,type=1,offset=0,limit=20): any {
+  if(type == 1) {
+    return axios.post(`/cloudsearch`,{ keywords, type, offset, limit});
+  }else {
+    return axios.post(`/search`,{ keywords, type, offset, limit});
+  }
+}

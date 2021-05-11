@@ -18,6 +18,14 @@
       </div>
       <img src="../../public/img/icons/list_icon.svg" alt="">
     </div>
+    <!-- 加载弹框 -->
+    <teleport to='#app'>
+      <div class="load" v-if="store.state.showLoading">
+        <img src="../../public/img/icons/loading.svg" alt="">
+        <span>加载中...</span>
+      </div>
+    </teleport>
+    
     <!-- <audio id="audio" ref="audio" :src="store.state.song_info.url"></audio> -->
      
     <!-- </van-popup> -->
@@ -238,6 +246,11 @@ export default defineComponent({
 });
 </script>
 <style lang="less" scoped>
+.home {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
 .slide-right-enter-active,
 .slide-right-leave-active,
 .slide-left-enter-active,
@@ -321,5 +334,18 @@ export default defineComponent({
 }
 .fixed_out {
   bottom: -50px;
+}
+.load {
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  img {
+    width: 20px;
+  }
 }
 </style>
