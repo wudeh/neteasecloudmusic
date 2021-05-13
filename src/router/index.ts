@@ -8,12 +8,16 @@ const routes: Array<RouteRecordRaw> = [
     meta: {
       keepAlive: true,
       level: 1,
-      transitionName: ""
+      transitionName: "",
     },
     children: [
       {
         path: "/songList",
         name: "songList",
+        meta: {
+          keepAlive: true,
+          level: 8,
+        },
         component: () => import(/* webpackChunkName: "login" */ "@/components/page/songList.vue"),
       },
       {
@@ -23,8 +27,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           keepAlive: true,
           level: 2,
-          transitionName: ""
-        }
+        },
       },
       {
         path: "/",
@@ -32,49 +35,49 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           keepAlive: true,
           level: 1,
-          transitionName: ""
         },
-        component: () =>
-          import(/* webpackChunkName: "login" */ "@/components/discover.vue"),
+        component: () => import(/* webpackChunkName: "login" */ "@/components/discover.vue"),
       },
-      
+      {
+        path: "/searchResult",
+        name: "searchResult",
+        component: () => import(/* webpackChunkName: "login" */ "@/components/page/searchResult.vue"),
+        meta: {
+          keepAlive: true,
+          level: 3,
+        },
+      },
+      {
+        path: "/comment",
+        name: "comment",
+        component: () => import(/* webpackChunkName: "login" */ "@/components/page/comment.vue"),
+        meta: {
+          keepAlive: true,
+          level: 10,
+        },
+      },
+      {
+        path: "/search",
+        name: "search",
+        component: () => import(/* webpackChunkName: "login" */ "@/components/page/search.vue"),
+        meta: {
+          keepAlive: true,
+          level: 2,
+        },
+      },
     ],
   },
-    {
-      path: "/comment",
-      name: "comment",
-      component: () => import(/* webpackChunkName: "login" */ "@/components/page/comment.vue"),
-      meta: {
-        keepAlive: true,
-        level: 2,
-        transitionName: ""
-      }
-    },
-    {
-      path: "/search",
-      name: "search",
-      component: () => import(/* webpackChunkName: "login" */ "@/components/page/search.vue"),
-      meta: {
-        keepAlive: true,
-        level: 2,
-        transitionName: ""
-      }
-    },
-    {
-      path: "/searchResult",
-      name: "searchResult",
-      component: () => import(/* webpackChunkName: "login" */ "@/components/page/searchResult.vue"),
-      meta: {
-        keepAlive: true,
-        level: 2,
-        transitionName: ""
-      }
-    },
 ];
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes,
 });
+
+
+// router.beforeEach((to: any,from: any, next) => {
+//   next()
+  
+// })
 
 export default router;

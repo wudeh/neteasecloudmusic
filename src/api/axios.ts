@@ -16,7 +16,7 @@ axios.defaults.withCredentials = true;
 axios.interceptors.request.use((config) => {
   console.log("请求拦截");
   console.log(config);
-  if (!config.url?.startsWith("https")) {
+  // if (!config.url?.startsWith("https")) {
     // 加上时间戳
     const timestamp = new Date().getTime();
     if (config.url?.indexOf("?") != -1) {
@@ -37,7 +37,7 @@ axios.interceptors.request.use((config) => {
     }
 
     // config.data.token = localStorage.getItem("tokenMusic");
-  }
+  // }
 
   return config;
 });

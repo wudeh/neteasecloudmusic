@@ -898,6 +898,8 @@ export default defineComponent({
     // 点击播放歌曲
     async function playMusicSingle(item: any):Promise<void> {
       console.log(item);
+      console.log(store.state.song_info.id);
+      
       if(item.resourceId == store.state.song_info.id) {
         console.log("是同一首");
         store.commit("play", !store.state.song_info.isPlaying);
@@ -906,21 +908,20 @@ export default defineComponent({
       if(item.resourceId != store.state.song_info.id) {
         store.commit("play", false);
         // 请求URL
-        const info = await getSongUrl(item.resourceId);
-        // 设置歌曲信息
-        store.commit("setSongInfo",{
+        // const info = await getSongUrl(item.resourceId);
+        let song = {
           id: item.resourceId,
           name: item.resourceExtInfo.songData.name,
           author: item.resourceExtInfo.artists.map((i:any) => i.name).join("/"),
-          url: info.data[0].url,
+          // url: info.data[0].url,
           img: item.uiElement.image.imageUrl
-        });
+        }
+        // 设置歌曲信息
+        store.commit("setSongInfo",song);
+        // store.commit("add_songList",song)
         // 再播放
       store.commit("play", true);
       }
-      
-      console.log(store.state.song_info);
-      
     }
     const show = function icon_click(a: string): void {
       console.log(a);
@@ -1004,6 +1005,7 @@ export default defineComponent({
   }
 .discover {
   // overflow: hidden;
+  background-color: rgb(245,245,245);
   width: 100vw;
   height: 617px;
   

@@ -94,9 +94,10 @@ export default defineComponent({
         click: false,
         scrollX: props.scrollX,
         scrollY: props.scrollY,
+        preventDefault: false,
         // pullDownRefresh: true
-        // disableMouse: false,
-        // disableTouch: false,
+        disableMouse: true,
+        disableTouch: false,
         // eventPassthrough: "vertical",
       });
 
@@ -126,11 +127,11 @@ export default defineComponent({
       // })
     });
 
-    onBeforeUnmount(() => {
-      window.removeEventListener("resize", () => {
-        data.bs.refresh();
-      });
-    });
+    // onBeforeUnmount(() => {
+    //   window.removeEventListener("resize", () => {
+    //     data.bs.refresh();
+    //   });
+    // });
 
     onUpdated(() => {
       data.bs.refresh();

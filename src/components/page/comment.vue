@@ -87,8 +87,10 @@
 
   <!-- 楼层弹出评论 -->
   <van-popup
-    v-model:show="showFloor"
+    v-model:show="store.state.showFloor"
     closeable
+    @close="store.commit(`close`)"
+    :close-on-popstate="true"
     close-icon-position="top-left"
     position="bottom"
     :style="{ height: '80%' }"
@@ -174,7 +176,7 @@ import { defineComponent, onMounted, reactive, onBeforeMount, toRefs } from "vue
 import { getComment, getSongInfo, getFloorComment } from "../../api/song";
 import { useRouter } from "vue-router";
 import { sendTimeConversion, numFilter } from "../../utils/num";
-
+import { useStore } from 'vuex'
 interface info {
   img: string;
   name: string;
@@ -204,6 +206,7 @@ export default defineComponent({
   name: "comment",
   setup() {
     const router = useRouter();
+    const store = useStore();
     const id: any = router.currentRoute.value.query.id; //获取参数
     const data = reactive<info>({
       img: "",
@@ -270,10 +273,11 @@ export default defineComponent({
     // 获取楼层评论
     const floorRequest = async (topComment: any,parentCommentId: number) => {
       data.floorTopComment = topComment;
-      data.showFloor = true;
+      store.commit("set_floor_comment", true)
       data.floorArr = [];
       data.floorFinish = false;
       data.floorLoading = true;
+      data.floorPageNo = 1;
       let info = await getFloorComment(id,parentCommentId,0,data.floorPageNo);
       console.log(data.floorTopComment);
       data.floorArr = info.data.comments;
@@ -329,6 +333,7 @@ export default defineComponent({
       onLoad,
       onLoadFloor,
       router,
+      store,
       change_sortType,
       floorRequest
     };

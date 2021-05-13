@@ -1,6 +1,41 @@
 import { createStore } from 'vuex'
-
-export default createStore({
+import { getLyric, getSongUrl, getComment} from "../api/song"
+interface song {
+  song_info: {
+    id: string,
+    name: string,
+    author: string,
+    img: string,
+    url: string,
+    isPlaying: boolean,
+    lyric: any[],
+    currentTime: number | string, // 当前播放时间
+    progressTime: number, // 进度条拖动时间
+    duration: number,
+    buffered: number, // 缓冲时间
+    commentcount: number, // 评论数量
+    list: any[], // 播放列表
+    listIndex: number,
+    playMode: '', // 播放模式
+    timer: null // 定时器
+    },
+    showLoading: boolean,
+    showList: boolean,
+    showPop: boolean,
+    showFloor: boolean,
+    showDetail: boolean,
+    song_pop_detail: {
+      id: number,
+      name: string,
+      author: string,
+      img: string,
+      url: string,
+      al: string,
+      commentCount: number
+    }
+  
+}
+export default createStore<song>({
   state: {
     song_info: {
       id: localStorage.getItem("songId") || '',
@@ -15,11 +50,25 @@ export default createStore({
       duration: 0,
       buffered: 0, // 缓冲时间
       commentcount: 0, // 评论数量
-      playList: [], // 播放列表
+      list:[], // 播放列表
+      listIndex: 0,
       playMode: '', // 播放模式
       timer: null // 定时器
     },
-    showLoading: true
+    showLoading: false,
+    showList: false,
+    showPop: false,
+    showFloor: false,
+    showDetail: false,
+    song_pop_detail: {
+      id: 0,
+      name: '',
+      author: '',
+      img: '',
+      url: '',
+      al: '',
+      commentCount: 0
+    }
   },
   mutations: {
     // 设置加载中
@@ -32,12 +81,14 @@ export default createStore({
       state.song_info.name = song.name;
       state.song_info.author = song.author;
       state.song_info.img = song.img;
-      state.song_info.url = song.url;
+      if(song.url) state.song_info.url = song.url;
+      // state.song_info.url = song.url;
       localStorage.setItem("songId",state.song_info.id);
       localStorage.setItem("songName",state.song_info.name);
       localStorage.setItem("songAuthor",state.song_info.author);
       localStorage.setItem("songImg",state.song_info.img);
-      // localStorage.setItem("songUrl",state.song_info.url);
+      state.song_info.list = state.song_info.list.concat(song);
+      state.song_info.listIndex += 1;
     },
     // 控制播放暂停
     play(state,play) {
@@ -63,12 +114,72 @@ export default createStore({
     // 设置歌曲缓冲时间
     set_song_buffered(state, time) {
       state.song_info.buffered = time;
+    },
+    // 播放歌曲列表
+    add_songList(state, list) {
+      state.song_info.list = list;
+      state.song_info.listIndex = 0;
+    },
+    // 下一首播放
+    add_song(state, song) {
+      state.song_info.list.splice(state.song_info.listIndex, 0, song);
+    },
+    // 展示当前播放列表
+    set_pop_list(state, i) {
+      state.showList = i;
+      if(i) state.showPop = true;
+    },
+    // 展示楼层评论区
+    set_floor_comment(state, i) {
+      state.showFloor = i;
+      if(i) state.showPop = true;
+    },
+    // 浏览器后退关闭弹出框
+    close(state) {
+      if(state.showList) state.showList = false;
+      state.showFloor = false;
+      state.showPop = false;
     }
   },
   actions: {
-    // 请求歌曲信息
-    getSongInfo(ctx) {
-      ctx.commit("setSongInfo");
+    // 播放下一首
+    async play_next(ctx) {
+      console.log("正在检查是否播放下一首");
+      
+      if(++ctx.state.song_info.listIndex > ctx.state.song_info.list.length -1 ) {
+        ctx.state.song_info.listIndex = 0;
+      }
+       // 请求URL
+      //  const info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
+      //  ctx.commit("set_song_url",info.data[0].url);
+      ctx.state.song_info.id = ctx.state.song_info.list[ctx.state.song_info.listIndex].id;
+      ctx.state.song_info.name = ctx.state.song_info.list[ctx.state.song_info.listIndex].name;
+      ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
+      ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
+      if(ctx.state.song_info.list[ctx.state.song_info.listIndex].url) {
+        ctx.state.song_info.url = ctx.state.song_info.list[ctx.state.song_info.listIndex].url;
+      }else {
+        const info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
+        ctx.state.song_info.url = info.data[0].url
+        ctx.state.song_info.list[ctx.state.song_info.listIndex].url = info.data[0].url
+      }
+    },
+    // 设置歌曲弹出框详情
+    async set_pop_detail(ctx, item) {
+      ctx.state.song_pop_detail = Object.assign({}, item);
+      ctx.state.song_pop_detail.author = item.ar.map((i:any) => i.name).join("/")
+      ctx.state.song_pop_detail.img = item.al.picUrl
+      ctx.state.showDetail = true;
+      ctx.state.showPop = true;
+      // 获取一下评论数量
+      let info = await getComment(item.id,0,1,20,1);
+      ctx.state.song_pop_detail.commentCount = info.data.totalCount
+      // 获取URL，以供下载
+      info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
+      ctx.state.song_pop_detail.url = info.data[0].url
+      
+      console.log(ctx.state.song_pop_detail);
+      
     }
   },
   modules: {

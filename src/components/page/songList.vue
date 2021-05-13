@@ -61,8 +61,11 @@
   <!-- 歌曲列表 -->
   <div class="songList">
     <div class="song_item" v-for="(item,index) in songListInfo" :key="index">
-      <div class="index">{{index + 1}}</div>
-      <div class="song_info">
+      <div class="index">
+        <img v-if="item.id == store.state.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="">
+        <span v-else>{{index + 1}}</span>
+      </div>
+      <div class="song_info" @click="playMusicSingle(item)">
         <div class="info_top">
           <div class="song_name">{{item.name}}</div>
           <div class="song_TV">{{item.Tv}}</div>
@@ -89,7 +92,7 @@ import { defineComponent, ref, toRefs, onBeforeMount,reactive } from "vue";
 import { useRouter } from "vue-router"
 import {getSongListInfo,getSongInfo,getSongUrl} from "../../api/song"
 import { numFilter } from "../../utils/num";
-
+import { useStore } from 'vuex'
 
 // 歌单
 interface songList {
@@ -131,6 +134,7 @@ interface author {
     setup() {
       //实例化路由
     const router = useRouter();
+    const store = useStore();
     const img = ref<string>()
     const data = reactive<songList>({
       numFilter:numFilter,
@@ -189,6 +193,8 @@ interface author {
           Tv: item.alia.join("/"), // 歌曲可能会有剧名
           author: item.ar.map((item:any) => item.name).join("/"),
           des: item.al.name,
+          ar: item.ar,
+          al: item.al
           // sq: item.maxbr >= 999000, 
           // vip: item.fee == 1,
           // dujia: item.flag == 1092
@@ -202,9 +208,42 @@ interface author {
       })
       
     })
+
+    // 点击播放歌曲
+     function playMusicSingle(item: any): void {
+      console.log(item);
+      console.log(store.state.song_info.id);
+      
+      if(item.id == store.state.song_info.id) {
+        console.log("是同一首");
+        store.commit("play", !store.state.song_info.isPlaying);
+        return
+      }
+      // 先判断和当前的歌曲是不是同一首,如果不是同一首
+      if(item.resourceId != store.state.song_info.id) {
+        store.commit("play", false);
+        // 请求URL
+        // const info = await getSongUrl(item.resourceId);
+        let song = {
+          id: item.id,
+          name: item.name,
+          author: item.ar.map((i:any) => i.name).join("/"),
+          // url: info.data[0].url,
+          img: item.al.picUrl
+        }
+        // 设置歌曲信息
+        store.commit("setSongInfo",song);
+        // store.commit("add_songList",song)
+        // 再播放
+      store.commit("play", true);
+      }
+    }
+
     return {
       ...toRefs(data),
       author,
+      store,
+      playMusicSingle
     }
 
     }
@@ -424,6 +463,7 @@ interface author {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        height: 20px;
         .vip {
           color: red;
           border: 1px solid red;

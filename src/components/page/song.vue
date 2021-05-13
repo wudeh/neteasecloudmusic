@@ -453,14 +453,13 @@ export default defineComponent({
   }
   .needle {
     width: 150px;
-    // transform: translate(28%);
-    margin-left: 50px;
-    margin-bottom: -90px;
-    margin-top: -10px;
     transform-origin:0% 0%;
     transition: all 0.3s;
     transform: rotate(-20deg);
     z-index: 1;
+    position: fixed;
+    top: 5%;
+    left: 39%;
   }
   .needle_play {
     transform: rotate(-5deg);
@@ -469,6 +468,8 @@ export default defineComponent({
     width: 300px;
     height: 300px;
     opacity: 1;
+    position: fixed;
+    top: 25%;
     .middle {
       width: 300px;
       height: 300px;
@@ -558,8 +559,8 @@ export default defineComponent({
     display: flex;
     justify-content: space-between;
     width: 280px;
-    margin-top: 50px;
-    margin-bottom: 20px;
+    position: fixed;
+    bottom: 16%;
     img {
       width: 30px;
     }
@@ -582,6 +583,8 @@ export default defineComponent({
     color: #fff;
     display: flex;
     align-items: center;
+    position: fixed;
+    bottom: 12%;
     .line {
       width: 280px;
       height: 2px;
@@ -605,7 +608,7 @@ export default defineComponent({
   }
   .bottom_icon {
     .icon_top;
-    margin-top: 10px;
+    bottom: 4%;
     .bigPlay {
       width: 40px;
     }
