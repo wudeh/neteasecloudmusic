@@ -51,6 +51,7 @@
           <div class="line" ref="line" @touchstart="processControlStart($event)" @touchmove="processControlMove($event)" @touchend="processControlEnd($event)">
             <div class="past" ref="linePast"></div>
             <div class="circle_point" ref="point"></div>
+            <div class="not_play"></div>
           </div>
           <div class="durasion">{{getTime(store.state.song_info.duration)}}</div>
         </div>
@@ -59,8 +60,8 @@
           <img src="../../../public/img/icons/circulate.svg" alt="">
           <img src="../../../public/img/icons/last_song.svg" alt="">
           <img class="bigPlay" @click.stop="change_play()" :src="store.state.song_info.isPlaying ? stopWhite : playWhite" alt="">
-          <img src="../../../public/img/icons/last_song.svg" style="transform:rotate(180deg)" alt="">
-          <img src="../../../public/img/icons/list_white.svg" alt="">
+          <img @click="store.dispatch(`play_next`)" src="../../../public/img/icons/last_song.svg" style="transform:rotate(180deg)" alt="">
+          <img @click="store.commit(`set_pop_list`, true);" src="../../../public/img/icons/list_white.svg" alt="">
         </div>
       </div>
     </div>
@@ -110,49 +111,66 @@ export default defineComponent({
     }
 
     const download = () => {
-      downloadFile(store.state.song_info.url,store.state.song_info.name)
+      downloadFile(store.state.song_info.url,{
+        id: store.state.song_info.id,
+        name: store.state.song_info.name,
+        author: store.state.song_info.author,
+      })
     }
 
     const lyricRequest = async () => {
+      // lyric = []
       const data = await getLyric(store.state.song_info.id);
       console.log(data);
-      console.log(data.lrc.lyric.split("["));
-      let i = data.lrc.lyric.split("[");
-      i.forEach((item:any,index: number) => {
-        let temp = {
-          time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 ,
-          lyric: item.split("]")[1] || i[index+1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
-        };
-        if(temp.lyric != "\n" && !Number.isNaN(temp.time)) lyric.push(temp);           
-      });
-      // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
-      lyric.push({
-        time: 9999,
-        lyric: 'wudeh'
-      })
-      
-
-      
-      lyric.sort((a: any,b: any) => {
-        return a.time - b.time;
-      })
-      console.log(lyric);
-      console.log("这是歌词");
-      if(data.tlyric.lyric) {
-        let i = data.tlyric.lyric.split("[");
+      // console.log(data.lrc.lyric.split("["));
+      if(data.lrc) {
+        let i = data.lrc.lyric.split("[");
         i.forEach((item:any,index: number) => {
           let temp = {
-            time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 || 0,
+            time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 ,
             lyric: item.split("]")[1] || i[index+1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
           };
-          lyric.forEach((item: any,index: number) => {
-            if(item.time == temp.time) {
-              lyric[index].lyric += `<br>${temp.lyric}`
-            }
-          })          
-
+          if(temp.lyric != "\n" && !Number.isNaN(temp.time)) lyric.push(temp);           
         });
+        // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
+        lyric.push({
+          time: 9999,
+          lyric: 'wudeh'
+        })
+        
+
+        
+        lyric.sort((a: any,b: any) => {
+          return a.time - b.time;
+        })
+        console.log(lyric);
+        console.log("这是歌词");
+        // 如果有翻译歌词
+        if(data.tlyric.lyric) {
+          let i = data.tlyric.lyric.split("[");
+          i.forEach((item:any,index: number) => {
+            let temp = {
+              time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 || 0,
+              lyric: item.split("]")[1] || i[index+1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
+            };
+            lyric.forEach((item: any,index: number) => {
+              if(item.time == temp.time) {
+                lyric[index].lyric += `<br>${temp.lyric}`
+              }
+            })          
+
+          });
+        }
+      }else if(data.nolyric) {
+        // lyric = reactive([])
+        lyric.push({
+          time: 9999,
+          lyric: '当前音乐暂无歌词'
+        })
       }
+      nextTick(() => {
+        lyricScorll.bs.refresh();
+      })
     }
     // 获取评论
     const commentRequest = async () => {
@@ -236,8 +254,11 @@ export default defineComponent({
     })
 
     // 歌曲变更重新请求歌词，评论
-    watch(() => store.state.song_info.id, () => {
-      lyric.length = 0;
+    watch(() => store.state.song_info.id, (id) => {
+      console.log("歌词页面监听到音乐变更，重新请求歌词");
+      console.log("变更id为" + id);
+      
+      lyric.splice(0);
       lyricRequest();
       commentRequest();
     })
@@ -514,7 +535,7 @@ export default defineComponent({
       height: 100%;
       .lyric_base {
         transition: all 0.3s;
-        height: 30px;
+        height: 40px;
         padding-bottom: 10px;
         box-sizing: border-box;
         font-size: 13px;
@@ -529,7 +550,7 @@ export default defineComponent({
     }
     .lyric_show {
       height: 50%;
-      width: 80%;
+      width: 100%;
       position: absolute;
       bottom: 0;
       left: 50%;
@@ -587,15 +608,18 @@ export default defineComponent({
     bottom: 12%;
     .line {
       width: 280px;
-      height: 2px;
+      height: 6px;
       margin: 0 8px;
       display: flex;
       align-items: center;
-      background-color: rgba(255, 255, 255, 0.2);
+      // background-color: rgba(255, 255, 255, 0.2);
       position: relative;
       .past {
+        position: absolute;
         background-color: #fff;
-        height: 100%;
+        height: 2px;
+        transition: all 0.3s;
+        z-index: 3;
       }
       .circle_point {
         position: absolute;
@@ -603,6 +627,12 @@ export default defineComponent({
         border-radius: 50%;
         width: 6px;
         height: 6px;
+      }
+      .not_play {
+        width: 280px;
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.2);;
+        height: 2px;
       }
     }
   }

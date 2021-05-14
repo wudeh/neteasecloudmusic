@@ -93,7 +93,7 @@
         onSearch,
         ...toRefs(data)
       }
-    }
+    },
   })
 </script>
 

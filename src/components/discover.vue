@@ -8,6 +8,7 @@
       <van-icon name="search" />
       <p>{{ searchWord }}</p>
     </div>
+    <img @click.stop="router.push({path: `/download`})" src="../../public/img/icons/download.svg" alt="">
   </div>
   <div class="discover" v-if="swiper.length">
     <bsscroll :scrollY="true" name="discover_scroll" :scrollData="swiper" :pulldown="true">
@@ -596,6 +597,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const active = ref<number>(0);
+    const topBg = ref<HTMLElement>();
     const store = useStore()
     const info = reactive<any>({
       cursor: {},  // 首页在登录状态下需要带上上一次请求回来的 cursor，作用相当于分页的页数
@@ -689,12 +691,9 @@ export default defineComponent({
     });
 
     // 数据请求
-    onBeforeMount(async () => {
+    onMounted(async () => {
       store.commit("set_load", true)
       let discoverInfo = await getDiscoverInfo(info.cursor);
-      const iconInfo = await getIconInfo();
-      // 圆形图标
-      info.icon = iconInfo.data;
       store.commit("set_load", false)
       // 分页数据
       info.cursor = discoverInfo.data.cursor;
@@ -702,6 +701,12 @@ export default defineComponent({
         // 轮播图
         if(item.blockCode == "HOMEPAGE_BANNER") {
           info["swiper"] = item.extInfo.banners;
+          nextTick(() => {
+            topBg.value?.setAttribute(
+            "style",
+            `background-image:url(${info.swiper[0].pic});background-color:red`
+          );
+          })
         }
         // 推荐歌单
         if(item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
@@ -865,22 +870,21 @@ export default defineComponent({
       })
       
       }
+      const iconInfo = await getIconInfo();
+      // 圆形图标
+      info.icon = iconInfo.data;
       let word = await getSearchWord();
       info.searchWord = word.data.showKeyword;
     });
 
     // 获取 top 的dom 元素, 根据轮播图轮播事件动态改变背景图片模糊
-    const topBg = ref<HTMLElement>();
+    
     const onChange = (index: number) => {
       topBg.value?.setAttribute(
         "style",
         `background-image:url(${info.swiper[index].pic});`
       );
     };
-    topBg.value?.setAttribute(
-      "style",
-      `background-image:url(${info.swiper[0].pic});`
-    );
 
     // 新歌，新碟，数字专辑
     function change_new(index: number): void {
@@ -908,19 +912,21 @@ export default defineComponent({
       if(item.resourceId != store.state.song_info.id) {
         store.commit("play", false);
         // 请求URL
-        // const info = await getSongUrl(item.resourceId);
+        const info = await getSongUrl(item.resourceId);
         let song = {
           id: item.resourceId,
           name: item.resourceExtInfo.songData.name,
           author: item.resourceExtInfo.artists.map((i:any) => i.name).join("/"),
-          // url: info.data[0].url,
+          url: info.data[0].url,
           img: item.uiElement.image.imageUrl
         }
+        console.log(song);
+        
         // 设置歌曲信息
         store.commit("setSongInfo",song);
         // store.commit("add_songList",song)
-        // 再播放
-      store.commit("play", true);
+        // 再由 home 页面监听播放
+      // store.commit("play", true);
       }
     }
     const show = function icon_click(a: string): void {
@@ -935,7 +941,7 @@ export default defineComponent({
     }
 
     const goSearch = () => {
-      router.push({path: "/search"})
+      router.push({path: "/search", query: {}})
     }
 
     // 退出登录
@@ -957,6 +963,7 @@ export default defineComponent({
       active,
       show,
       login,
+      router,
       goSearch,
       logoutDD,
       onChange,
@@ -1001,6 +1008,9 @@ export default defineComponent({
         margin-left: 5px;
         color: #ccc;
       }
+    }
+    img {
+      width: 30px;
     }
   }
 .discover {
@@ -1219,7 +1229,6 @@ export default defineComponent({
               .vip {
                 color: red;
                 border: 1px solid red;
-                padding: 1px;
                 border-radius: 3px;
                 opacity: 0.6;
               }
@@ -1232,7 +1241,6 @@ export default defineComponent({
               .hear_try {
                 color: rgb(0, 217, 255);
                 border: 1px solid rgb(0, 153, 255);
-                padding: 1px;
                 border-radius: 3px;
                 opacity: 0.6;
               }

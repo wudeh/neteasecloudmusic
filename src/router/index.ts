@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw, createMemoryHistory } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -26,7 +26,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "login" */ "@/components/page/song.vue"),
         meta: {
           keepAlive: true,
-          level: 2,
+          level: 99,
         },
       },
       {
@@ -63,6 +63,15 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
           keepAlive: true,
           level: 2,
+        },
+      },
+      {
+        path: "/download",
+        name: "download",
+        component: () => import(/* webpackChunkName: "login" */ "@/components/page/download.vue"),
+        meta: {
+          keepAlive: true,
+          level: 9,
         },
       },
     ],

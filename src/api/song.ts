@@ -18,7 +18,8 @@ export function getSongInfo(ids: string): any {
 
 // 获取歌词
 export function getLyric(id: string): any {
-  return axios.post("/lyric",{id});
+  // return axios.post("/lyric",{id});
+  return axios.get(`/lyric?id=${id}&timestamp=${new Date().getTime()}`)
 }
 
 // 获取歌曲评论
@@ -46,8 +47,13 @@ export function getSongComment(id: string,limit=20,offset?: number,before?: any)
  * @returns 
  */
 export function getComment(id: number,type: number,pageNo: number,pageSize=20,sortType: number,cursor?: any): any {
-  return axios.post("/comment/new",{id,type,pageNo,pageSize,sortType,cursor});
-  // return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}&cursor=${cursor}&timestamp=1620481585789`);
+  if(sortType == 3) {
+    return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}&cursor=${cursor}`);
+  }else {
+    return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}`);
+  }
+  // return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}&cursor=${cursor}`,{id,type,pageNo,pageSize,sortType,cursor});
+  
 }
 
 // 获取楼层评论
@@ -61,6 +67,6 @@ export function getComment(id: number,type: number,pageNo: number,pageSize=20,so
  * @returns 
  */
 export function getFloorComment(id: number,parentCommentId: number,type: number,time?: any,limit?:number): any {
-  return axios.post("/comment/floor",{id,parentCommentId,type,time,limit});
-  // return axios.get(`/comment/floor?parentCommentId=${parentCommentId}&id=${id}&type=${type}`);
+  // return axios.post("/comment/floor",{id,parentCommentId,type,time,limit});
+  return axios.get(`/comment/floor?parentCommentId=${parentCommentId}&id=${id}&type=${type}&time=${time}`);
 }

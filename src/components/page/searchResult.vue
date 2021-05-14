@@ -8,9 +8,9 @@
         @search="onSearch"
       />
     </form>
-    <van-tabs ref="tab" v-model:active="activeName" swipeable sticky @click="onClick">
+    <van-tabs ref="tab" v-model:active="activeName"  sticky @click="onClick">
       <van-tab title="综合" name="1018">
-        <div class="wrapper" v-if="song.songs">
+        <div class="wrapper" v-if="song">
           <!-- 单曲 -->
           <div class="song" v-if="song">
             <div class="title">
@@ -169,7 +169,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <div class="song" v-if="song">
+          <div class="song" v-if="songs">
             <div class="title">
               播放全部
             </div>
@@ -216,7 +216,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <div class="playList" v-if="album">
+          <div class="playList">
             <div class="item" v-for="(item, index) in albums" :key="index">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.picUrl" />
@@ -247,7 +247,7 @@
               <span>加载中...</span>
             </div>
           </template>
-        <div class="video" v-if="video">
+        <div class="video">
             <div class="item" v-for="(item, index) in videos" :key="index">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.coverUrl" />
@@ -313,7 +313,7 @@
               <span>加载中...</span>
             </div>
           </template>
-        <div class="playList" v-if="playLists.length">
+        <div class="playList">
             <div class="item" v-for="(item, index) in playLists" :key="index">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.coverImgUrl" />
@@ -344,7 +344,7 @@
               <span>加载中...</span>
             </div>
           </template>
-         <div class="user" v-if="user">
+         <div class="user">
               <div class="item" v-for="(item, index) in users" :key="index">
                 <div class="left">
                   <van-image class="img" radius="50%" :src="item.avatarUrl" />
@@ -380,7 +380,7 @@
               <span>加载中...</span>
             </div>
           </template>
-        <div class="video" v-if="mvs.length">
+        <div class="video">
             <div class="item" v-for="(item, index) in mvs" :key="index">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.cover" />
@@ -413,7 +413,7 @@
               <span>加载中...</span>
             </div>
           </template>
-        <div class="djRadio" v-if="djRadios.length">
+        <div class="djRadio">
             <div class="item" v-for="(item, index) in djRadios" :key="index">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.picUrl" />
@@ -442,6 +442,7 @@
   import { useStore } from 'vuex'
   import { useRouter,useRoute } from "vue-router";
   import { sendTimeConversion, numFilter } from "../../utils/num";
+
   interface info {
     word: string,
     activeName: number,
@@ -490,7 +491,7 @@
     lyricLoading: boolean
   }
   export default defineComponent({
-    name: "search",
+    name: "searchResult",
     setup: () => {
       const store = useStore();
       const router = useRouter();
@@ -809,6 +810,12 @@
         ...toRefs(data)
       }
     },
+    // activated: () => {
+    //   // console.log(router.cur);
+    //   router.push
+      
+    // },
+    // deactivated
     // directives: {
     //   // 用来替换关键搜索词颜色的指令
     //   word(el,binding): void {
@@ -900,6 +907,9 @@
           width: 300px;
           .name {
             color: black;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
             span {
               color: orange;
               font-size: 12px;
@@ -908,7 +918,6 @@
           .vip {
             color: red;
             border: 1px solid red;
-            padding: 1px;
             border-radius: 3px;
             opacity: 0.6;
             font-size: 12px;
@@ -928,7 +937,6 @@
           .hear_try {
             color: rgb(0, 217, 255);
             border: 1px solid rgb(0, 153, 255);
-            padding: 1px;
             border-radius: 3px;
             opacity: 0.6;
           }

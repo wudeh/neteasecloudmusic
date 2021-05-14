@@ -32,7 +32,13 @@ interface song {
       url: string,
       al: string,
       commentCount: number
-    }
+    },
+    download_list: Array<{
+      id: number,
+      name: string,
+      author: string,
+      progress: number
+    }>
   
 }
 export default createStore<song>({
@@ -60,6 +66,7 @@ export default createStore<song>({
     showPop: false,
     showFloor: false,
     showDetail: false,
+    // 歌曲弹出框详情
     song_pop_detail: {
       id: 0,
       name: '',
@@ -68,7 +75,8 @@ export default createStore<song>({
       url: '',
       al: '',
       commentCount: 0
-    }
+    },
+    download_list: []
   },
   mutations: {
     // 设置加载中
@@ -77,11 +85,12 @@ export default createStore<song>({
     },
     // 设置歌曲信息
     setSongInfo(state, song) {
+      if(song.url) state.song_info.url = song.url;
       state.song_info.id = song.id;
       state.song_info.name = song.name;
       state.song_info.author = song.author;
       state.song_info.img = song.img;
-      if(song.url) state.song_info.url = song.url;
+      
       // state.song_info.url = song.url;
       localStorage.setItem("songId",state.song_info.id);
       localStorage.setItem("songName",state.song_info.name);
@@ -134,34 +143,63 @@ export default createStore<song>({
       state.showFloor = i;
       if(i) state.showPop = true;
     },
+    // 下载
+    download_progress(state, i) {
+      let have = false
+      state.download_list.forEach((item: any) => {
+        if(item.id == i.id) {
+          item.progress = i.progress >= 100 ? `下载完成` : i.progress
+          have = true
+          return
+        }
+      })
+      if(!have) {
+        state.download_list.push(i)
+      }
+    },
     // 浏览器后退关闭弹出框
     close(state) {
       if(state.showList) state.showList = false;
       state.showFloor = false;
       state.showPop = false;
+      state.showDetail = false;
     }
   },
   actions: {
     // 播放下一首
-    async play_next(ctx) {
+    async play_next(ctx, i) {
       console.log("正在检查是否播放下一首");
-      
-      if(++ctx.state.song_info.listIndex > ctx.state.song_info.list.length -1 ) {
-        ctx.state.song_info.listIndex = 0;
+      ctx.commit(`set_song_time`,0)
+      // 有传参数 i ，播放上一首
+      if(i) {
+        if(--ctx.state.song_info.listIndex < ctx.state.song_info.list.length -1) {
+          ctx.state.song_info.listIndex = ctx.state.song_info.list.length -1;
+        }
+      }else {
+        // 播放下一首
+        if(++ctx.state.song_info.listIndex > ctx.state.song_info.list.length -1 ) {
+          ctx.state.song_info.listIndex = 0;
+        }
       }
+      
+      
        // 请求URL
       //  const info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
       //  ctx.commit("set_song_url",info.data[0].url);
-      ctx.state.song_info.id = ctx.state.song_info.list[ctx.state.song_info.listIndex].id;
-      ctx.state.song_info.name = ctx.state.song_info.list[ctx.state.song_info.listIndex].name;
-      ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
-      ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
       if(ctx.state.song_info.list[ctx.state.song_info.listIndex].url) {
         ctx.state.song_info.url = ctx.state.song_info.list[ctx.state.song_info.listIndex].url;
+        ctx.state.song_info.id = ctx.state.song_info.list[ctx.state.song_info.listIndex].id;
+        ctx.state.song_info.name = ctx.state.song_info.list[ctx.state.song_info.listIndex].name;
+        ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
+        ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
       }else {
         const info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
         ctx.state.song_info.url = info.data[0].url
         ctx.state.song_info.list[ctx.state.song_info.listIndex].url = info.data[0].url
+        ctx.state.song_info.id = ctx.state.song_info.list[ctx.state.song_info.listIndex].id;
+        ctx.state.song_info.name = ctx.state.song_info.list[ctx.state.song_info.listIndex].name;
+        ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
+        ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
       }
     },
     // 设置歌曲弹出框详情

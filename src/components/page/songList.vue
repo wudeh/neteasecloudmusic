@@ -467,7 +467,6 @@ interface author {
         .vip {
           color: red;
           border: 1px solid red;
-          padding: 1px;
           border-radius: 3px;
           opacity: 0.6;
         }
@@ -480,7 +479,6 @@ interface author {
         .hear_try {
           color: rgb(0, 217, 255);
           border: 1px solid rgb(0, 153, 255);
-          padding: 1px;
           border-radius: 3px;
           opacity: 0.6;
         }

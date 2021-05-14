@@ -38,9 +38,14 @@ export function getSuggest(word: string): any {
  * @returns 
  */
 export function getsearchResult(keywords: string,type=1,offset=0,limit=20): any {
+  // if(type == 1) {
+  //   return axios.post(`/search`,{ keywords, type, offset: offset*limit, limit});
+  // }else {
+  //   return axios.post(`/search`,{ keywords, type, offset: offset*limit, limit});
+  // }
   if(type == 1) {
-    return axios.post(`/cloudsearch`,{ keywords, type, offset: offset*limit, limit});
+    return axios.get(`/cloudsearch?keywords=${keywords}&type=${type}&offset=${offset}&limit=${limit}`)
   }else {
-    return axios.post(`/search`,{ keywords, type, offset: offset*limit, limit});
+    return axios.get(`/search?keywords=${keywords}&type=${type}&offset=${offset}&limit=${limit}`)
   }
 }
