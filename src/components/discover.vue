@@ -90,7 +90,7 @@
     <div class="long">
       <div class="rec_title">
         <div class="rec_des">{{ long.uiElement.subTitle.title }}</div>
-        <div class="rec_more">
+        <div class="rec_more" @click="add_song_list">
           <img src="../../public/img/icons/videoPlay.svg" alt="" />
           <span>{{ long.uiElement.button.text }}</span>
         </div>
@@ -915,6 +915,7 @@ export default defineComponent({
         const info = await getSongUrl(item.resourceId);
         let song = {
           id: item.resourceId,
+          type: 0,
           name: item.resourceExtInfo.songData.name,
           author: item.resourceExtInfo.artists.map((i:any) => i.name).join("/"),
           url: info.data[0].url,
@@ -959,6 +960,24 @@ export default defineComponent({
       router.push({path:"/songList", query:{id}})
     }
 
+    // 播放列表
+    const add_song_list = () => {
+      let list: any[] = [];
+      info.long.creatives.forEach((item: any, index: number) => {
+        item.resources.forEach((it: any) => {
+          list.push({
+            id: it.resourceId,
+            type: 0,
+            name: it.resourceExtInfo.songData.name,
+            author: it.resourceExtInfo.songData.artists.map((item: any) => item.name).join(`/`),
+            img: it.uiElement.image.imageUrl
+          })
+        })
+      })
+      console.log(list);
+      store.commit(`add_songList`, list)
+    }
+
     return {
       active,
       show,
@@ -968,6 +987,7 @@ export default defineComponent({
       logoutDD,
       onChange,
       topBg,
+      add_song_list,
       change_new,
       goSongList,
       recentcontactDD,

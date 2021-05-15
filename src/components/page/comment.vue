@@ -27,12 +27,12 @@
   <!-- 音乐信息 -->
   <div class="song_info">
     <div class="img">
-      <van-image class="song_img" :src="img" />
+      <van-image radius="8" class="song_img" :src="img" />
     </div>
     <van-skeleton title :row="3" :loading="name == ``" />
     <div class="info" v-if="name">
       <div class="title">{{ name }}</div>
-      <div class="singer">{{ singer }}</div>
+      <div class="singer"><span style="color: black">by&nbsp;</span>{{ singer }}</div>
     </div>
   </div>
   <!-- </van-skeleton> -->
@@ -61,7 +61,18 @@
         <div class="info">
           <div class="top">
             <div class="top_left">
-              <div class="name">{{ item.user.nickname }}</div>
+              <div class="name">
+                {{ item.user.nickname }} &nbsp; 
+                <span v-if="item.user.vipRights" style="display:flex;align-items: center">
+                  <img src="../../../public/img/icons/1.png" alt="">
+                  <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 5"  class="level">·伍</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 4"  class="level">·肆</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 3" class="level">·仨</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 2" class="level">·贰</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 1" class="level">·一</span>
+                </span>
+              </div>
               <div class="time">
                 <span class="time">{{ sendTimeConversion(item.time) }}</span>
                 <span v-if="item.tag.datas" style="margin: 0 2px">-</span>
@@ -89,6 +100,7 @@
   <van-popup
     v-model:show="store.state.showFloor"
     closeable
+    round
     @close="store.commit(`close`)"
     :close-on-popstate="true"
     close-icon-position="top-left"
@@ -144,7 +156,18 @@
         <div class="info">
           <div class="top">
             <div class="top_left">
-              <div class="name">{{ item.user.nickname }}</div>
+              <div class="name">
+                {{ item.user.nickname }} &nbsp; 
+                <span v-if="item.user.vipRights" style="display:flex;align-items: center">
+                  <img src="../../../public/img/icons/1.png" alt="">
+                  <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 5"  class="level">·伍</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 4"  class="level">·肆</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 3" class="level">·仨</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 2" class="level">·贰</span>
+                  <span v-if="item.user.vipRights.redVipLevel == 1" class="level">·壹</span>
+                </span>
+              </div>
               <div class="time">
                 <span class="time">{{ sendTimeConversion(item.time) }}</span>
                 <!-- <span v-if="item.tag.datas" style="margin: 0 2px">-</span> -->
@@ -173,7 +196,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, reactive, onBeforeMount, toRefs } from "vue";
-import { getComment, getSongInfo, getFloorComment } from "../../api/song";
+import { getComment, getSongInfo, getFloorComment,getPlayListDetail } from "../../api/song";
 import { useRouter } from "vue-router";
 import { sendTimeConversion, numFilter } from "../../utils/num";
 import { useStore } from 'vuex'
@@ -208,6 +231,7 @@ export default defineComponent({
     const router = useRouter();
     const store = useStore();
     const id: any = router.currentRoute.value.query.id; //获取参数
+    const type: any = router.currentRoute.value.query.type; //获取参数
     const data = reactive<info>({
       img: "",
       name: "",
@@ -235,18 +259,29 @@ export default defineComponent({
     });
     onBeforeMount(async () => {
       // 获取音乐图片，标题，歌手
-      let info = await getSongInfo(id);
-      data.img = info.songs[0].al.picUrl;
-      data.name = info.songs[0].name;
-      data.singerInfo.concat(info.songs[0].ar);
-      info.songs[0].ar.forEach((item: any, index: number) => {
-        if (index == 0) {
-          data.singer += `${item.name}`;
-        } else {
-          data.singer += `/${item.name}`;
-        }
-      });
-      info = await getComment(id, 0, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
+      let info;
+      if(type == 2) {
+        // 歌单
+        info = await getPlayListDetail(id);
+        data.img = info.playlist.coverImgUrl;
+        data.singer = info.playlist.creator.nickname;
+        data.name = info.playlist.name;
+      }
+      if(type == 0) {
+        info = await getSongInfo(id);
+        data.img = info.songs[0].al.picUrl;
+        data.name = info.songs[0].name;
+        data.singerInfo.concat(info.songs[0].ar);
+        info.songs[0].ar.forEach((item: any, index: number) => {
+          if (index == 0) {
+            data.singer += `${item.name}`;
+          } else {
+            data.singer += `/${item.name}`;
+          }
+        });
+      }
+      
+      info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
       data.commentTotal = info.data.totalCount;
       data.arr = info.data.comments;
       info.data.sortTypeList.forEach((item: any,index: number) => {
@@ -273,12 +308,12 @@ export default defineComponent({
     // 获取楼层评论
     const floorRequest = async (topComment: any,parentCommentId: number) => {
       data.floorTopComment = topComment;
+      data.floorLoading = true;
       store.commit("set_floor_comment", true)
       data.floorArr = [];
       data.floorFinish = false;
-      data.floorLoading = true;
       data.floorPageNo = 1;
-      let info = await getFloorComment(id,parentCommentId,0,data.floorPageNo);
+      let info = await getFloorComment(id,parentCommentId,type,data.floorPageNo);
       console.log(data.floorTopComment);
       data.floorArr = info.data.comments;
       data.floorPageNo +=1;
@@ -367,15 +402,14 @@ export default defineComponent({
 }
 
 .song_info {
-  height: 110px;
+  height: 80px;
   margin-bottom: 8px;
+  padding: 8px;
   background-color: #fff;
   display: flex;
   .img {
-    padding: 8px;
-    // width: 90px;
-    // height: 90px;
     border-radius: 8px;
+    margin-right: 8px;
     .song_img {
       width: 80px;
       height: 80px;
@@ -383,8 +417,11 @@ export default defineComponent({
   }
   .info {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     .title {
-      font-size: 18px;
+      font-size: 15px;
       display: -webkit-box;
       -webkit-box-orient: vertical;
       -webkit-line-clamp: 2;
@@ -437,6 +474,24 @@ export default defineComponent({
         display: flex;
         justify-content: space-between;
         .top_left {
+          .name  {
+            display: flex;
+            img {
+              height: 16px;
+            }
+            .level {
+              height: 16px;
+              font-size: 12px;
+              font-weight: bold;
+              color: rgb(244, 218, 214);
+              background-color: black;
+              margin-left: -2px;
+              border-top-right-radius: 3px;
+              border-bottom-right-radius: 3px;
+              padding-right: 3px;
+              filter: blur(0.4px);
+            }
+          }
           .time {
             font-size: 12px;
             color: #ccc;

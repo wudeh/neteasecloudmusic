@@ -70,3 +70,28 @@ export function getFloorComment(id: number,parentCommentId: number,type: number,
   // return axios.post("/comment/floor",{id,parentCommentId,type,time,limit});
   return axios.get(`/comment/floor?parentCommentId=${parentCommentId}&id=${id}&type=${type}&time=${time}`);
 }
+
+/**
+ * 
+ * @param rid 获取电台信息
+ * @returns 
+ */
+export function getDjDetail(rid: number): any {
+  return axios.get(`/dj/detail?rid=${rid}`);
+}
+/**
+ * 获取电台节目
+ * @param rid 
+ * @param limit 返回数量 , 默认为 30
+ * @param offset 偏移数量，用于分页 , 如 :( 页数 -1)*30, 其中 30 为 limit 的值 , 默认为 0
+ * @param asc 排序方式,默认为 false (新 => 老 ) 设置 true 可改为 老 => 新
+ * @returns 
+ */
+export function getDjProgram(rid: number,asc=false,limit=999,offset=0): any {
+  return axios.get(`/dj/program?rid=${rid}&limit=${limit}&asc=${asc}`);
+}
+
+
+export function getPlayListDetail(id: number): any {
+  return axios.get(`/playlist/detail?id=${id}`);
+}

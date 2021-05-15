@@ -4,6 +4,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "Home",
+    redirect: `/discover`,
     component: () => import(/* webpackChunkName: "login" */ "@/views/Home.vue"),
     meta: {
       keepAlive: true,
@@ -30,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/",
+        path: "/discover",
         name: "discover",
         meta: {
           keepAlive: true,
@@ -69,6 +70,15 @@ const routes: Array<RouteRecordRaw> = [
         path: "/download",
         name: "download",
         component: () => import(/* webpackChunkName: "login" */ "@/components/page/download.vue"),
+        meta: {
+          keepAlive: true,
+          level: 9,
+        },
+      },
+      {
+        path: "/djProgram",
+        name: "djProgram",
+        component: () => import(/* webpackChunkName: "login" */ "@/components/page/djProgram.vue"),
         meta: {
           keepAlive: true,
           level: 9,

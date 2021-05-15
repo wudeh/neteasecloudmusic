@@ -57,8 +57,10 @@
         </div>
         <!-- 播放图标 -->
         <div class="bottom_icon">
-          <img src="../../../public/img/icons/circulate.svg" alt="">
-          <img src="../../../public/img/icons/last_song.svg" alt="">
+          <img @click="store.commit(`set_circulate`)" v-if="store.state.song_info.playMode == 1" src="../../../public/img/icons/circulate.svg" alt="">
+          <img @click="store.commit(`set_circulate`)" v-else-if="store.state.song_info.playMode == 2" src="../../../public/img/icons/circulate_random.svg" alt="">
+          <img @click="store.commit(`set_circulate`)" v-else-if="store.state.song_info.playMode == 3" src="../../../public/img/icons/circulate_one.svg" alt="">
+          <img @click="store.dispatch(`play_next`, -1)" src="../../../public/img/icons/last_song.svg" alt="">
           <img class="bigPlay" @click.stop="change_play()" :src="store.state.song_info.isPlaying ? stopWhite : playWhite" alt="">
           <img @click="store.dispatch(`play_next`)" src="../../../public/img/icons/last_song.svg" style="transform:rotate(180deg)" alt="">
           <img @click="store.commit(`set_pop_list`, true);" src="../../../public/img/icons/list_white.svg" alt="">
@@ -161,7 +163,7 @@ export default defineComponent({
 
           });
         }
-      }else if(data.nolyric) {
+      }else {
         // lyric = reactive([])
         lyric.push({
           time: 9999,
@@ -193,8 +195,14 @@ export default defineComponent({
 
     // 去评论区
     const goComment = () => {
-      router.push({path: "/comment",query: {id: store.state.song_info.id}})
+      router.push({path: "/comment",query: {id: store.state.song_info.id, type: store.state.song_info.type}})
     }
+
+    onBeforeMount(() => {
+      if(!store.state.song_info.id) {
+        router.push(`/`)
+      }
+    })
 
     onMounted(async () => {
       console.log("mounted");
@@ -439,7 +447,7 @@ export default defineComponent({
     top: 0;
     bottom: 0;
     right: 0;
-    filter: blur(150px);
+    filter: blur(350px);
     z-index: -1;
   }
   .nav {

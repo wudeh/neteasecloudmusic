@@ -1,3 +1,5 @@
+import router from '@/router';
+import { Toast } from 'vant';
 import { createStore } from 'vuex'
 import { getLyric, getSongUrl, getComment} from "../api/song"
 interface song {
@@ -7,6 +9,7 @@ interface song {
     author: string,
     img: string,
     url: string,
+    type: number | string,
     isPlaying: boolean,
     lyric: any[],
     currentTime: number | string, // 当前播放时间
@@ -16,7 +19,7 @@ interface song {
     commentcount: number, // 评论数量
     list: any[], // 播放列表
     listIndex: number,
-    playMode: '', // 播放模式
+    playMode: number, // 播放模式
     timer: null // 定时器
     },
     showLoading: boolean,
@@ -49,6 +52,7 @@ export default createStore<song>({
       author: localStorage.getItem("songAuthor") || '',
       img: localStorage.getItem("songImg") || '',
       url: '',
+      type: localStorage.getItem("songType") || `0`,
       isPlaying: false,
       lyric: [],
       currentTime: localStorage.getItem("songPlayTime") || 0, // 当前播放时间
@@ -58,7 +62,7 @@ export default createStore<song>({
       commentcount: 0, // 评论数量
       list:[], // 播放列表
       listIndex: 0,
-      playMode: '', // 播放模式
+      playMode: 1, // 播放模式：1 列表循环，2：随机播放，3：单曲循环
       timer: null // 定时器
     },
     showLoading: false,
@@ -90,12 +94,14 @@ export default createStore<song>({
       state.song_info.name = song.name;
       state.song_info.author = song.author;
       state.song_info.img = song.img;
+      state.song_info.type = song.type;
       
       // state.song_info.url = song.url;
       localStorage.setItem("songId",state.song_info.id);
       localStorage.setItem("songName",state.song_info.name);
       localStorage.setItem("songAuthor",state.song_info.author);
       localStorage.setItem("songImg",state.song_info.img);
+      localStorage.setItem("songType",JSON.stringify(state.song_info.type));
       state.song_info.list = state.song_info.list.concat(song);
       state.song_info.listIndex += 1;
     },
@@ -126,10 +132,16 @@ export default createStore<song>({
     },
     // 播放歌曲列表
     add_songList(state, list) {
-      state.song_info.list = list;
+      state.song_info.list.splice(0);
+      state.song_info.list = state.song_info.list.concat(list);
       state.song_info.listIndex = 0;
+      state.song_info.name = state.song_info.list[state.song_info.listIndex].name;
+      state.song_info.author = state.song_info.list[state.song_info.listIndex].author;
+      state.song_info.img = state.song_info.list[state.song_info.listIndex].img;
+      state.song_info.type = state.song_info.list[state.song_info.listIndex].type;
+      state.song_info.id = state.song_info.list[state.song_info.listIndex].id;
     },
-    // 下一首播放
+    // 添加到下一首播放
     add_song(state, song) {
       state.song_info.list.splice(state.song_info.listIndex, 0, song);
     },
@@ -163,25 +175,58 @@ export default createStore<song>({
       state.showFloor = false;
       state.showPop = false;
       state.showDetail = false;
-    }
+    },
+    // 改变播放模式
+    set_circulate(state) {
+      state.song_info.playMode ++;
+      state.song_info.playMode > 3 && (state.song_info.playMode = 1)
+      state.song_info.playMode == 1 && Toast(`列表循环播放`)
+      state.song_info.playMode == 2 && Toast(`随机播放`)
+      state.song_info.playMode == 3 && Toast(`单曲循环`)
+    },
+    
   },
   actions: {
     // 播放下一首
     async play_next(ctx, i) {
+      if(ctx.state.song_info.list.length == 1) {
+        Toast("当前列表只有一首歌")
+        return
+      }
       console.log("正在检查是否播放下一首");
+      ctx.state.song_info.isPlaying = false
       ctx.commit(`set_song_time`,0)
-      // 有传参数 i ，播放上一首
-      if(i) {
-        if(--ctx.state.song_info.listIndex < ctx.state.song_info.list.length -1) {
-          ctx.state.song_info.listIndex = ctx.state.song_info.list.length -1;
-        }
-      }else {
-        // 播放下一首
-        if(++ctx.state.song_info.listIndex > ctx.state.song_info.list.length -1 ) {
-          ctx.state.song_info.listIndex = 0;
+      // 如果是列表循环
+      if(ctx.state.song_info.playMode == 1) {
+        // 参数 i < 0，播放上一首
+        if(i < 0) {
+          if(--ctx.state.song_info.listIndex < 0) {
+            ctx.state.song_info.listIndex = ctx.state.song_info.list.length -1;
+          }
+        }else if(i >=0 ) {
+          // 播放指定歌曲
+          ctx.state.song_info.listIndex = i;
+        }else {
+          // 播放下一首
+          if(++ctx.state.song_info.listIndex > ctx.state.song_info.list.length -1 ) {
+            ctx.state.song_info.listIndex = 0;
+          }
         }
       }
+
+      // 如果是随机播放
+      if(ctx.state.song_info.playMode == 2) {
+        ctx.state.song_info.listIndex = Math.floor(Math.random() * ctx.state.song_info.list.length);
+        console.log(ctx.state.song_info.listIndex);
+        
+      }
       
+      // 如果是单曲循环
+      if(ctx.state.song_info.playMode == 3) {
+        ctx.state.song_info.isPlaying = true;
+        Toast(`当前播放模式为单曲循环，重新播放`)
+        return;
+      }
       
        // 请求URL
       //  const info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
@@ -204,20 +249,49 @@ export default createStore<song>({
     },
     // 设置歌曲弹出框详情
     async set_pop_detail(ctx, item) {
-      ctx.state.song_pop_detail = Object.assign({}, item);
-      ctx.state.song_pop_detail.author = item.ar.map((i:any) => i.name).join("/")
-      ctx.state.song_pop_detail.img = item.al.picUrl
       ctx.state.showDetail = true;
       ctx.state.showPop = true;
-      // 获取一下评论数量
-      let info = await getComment(item.id,0,1,20,1);
-      ctx.state.song_pop_detail.commentCount = info.data.totalCount
-      // 获取URL，以供下载
-      info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
-      ctx.state.song_pop_detail.url = info.data[0].url
+
+      if(ctx.state.song_pop_detail.id != item.id) {
+        ctx.state.song_pop_detail = Object.assign({}, item);
+        ctx.state.song_pop_detail.author = item.ar.map((i:any) => i.name).join("/")
+        ctx.state.song_pop_detail.img = item.al.picUrl
       
-      console.log(ctx.state.song_pop_detail);
-      
+        // 获取一下评论数量
+        let info = await getComment(item.id,0,1,20,1);
+        ctx.state.song_pop_detail.commentCount = info.data.totalCount
+        // 获取URL，以供下载
+        info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
+        ctx.state.song_pop_detail.url = info.data[0].url
+      }
+    },
+    // 删除列表歌曲
+    delete(ctx, i) {
+      // i 小于 0，或者当前列表只有一首歌，删除全部
+      if(i < 0 || (i == ctx.state.song_info.listIndex && ctx.state.song_info.list.length == 1)) {
+        ctx.state.song_info.list.splice(0)
+        ctx.state.song_info.listIndex = 0;
+        ctx.state.song_info.isPlaying = false;
+        // ctx.state.song_info.url = '' 不删除 URL，造成所有歌曲被删除的假象就行
+        ctx.state.song_info.name = ''
+        ctx.state.song_info.author = ''
+        ctx.state.song_info.type = 0
+        ctx.state.song_info.id = ''
+        localStorage.removeItem("songId");
+        localStorage.removeItem("songName");
+        localStorage.removeItem("songAuthor");
+        localStorage.removeItem("songImg");
+        localStorage.removeItem("songType");
+        ctx.commit(`close`)
+        router.go(-1)
+      }else {
+        // 如果删除的是当前播放的歌曲，先播放下一首歌
+        if(i == ctx.state.song_info.listIndex) {
+          ctx.dispatch(`play_next`)
+        }
+        // 再删除
+        ctx.state.song_info.list.splice(i, 1)
+      }
     }
   },
   modules: {

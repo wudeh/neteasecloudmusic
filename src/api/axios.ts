@@ -2,7 +2,7 @@ import axios from "axios";
 import { Toast } from "vant";
 //  import router from '../router'
 
-axios.defaults.baseURL = process.env.NODE_ENV == "development" ? "http://39.108.136.207:3000/" : "https://netease-cloud-music-api-jet.vercel.app/";
+axios.defaults.baseURL = process.env.NODE_ENV == "development" ? "https://netease-cloud-music-api-jet.vercel.app/" : "https://netease-cloud-music-api-jet.vercel.app/";
 // axios.defaults.withCredentials = true;
 
 // axios.defaults.headers["X-Requested-With"] = "XMLHttpRequest";

@@ -44,8 +44,8 @@ export function getsearchResult(keywords: string,type=1,offset=0,limit=20): any 
   //   return axios.post(`/search`,{ keywords, type, offset: offset*limit, limit});
   // }
   if(type == 1) {
-    return axios.get(`/cloudsearch?keywords=${keywords}&type=${type}&offset=${offset}&limit=${limit}`)
+    return axios.get(`/cloudsearch?keywords=${keywords}&type=${type}&offset=${offset*limit}&limit=${limit}`)
   }else {
-    return axios.get(`/search?keywords=${keywords}&type=${type}&offset=${offset}&limit=${limit}`)
+    return axios.get(`/search?keywords=${keywords}&type=${type}&offset=${offset*limit}&limit=${limit}`)
   }
 }

@@ -22,13 +22,29 @@
       <div class="pop_list">
         <div class="title">当前播放列表({{ store.state.song_info.list.length }})</div>
         <div class="option">
-          <div class="circulate">列表循环</div>
-          <div class="get">收藏全部</div>
-          <div class="del_list"></div>
+          <div class="circulate"  v-if="store.state.song_info.playMode == 1">
+            <img @click="store.commit(`set_circulate`)" src="../../public/img/icons/circulate_gray.svg" alt="">
+            <span>列表循环</span>
+          </div>
+          <div class="circulate"  v-if="store.state.song_info.playMode == 2">
+            <img @click="store.commit(`set_circulate`)" src="../../public/img/icons/circulate_random_gray.svg" alt="">
+            <span>随机播放</span>
+          </div>
+          <div class="circulate"  v-if="store.state.song_info.playMode == 3">
+            <img @click="store.commit(`set_circulate`)" src="../../public/img/icons/circulate_one_gray.svg" alt="">
+            <span>单曲循环</span>
+          </div>
+          
+          <div class="get">
+            <img src="../../public/img/icons/collect_gray.svg" alt="">
+            <img class="finger" src="../../public/img/icons/finger.svg" alt="">
+            <span>收藏全部</span>
+            <img class="del_list" @click="store.dispatch(`delete`, -1)" src="../../public/img/icons/delete_gray.svg" alt="">
+          </div>
         </div>
         <div class="list">
           <div class="item" v-for="(it, i) in store.state.song_info.list" :key="i">
-            <div :class="{ info: true, red: i == store.state.song_info.listIndex }">
+            <div :class="{ info: true, red: i == store.state.song_info.listIndex }" @click="store.dispatch(`play_next`, i)">
               <div class="icon">
                 <img v-if="i == store.state.song_info.listIndex" src="../../public/img/icons/loading.svg" alt="" />
               </div>
@@ -36,7 +52,7 @@
               <span>&nbsp;-&nbsp;</span>
               <span class="author">{{ it.author }}</span>
             </div>
-            <img class="delete" src="../../public/img/icons/delete.svg" alt="" />
+            <img class="delete"  @click="store.dispatch(`delete`, i)" src="../../public/img/icons/delete.svg" alt="" />
           </div>
         </div>
       </div>
@@ -61,7 +77,7 @@
             <span class="author">{{ store.state.song_pop_detail.author }}</span>
           </div>
         </div>
-        <div class="item" @click="store.commit(`add_song`, store)">
+        <div class="item" @click="store.commit(`add_song`, store.state.song_pop_detail)">
           <img style="border-radius: 50%" src="../../public/img/player/cover-bg-in.png" alt="" />
           <span>下一首播放</span>
         </div>
@@ -69,11 +85,11 @@
           <img src="../../public/img/icons/sub.svg" alt="" />
           <span>收藏到歌单</span>
         </div>
-        <div class="item">
-          <img src="../../public/img/icons/download_gray.svg" alt="" @click="downloadFile(store.state.song_pop_detail.url, { id: store.state.song_pop_detail.id, name: store.state.song_pop_detail.name, author: store.state.song_pop_detail.author })" />
+        <div class="item" @click="downloadFile(store.state.song_pop_detail.url, { id: store.state.song_pop_detail.id, name: store.state.song_pop_detail.name, author: store.state.song_pop_detail.author })">
+          <img src="../../public/img/icons/download_gray.svg" alt="" />
           <span>下载</span>
         </div>
-        <div class="item">
+        <div class="item" @click="router.push({path: `/comment`,query: {id: store.state.song_pop_detail.id}})">
           <img src="../../public/img/icons/comment.svg" alt="" />
           <span>评论（{{ store.state.song_pop_detail.commentCount }}）</span>
         </div>
@@ -210,8 +226,11 @@ export default defineComponent({
         console.log("监听到播放歌曲变更");
         audio.value.pause();
         // 请求URL
-        // const info = await getSongUrl(store.state.song_info.id);
-        // store.commit("set_song_url",info.data[0].url);
+        if(!store.state.song_info.url) {
+          const info = await getSongUrl(store.state.song_info.id);
+          store.commit("set_song_url",info.data[0].url);
+        }
+        
         audio.value.src = store.state.song_info.url;
         audio.value.play();
         store.commit("play", true);
@@ -261,6 +280,8 @@ export default defineComponent({
           });
         }
       }
+
+      audio.value.preload = `auto`
 
       audio.value.addEventListener("progress", () => {
         console.log("<-- 请求缓冲数据 ing -->");
@@ -478,6 +499,7 @@ export default defineComponent({
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1111;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -496,12 +518,48 @@ export default defineComponent({
     overflow: hidden;
     .circulate {
       float: left;
+      display: flex;
+      align-items: center;
+      img {
+        width: 20px;
+        margin-right: 8px;
+      }
     }
     .get {
       float: right;
-    }
-    .del_list {
-      float: right;
+      display: flex;
+      align-items: center;
+      // position: relative;
+      img {
+        width: 20px;
+        margin-left: 8px;
+      }
+      @keyframes finger {
+        0% {
+          top: 10px;
+        }
+        50% {
+          top: 20px;
+        }
+        100% {
+          top: 10px;
+        }
+      }
+      .finger {
+        position: absolute;
+        left: 204;
+        top: 10px;
+        transform: rotate(180deg);
+        animation: finger 1s  infinite;
+      }
+      span {
+        margin-left: 8px;
+      }
+      .del_list {
+        float: right;
+        width: 20px;
+        margin-left: 40px;
+      }
     }
   }
   .list {
@@ -530,8 +588,17 @@ export default defineComponent({
           }
         }
         .name {
+          width: 240px;
           font-size: 18px;
           color: black;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .author {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .red {
           color: red;

@@ -10,7 +10,7 @@
     </form>
     <van-tabs ref="tab" v-model:active="activeName"  sticky @click="onClick">
       <van-tab title="综合" name="1018">
-        <div class="wrapper" v-if="song">
+        <div class="wrapper" v-if="song.songs.length">
           <!-- 单曲 -->
           <div class="song" v-if="song">
             <div class="title">
@@ -26,10 +26,12 @@
                     <span class="vip" v-if="item.fee == 1">VIP</span>
                     <span class="hear_try" v-if="item.fee == 1">试听</span>
                     <span class="sq" v-if="item.privilege.maxbr >= 999000">SQ</span>
+                    <span class="sq" v-if="item.privilege.flag >= 60 && item.privilege.flag < 70">独家</span>
                     <span  v-word="word" class="singer" v-for="(it, i) in item.ar" :key="i"><span v-if="i > 0">/</span>{{ it.name }} </span>
                     - 
                     <span  v-word="word" class="album">{{ item.al.name }}</span>
                   </div>
+                  <div  class="author" v-if="item.alia.length">{{ item.alia[0] }}</div>
                   <div class="originSinger" v-if="item.originSongSimpleData">
                     <span>原唱：</span>
                     <span v-for="(it, i) in item.originSongSimpleData.artists" :key="i"><i v-if="i > 0">/</i>{{it.name}}</span>
@@ -117,7 +119,7 @@
           <!-- 电台播单 -->
           <div class="djRadio" v-if="djRadio">
             <div class="title">播单（电台）</div>
-            <div class="item" v-for="(item, index) in djRadio.djRadios" :key="index">
+            <div class="item" v-for="(item, index) in djRadio.djRadios" :key="index"  @click="router.push({path:`/djProgram`, query:{id: item.id}})">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.picUrl" />
               </div>
@@ -180,6 +182,7 @@
                   <div class="author">
                     <span class="origin" v-for="(it, i) in item.specialTags" :key="i">{{ it }}</span>
                     <span  v-word="word" class="origin" v-if="item.originCoverType == 1">原唱</span>
+                    <span class="sq" v-if="item.privilege.flag >= 60 && item.privilege.flag < 70">独家</span>
                     <span class="vip" v-if="item.fee == 1">VIP</span>
                     <span class="hear_try" v-if="item.fee == 1">试听</span>
                     <span class="sq" v-if="item.privilege.maxbr >= 999000">SQ</span>
@@ -187,12 +190,13 @@
                     - 
                     <span  v-word="word" class="album">{{ item.al.name }}</span>
                   </div>
+                  <div  class="author" v-if="item.alia.length">{{ item.alia[0] }}</div>
                   <div class="originSinger" v-if="item.originSongSimpleData">
                     <span>原唱：</span>
                     <span v-for="(it, i) in item.originSongSimpleData.artists" :key="i"><i v-if="i > 0">/</i>{{it.name}}</span>
                   </div>
                 </div>
-                <div class="rignt">
+                <div class="rignt" @click="store.dispatch(`set_pop_detail`, item)">
                   <img src="../../../public/img/icons/more_gray.svg" alt="">
                 </div>
               </div>
@@ -314,7 +318,7 @@
             </div>
           </template>
         <div class="playList">
-            <div class="item" v-for="(item, index) in playLists" :key="index">
+            <div class="item" v-for="(item, index) in playLists" :key="index"  @click="router.push({path:`/songList`, query:{id: item.id}})">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.coverImgUrl" />
               </div>
@@ -414,7 +418,7 @@
             </div>
           </template>
         <div class="djRadio">
-            <div class="item" v-for="(item, index) in djRadios" :key="index">
+            <div class="item" v-for="(item, index) in djRadios" :key="index" @click="router.push({path:`/djProgram`, query:{id: item.id}})">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.picUrl" />
               </div>
@@ -771,6 +775,7 @@
         let song = {
           id: item.id,
           name: item.name,
+          type: 0,
           author: item.ar.map((i:any) => i.name).join("/"),
           // url: info.data[0].url,
           img: item.al.picUrl

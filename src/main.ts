@@ -19,12 +19,17 @@ import "vant/lib/index.css";
 const app = createApp(App);
 
 router.beforeEach((to, from, next) => {
-  if(store.state.showPop) {
+  
+  if(from.name == `searchResult` && to.name == `comment`) {
+    store.commit("close")
+    // next()
+  }else if(store.state.showPop) {
     console.log("当前有弹出框禁止后退");
     
     store.commit("close")
     return next(false)
   }
+  
   next()
 })
 

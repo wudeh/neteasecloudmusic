@@ -1,5 +1,5 @@
 // 过滤播放量函数
-export function numFilter(num: number): number | string {
+export function numFilter(num: number): string {
   if (num >= 100000 && num < 100000000) {
     const i = (num / 10000).toFixed(1);
     return i + "万";
@@ -7,7 +7,7 @@ export function numFilter(num: number): number | string {
     const i = (num / 100000000).toFixed(1);
     return i + "亿";
   }
-  return num;
+  return `${num}`;
 }
 
 // 手动删除cookie
@@ -28,7 +28,7 @@ export function getTime(time: number): string {
   let hour = Math.floor(i / 3600);
   // console.log("计算后的小时" + hour);
 
-  let min = Math.floor(i / 60);
+  let min = Math.floor(i / 60 - hour * 60);
   // console.log("计算后的分钟" + min);
   
   let h = `${hour}`.padStart(2, '0');
@@ -37,7 +37,7 @@ export function getTime(time: number): string {
   // console.log("计算后的秒" + sec);
   let s = `${sec}`.padStart(2, '0');
   if(Number.isNaN(min)) return "00:00"
-  if(hour>0) return h + m +':' + s;
+  if(hour>0) return h + `:` + m +':' + s;
   return m +':' + s;
 }
 

@@ -7,7 +7,7 @@
       <div class="left_arrow">
         <img src="../../../public/img/icons/left_arrow.svg" alt="">
       </div>
-      <div class="title">歌单</div>
+      <div class="title">播单</div>
       <div class="search">
         <img src="../../../public/img/icons/search.svg" alt="">
       </div>
@@ -38,7 +38,7 @@
         <span>{{numFilter(subscribedCount)}}</span>
     </div>
     <div class="line"></div>
-    <div class="comment item" @click="router.push({path: `/comment`, query: {id: id, type: 2}})">
+    <div class="comment item">
       <img src="../../../public/img/icons/comment.svg" alt="">
         <span>{{numFilter(commentCount)}}</span>
     </div>
@@ -56,28 +56,23 @@
     <div class="text">
       <div class="play_all_title">播放全部</div>
     </div>
-    <div class="play_count">({{songListInfo.length}})</div>
+    <div class="play_count" v-if="songListInfo.length">({{songListInfo.length}})</div>
   </div>
   <!-- 歌曲列表 -->
   <div class="songList">
     <div class="song_item" v-for="(item,index) in songListInfo" :key="index">
       <div class="index">
         <img v-if="item.id == store.state.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="">
-        <span v-else>{{index + 1}}</span>
+        <span v-else>{{ songListInfo.length - index }}</span>
       </div>
       <div class="song_info" @click="playMusicSingle(item)">
         <div class="info_top">
           <div class="song_name">{{item.name}}</div>
-          <div class="song_TV" v-if="item.Tv">&nbsp;-&nbsp;{{item.Tv}}</div>
         </div>
         <div class="info_bottom">
-          <span class="vip" v-if="item.vip">vip</span>
-          <span class="hear_try" v-if="item.vip">试听</span>
-          <span class="dujia" v-if="item.dujia">独家</span>
-          <span class="sq" v-if="item.sq">SQ</span>
-          {{item.author}}
-          -
-          {{item.des}}
+          播放量：{{ item.playCount}}&nbsp;
+           时长：{{ item.duration}}&nbsp;      
+          by：{{item.author}}
         </div>
       </div>
       <div class="more">
@@ -90,13 +85,12 @@
 <script lang="ts">
 import { defineComponent, ref, toRefs, onBeforeMount,reactive } from "vue";
 import { useRouter } from "vue-router"
-import {getSongListInfo,getSongInfo,getSongUrl} from "../../api/song"
-import { numFilter } from "../../utils/num";
+import {getSongListInfo,getSongInfo,getSongUrl, getDjProgram, getDjDetail} from "../../api/song"
+import { numFilter, getTime } from "../../utils/num";
 import { useStore } from 'vuex'
 
 // 歌单
 interface songList {
-  id: number,
   numFilter: any,
   title: string,
   img: string,
@@ -108,18 +102,18 @@ interface songList {
   commentCount:number,
   subedIcon: string,
   subIcon: string,
+  asc: boolean // 排序方式,默认为 false (新 => 老 ) 设置 true 可改为 老 => 新
 }
 
 // 歌曲
 interface song {
   id: string | number,
   name: string,
-  Tv: string, // 歌曲可能会有剧名
   author: string,
-  des: string,
-  sq: boolean, 
-  vip: boolean,
-  dujia: boolean
+  playCount: string,
+  duration: string,
+  url: string,
+  img: string
 }
 
 // 作者
@@ -131,14 +125,13 @@ interface author {
 }
 
   export default defineComponent({
-    name: "songList",
+    name: "djProgram",
     setup() {
       //实例化路由
     const router = useRouter();
     const store = useStore();
     const img = ref<string>()
     const data = reactive<songList>({
-      id: 0,
       numFilter:numFilter,
       title: '',
       img: '',
@@ -150,6 +143,7 @@ interface author {
       commentCount: 0,
       subedIcon: require('../../../public/img/icons/subed.svg'),
       subIcon: require('../../../public/img/icons/sub.svg'),
+      asc: false
     })
     const author = reactive<author>({
       avatar: '',
@@ -161,55 +155,47 @@ interface author {
     onBeforeMount(async () => {
       console.log(router.currentRoute.value);
       
-      // 得到歌单数据
-      const songList = await getSongListInfo(id);
+      // 得到基本信息
+      const songList = await getDjDetail(id);
       console.log(songList);
       // 组装歌单数据
-      data.title = songList.playlist.name;
-      data.id = songList.playlist.id;
-      data.img = songList.playlist.coverImgUrl;
-      data.description = songList.playlist.description;
-      data.subscribed = songList.playlist.subscribed;
-      console.log(data.subscribed);
+      data.title = songList.data.name;
+      data.img = songList.data.picUrl;
+      data.description = songList.data.desc;
+      data.subscribed = songList.data.subed;
       
-      data.subscribedCount = songList.playlist.subscribedCount;
-      data.commentCount = songList.playlist.commentCount;
-      data.shareCount = songList.playlist.shareCount;
+      data.subscribedCount = songList.data.subCount;
+      data.commentCount = songList.data.commentCount;
+      data.shareCount = songList.data.shareCount;
 
-      author.avatar = songList.playlist.creator.avatarUrl;
-      author.userId = songList.playlist.creator.userId;
-      author.nickname = songList.playlist.creator.nickname;
-      author.followed = songList.playlist.creator.followed;
+      author.avatar = songList.data.dj.defaultAvatar ? songList.data.dj.defaultAvatar : songList.data.dj.avatarUrl;
+      author.userId = songList.data.dj.userId;
+      author.nickname = songList.data.dj.nickname;
+      author.followed = songList.data.dj.followed;
 
-      let allId = songList.playlist.trackIds.map((item: { id: string; }) => {
+      // 得到节目列表信息
+      let list = await getDjProgram(id, data.asc)
+      data.songListInfo = data.songListInfo.concat(list.programs)
+      // 得到所有 id
+      let allId = list.programs.map((item: any) => {
         return item.id
       });
-      // 得到歌单里的全部歌曲信息
-      const songListInfo:any = await getSongInfo(allId.join(","));
-      console.log(songListInfo);
+      // 得到歌单里的全部歌曲 URL
+      const URL:any = await getSongUrl(allId.join(","));
+      // console.log(songListInfo);
+      data.songListInfo.splice(0)
+      list.programs.forEach((item: any, index: number) => {
 
-      data.songListInfo = songListInfo.songs.map((item: any) => {
-
-        return {
-          id: item.id,
-          name: item.name,
-          Tv: item.alia.join("/"), // 歌曲可能会有剧名
-          author: item.ar.map((item:any) => item.name).join("/"),
-          des: item.al.name,
-          ar: item.ar,
-          al: item.al
-          // sq: item.maxbr >= 999000, 
-          // vip: item.fee == 1,
-          // dujia: item.flag == 1092
-        }
+        data.songListInfo.push({
+          id: item.mainSong.id,
+          name: item.mainSong.name,
+          author: item.dj.nickname,
+          playCount: numFilter(item.listenerCount),
+          duration: getTime(item.duration / 1000),
+          url: URL[index],
+          img: item.coverUrl
+        })
       })
-
-      songListInfo.privileges.forEach((item:any,index:number) => {
-        data.songListInfo[index].sq = (item.maxbr >= 999000);
-        data.songListInfo[index].vip = (item.fee == 1);
-        data.songListInfo[index].dujia = (item.flag == 1092);
-      })
-      
     })
 
     // 点击播放歌曲
@@ -229,10 +215,11 @@ interface author {
         // const info = await getSongUrl(item.resourceId);
         let song = {
           id: item.id,
+          type: 4,
           name: item.name,
-          author: item.ar.map((i:any) => i.name).join("/"),
-          // url: info.data[0].url,
-          img: item.al.picUrl
+          author: item.author,
+          url: item.url,
+          img: item.img
         }
         // 设置歌曲信息
         store.commit("setSongInfo",song);
@@ -246,7 +233,6 @@ interface author {
       ...toRefs(data),
       author,
       store,
-      router,
       playMusicSingle
     }
 
@@ -354,7 +340,7 @@ interface author {
         opacity: 0.5;
         display: flex;
         .text {
-          width: 180px;
+          // width: 180px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -451,10 +437,12 @@ interface author {
         overflow: hidden;
         display: flex;
         .song_name {
+          font-size: 16px;
           white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .song_TV {
-          color: #fff;
           opacity: 0.5;
           white-space: nowrap;
           overflow: hidden;
@@ -462,31 +450,13 @@ interface author {
         }
       }
       .info_bottom {
-        // color: #fff;
+        color: #fff;
         opacity: 0.5;
         font-size: 12px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         height: 20px;
-        .vip {
-          color: red;
-          border: 1px solid red;
-          border-radius: 3px;
-          opacity: 0.6;
-        }
-        .dujia {
-          .vip
-        }
-        .sq {
-          .vip
-        }
-        .hear_try {
-          color: rgb(0, 217, 255);
-          border: 1px solid rgb(0, 153, 255);
-          border-radius: 3px;
-          opacity: 0.6;
-        }
       }
     }
     .more {
