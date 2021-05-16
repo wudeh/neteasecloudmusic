@@ -7,7 +7,7 @@
       <div class="left_arrow" @click="router.go(-1)">
         <img src="../../../public/img/icons/left_arrow.svg" alt="">
       </div>
-      <div class="title">歌单</div>
+      <div class="title">专辑</div>
       <div class="search">
         <img src="../../../public/img/icons/search.svg" alt="">
       </div>
@@ -38,7 +38,7 @@
         <span>{{numFilter(subscribedCount)}}</span>
     </div>
     <div class="line"></div>
-    <div class="comment item" @click="router.push({path: `/comment`, query: {id: id, type: 2}})">
+    <div class="comment item" @click="router.push({path: `/comment`, query: {id: id, type: 3}})">
       <img src="../../../public/img/icons/comment.svg" alt="">
         <span>{{numFilter(commentCount)}}</span>
     </div>
@@ -90,7 +90,7 @@
 <script lang="ts">
 import { defineComponent, ref, toRefs, onBeforeMount,reactive } from "vue";
 import { useRouter } from "vue-router"
-import {getSongListInfo,getSongInfo,getSongUrl} from "../../api/song"
+import {getSongListInfo,getSongInfo,getAlbumDetail} from "../../api/song"
 import { numFilter } from "../../utils/num";
 import { useStore } from 'vuex'
 
@@ -131,7 +131,7 @@ interface author {
 }
 
   export default defineComponent({
-    name: "songList",
+    name: "album",
     setup() {
       //实例化路由
     const router = useRouter();
@@ -162,34 +162,29 @@ interface author {
       console.log(router.currentRoute.value);
       store.commit("set_load", true)
       
-      // 得到歌单数据
-      const songList = await getSongListInfo(id);
+      // 得到专辑数据
+      const songList = await getAlbumDetail(id);
       console.log(songList);
       // 组装歌单数据
-      data.title = songList.playlist.name;
-      data.id = songList.playlist.id;
-      data.img = songList.playlist.coverImgUrl;
-      data.description = songList.playlist.description;
-      data.subscribed = songList.playlist.subscribed;
+      data.title = songList.album.name;
+      data.id = songList.album.id;
+      data.img = songList.album.picUrl;
+      data.description = songList.album.description;
+      data.subscribed = songList.album.info.liked;
       console.log(data.subscribed);
       
-      data.subscribedCount = songList.playlist.subscribedCount;
-      data.commentCount = songList.playlist.commentCount;
-      data.shareCount = songList.playlist.shareCount;
+      data.subscribedCount = songList.album.info.likedCount;
+      data.commentCount = songList.album.info.commentCount;
+      data.shareCount = songList.album.info.shareCount;
 
-      author.avatar = songList.playlist.creator.avatarUrl;
-      author.userId = songList.playlist.creator.userId;
-      author.nickname = songList.playlist.creator.nickname;
-      author.followed = songList.playlist.creator.followed;
+      author.avatar = songList.album.artist.img1v1Url;
+      author.userId = songList.album.artist.id;
+      author.nickname = songList.album.artist.name;
+      author.followed = songList.album.artist.followed;
 
-      let allId = songList.playlist.trackIds.map((item: { id: string; }) => {
-        return item.id
-      });
       // 得到歌单里的全部歌曲信息
-      const songListInfo:any = await getSongInfo(allId.join(","));
-      console.log(songListInfo);
 
-      data.songListInfo = songListInfo.songs.map((item: any) => {
+      data.songListInfo = songList.songs.map((item: any) => {
 
         return {
           id: item.id,
@@ -198,20 +193,20 @@ interface author {
           author: item.ar.map((item:any) => item.name).join("/"),
           des: item.al.name,
           ar: item.ar,
-          al: item.al
-          // sq: item.maxbr >= 999000, 
-          // vip: item.fee == 1,
-          // dujia: item.flag == 1092
+          al: item.al,
+          sq: item.privilege.maxbr >= 999000, 
+          vip: item.privilege.fee == 1,
+          dujia: item.privilege.flag == 1092
         }
       })
 
       store.commit("set_load", false)
 
-      songListInfo.privileges.forEach((item:any,index:number) => {
-        data.songListInfo[index].sq = (item.maxbr >= 999000);
-        data.songListInfo[index].vip = (item.fee == 1);
-        data.songListInfo[index].dujia = (item.flag == 1092);
-      })
+      // songListInfo.privileges.forEach((item:any,index:number) => {
+      //   data.songListInfo[index].sq = (item.maxbr >= 999000);
+      //   data.songListInfo[index].vip = (item.fee == 1);
+      //   data.songListInfo[index].dujia = (item.flag == 1092);
+      // })
       
     })
 
@@ -234,7 +229,7 @@ interface author {
           id: item.id,
           name: item.name,
           author: item.ar.map((i:any) => i.name).join("/"),
-          type: 4,
+          type: 0,
           // url: info.data[0].url,
           img: item.al.picUrl
         }

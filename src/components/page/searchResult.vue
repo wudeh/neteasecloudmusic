@@ -3,6 +3,7 @@
     <form action="/">
       <van-search
         v-model="word"
+        shape="round"
         @update:model-value="suggest()"
         placeholder="请输入搜索关键词"
         @search="onSearch"
@@ -81,7 +82,7 @@
           <!-- 视频 -->
           <div class="video" v-if="video">
             <div class="title">视频</div>
-            <div class="item" v-for="(item, index) in video.videos" :key="index">
+            <div class="item" v-for="(item, index) in video.videos" :key="index" @click="router.push({path: `/vid`, query: {vid: item.vid}})">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.coverUrl" />
                 <img src="../../../public/img/icons/play_white.svg" alt="">
@@ -103,7 +104,7 @@
           <!-- 专辑 -->
           <div class="playList" v-if="album">
             <div class="title">专辑</div>
-            <div class="item" v-for="(item, index) in album.albums" :key="index">
+            <div class="item" v-for="(item, index) in album.albums" :key="index" @click="router.push({path: `/album`, query: {id: item.id}})">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.picUrl" />
               </div>
@@ -221,7 +222,7 @@
             </div>
           </template>
           <div class="playList">
-            <div class="item" v-for="(item, index) in albums" :key="index">
+            <div class="item" v-for="(item, index) in albums" :key="index"  @click="router.push({path: `/album`, query: {id: item.id}})">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.picUrl" />
               </div>

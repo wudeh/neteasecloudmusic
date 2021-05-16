@@ -77,7 +77,7 @@ import { getTime } from "../../utils/num"
 import downloadFile from "../../utils/download"
 import BScroll from "@better-scroll/core";
 import {Toast} from "vant"
-import { getLyric, getSongUrl,getSongComment } from "../../api/song"
+import { getLyric, getSongUrl,getSongComment, getComment } from "../../api/song"
 interface info {
   bs: any;
 }
@@ -176,8 +176,8 @@ export default defineComponent({
     }
     // 获取评论
     const commentRequest = async () => {
-      const info = await getSongComment(store.state.song_info.id)
-      let total = info.total
+      const info = await getComment(store.state.song_info.id, store.state.song_info.type, 1, 20, 1, '');
+      let total = info.data.totalCount
         if (total >= 100 && total < 1000) {
           commentNum.value = '99+'
         } else if (total >= 1000 && total < 10000) {

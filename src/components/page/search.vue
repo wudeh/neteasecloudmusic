@@ -3,6 +3,7 @@
     <form action="/">
       <van-search
         v-model="word"
+        shape="round"
         @update:model-value="suggest()"
         placeholder="请输入搜索关键词"
         @search="onSearch"

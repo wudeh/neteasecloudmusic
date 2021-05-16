@@ -78,3 +78,15 @@ export function getTime(time: number): string {
     return `${userDate.getFullYear()}年${userDate.getMonth() + 1}月${userDate.getDate()}日`
   }
 }
+
+// 计算视频时长
+export function timeFilter (i: number) {
+  let a = Math.floor(i / 1000);
+  return `${Math.floor(a/60)}`.padStart(2, "00") + ":" + `${a % 60}`.padStart(2, "0")
+}
+
+// 计算日期
+export function getDate (i: number) {
+  let a = new Date(i);       
+  return `${a.getFullYear()}.${a.getMonth() + 1}.${a.getDate()}`
+}

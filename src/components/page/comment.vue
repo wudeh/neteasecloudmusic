@@ -41,12 +41,12 @@
     <div class="comment_choose">
       <div class="title">评论区</div>
       <div class="choose" v-show="!arrloading">
-        <!-- <span :class="{choosed: sortType == 1}" @click="change_sortType(1)">推荐</span>
+        <span :class="{choosed: sortType == 1}" @click="change_sortType(1)">推荐</span>
         <span :class="{choosed: sortType == 2}" @click="change_sortType(2)">最热</span>
-        <span :class="{choosed: sortType == 3}" @click="change_sortType(3)">最新</span> -->
-        <van-dropdown-menu >
+        <span :class="{choosed: sortType == 3}" @click="change_sortType(3)">最新</span>
+        <!-- <van-dropdown-menu >
           <van-dropdown-item @change="change_sortType()" v-model="sortType" :options="sortTypeList" />
-        </van-dropdown-menu>
+        </van-dropdown-menu> -->
       </div>
     </div>
   </van-sticky>
@@ -55,7 +55,6 @@
     <div class="comment_area">
       <div class="comment_item" v-for="item in arr" :key="item.commentId">
         <div class="avatar">
-          <!-- <img :src="item.user.avatarUrl" alt=""> -->
           <van-image round width="30" height="30" :src="item.user.avatarUrl" />
         </div>
         <div class="info">
@@ -284,13 +283,14 @@ export default defineComponent({
       info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
       data.commentTotal = info.data.totalCount;
       data.arr = info.data.comments;
+      if(info.data.cursor) data.cursor = info.data.cursor;
       info.data.sortTypeList.forEach((item: any,index: number) => {
         data.sortTypeList.push({
           text: item.sortTypeName,
           value: item.sortType
         })
       })
-      data.sortType = data.sortTypeList[0].value;
+      // data.sortType = data.sortTypeList[0].value;
       console.log(data.sortTypeList);
       
       data.arrloading = false;
@@ -340,7 +340,7 @@ export default defineComponent({
     // 加载更多评论
     const onLoad = async () => {
       data.requestLoading = true;
-      let info = await getComment(id, 0, data.pageNo, 20, data.sortType, data.cursor);
+      let info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor);
       data.requestLoading = false;
       data.commentTotal = info.data.totalCount;
       data.cursor = info.data.cursor;
@@ -353,7 +353,7 @@ export default defineComponent({
     }
 
     const change_sortType = async (index: any) => {
-      // data.sortType = index;
+      data.sortType = index;
       console.log(data.sortType);
       
       data.pageNo = 1;
@@ -456,6 +456,7 @@ export default defineComponent({
     }
   }
 }
+
 .comment_area {
   background-color: #fff;
   .comment_item {

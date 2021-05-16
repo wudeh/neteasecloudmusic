@@ -4,7 +4,7 @@
       <img :src="img" alt="">
     </div>
     <div class="nav">
-      <div class="left_arrow">
+      <div class="left_arrow" @click="router.go(-1)">
         <img src="../../../public/img/icons/left_arrow.svg" alt="">
       </div>
       <div class="title">播单</div>
@@ -19,14 +19,14 @@
       <div class="detail">
         <div class="title">{{title}}</div>
         <div class="person">
-          <img :src="author.avatar" alt="">
+          <van-image radius="50%" class="img" :src="author.avatar" />
           <span class="name">{{author.nickname}}</span>
           <span class="Follow" v-if="author.followed">></span>
           <span class="notFollow" v-else>+</span>
         </div>
         <div class="des">
           <div class="text">{{description}}</div>
-          <img src="../../../public/img/icons/more.svg" alt="">
+          <img  v-if="description" src="../../../public/img/icons/more.svg" alt="">
         </div>
       </div>
     </div>
@@ -232,6 +232,7 @@ interface author {
     return {
       ...toRefs(data),
       author,
+      router,
       store,
       playMusicSingle
     }
@@ -309,7 +310,7 @@ interface author {
       .person {
         display: flex;
         align-items: center;
-        img {
+        .img {
           width: 30px;
           height: 30px;
           border-radius: 50%;
@@ -410,7 +411,7 @@ interface author {
     }
 }
 .songList {
-  height: 300px;
+  height: 90vw;
   overflow: scroll;
   .song_item {
     display: flex;

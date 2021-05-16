@@ -17,7 +17,10 @@ export function loginStatus(): any {
   return axios.post("/login/status");
 }
 
-
+// 用户详情
+export function getUserDetail(uid: any): any {
+  return axios.post(`/user/detail?uid=${uid}`);
+}
 
 
 // 最近联系人

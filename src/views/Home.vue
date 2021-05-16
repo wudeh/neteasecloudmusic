@@ -476,6 +476,9 @@ export default defineComponent({
   .song_name {
     margin: 0 3px;
     white-space: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .song_author {
     font-size: 12px;
@@ -575,6 +578,9 @@ export default defineComponent({
         color: #ccc;
         font-size: 12px;
         margin-left: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         img {
           width: 25px;
         }
@@ -588,12 +594,13 @@ export default defineComponent({
           }
         }
         .name {
-          width: 240px;
-          font-size: 18px;
+          // width: 220px;
+          font-size: 16px;
           color: black;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          margin-left: 4px;
         }
         .author {
           white-space: nowrap;

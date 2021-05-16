@@ -7,7 +7,8 @@ export function getSongListInfo(id:string): any {
 
 // 获取歌曲URL
 export function getSongUrl(id: string): any {
-  return axios.post("/song/url",{id,realIP:'116.25.146.177'});
+  // return axios.post("/song/url",{id,realIP:'116.25.146.177'});
+  return axios.post("/song/url",{id});
 }
 
 
@@ -47,11 +48,11 @@ export function getSongComment(id: string,limit=20,offset?: number,before?: any)
  * @returns 
  */
 export function getComment(id: number,type: number,pageNo: number,pageSize=20,sortType: number,cursor?: any): any {
-  if(sortType == 3) {
+  // if(sortType == 3) {
     return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}&cursor=${cursor}`);
-  }else {
-    return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}`);
-  }
+  // }else {
+  //   return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}`);
+  // }
   // return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}&cursor=${cursor}`,{id,type,pageNo,pageSize,sortType,cursor});
   
 }
@@ -94,4 +95,9 @@ export function getDjProgram(rid: number,asc=false,limit=999,offset=0): any {
 
 export function getPlayListDetail(id: number): any {
   return axios.get(`/playlist/detail?id=${id}`);
+}
+
+// 专辑详情
+export function getAlbumDetail(id: number): any {
+  return axios.get(`/album?id=${id}`);
 }

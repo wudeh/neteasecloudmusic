@@ -1251,6 +1251,7 @@ export default defineComponent({
                 border: 1px solid red;
                 border-radius: 3px;
                 opacity: 0.6;
+                margin-right: 1px;
               }
               .dujia {
                 .vip
