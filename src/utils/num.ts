@@ -71,8 +71,8 @@ export function getTime(time: number): string {
     let Um = userDate.getMinutes() < 10 ? `0${userDate.getMinutes()}` : userDate.getMinutes()
     return `昨天${UH}:${Um}`
   } else if ((todayLast - t) > 172800000 && (todayLast - t) <= 31557600000) {
-    let userDate = new Date(Number(t))
-    return `${userDate.getMonth() + 1}月${userDate.getDate()}日`
+    let userDate = new Date(Number(t))                         
+    return `${userDate.getFullYear()}年${userDate.getMonth() + 1}月${userDate.getDate()}日`
   } else {
     let userDate = new Date(Number(t))
     return `${userDate.getFullYear()}年${userDate.getMonth() + 1}月${userDate.getDate()}日`

@@ -1,6 +1,6 @@
 <template>
 <!-- 导航栏 -->
-  <div class="nav" @click="goSearch()">
+  <div :class="{nav: true, red: scrollY >= 50}" @click="goSearch()">
     <div class="pop">
       <van-icon name="chat-o" badge="" />
     </div>
@@ -600,6 +600,7 @@ export default defineComponent({
     const topBg = ref<HTMLElement>();
     const store = useStore()
     const info = reactive<any>({
+      scrollY: 0,
       cursor: {},  // 首页在登录状态下需要带上上一次请求回来的 cursor，作用相当于分页的页数
       numFilter: numFilter,// 播放量过滤函数
       searchWord: "",
@@ -690,8 +691,28 @@ export default defineComponent({
       }
     });
 
+    // 简单的节流
+    const decrease = (i: number) => {      
+      let isDoing = false;
+      return () => {
+        let timer: number|undefined;
+        if(isDoing ) {
+          return;
+        }
+        isDoing = true;
+        timer = setTimeout(() => {
+          isDoing = false
+          info.scrollY = i;
+          clearTimeout(timer)
+        }, 500);
+      }
+    }
+
     // 数据请求
     onMounted(async () => {
+      window.addEventListener("scroll", () => {
+        decrease(window.scrollY)()
+      })
       store.commit("set_load", true)
       let discoverInfo = await getDiscoverInfo(info.cursor);
       store.commit("set_load", false)
@@ -1000,6 +1021,7 @@ export default defineComponent({
 
 <style lang="less" scoped>
 .nav {
+    transition: all 0.3s;
     position: fixed;
     z-index: 1111;
     top: 0;
@@ -1032,6 +1054,9 @@ export default defineComponent({
     img {
       width: 30px;
     }
+  }
+  .red {
+    background-color: rgb(231, 66, 66);
   }
 .discover {
   // overflow: hidden;

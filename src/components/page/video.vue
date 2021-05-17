@@ -10,23 +10,24 @@
       <van-tab title="简介" name="1">
         <div class="author">
             <van-image radius="50%" class="img" :src="avatarUrl" />
-            <div class="detail">
+            <div class="detail" v-if="type == 1">
               <span class="name">{{ nickname }}</span>
-              <span class="fan">12粉丝</span>
+              <span class="fan" v-if="type == 5">{{ numFilter(fans) }}粉丝</span>
             </div>
-            <div class="look">+ 关注</div>
+            <div class="look" v-if="type == 1">+ 关注</div>
         </div>
         <div class="vid_detail">
           <div class="title">{{ title }}</div>
           <div class="vid_count">
             <span class="playTime">{{ numFilter(playTime)}}&nbsp;</span>
-            <span class="publishTime">{{ sendTimeConversion(publishTime)}}</span>
+            <span class="publishTime" v-if="type == 5">{{ sendTimeConversion(publishTime)}}</span>
+            <span class="publishTime" v-else>{{ publishTime }}</span>
           </div>
           <div class="des">
             {{ description }}
           </div>
           <div class="count">
-            <div class="count_item">
+            <div class="count_item" v-if="praisedCount != 0">
               <img src="../../../public/img/icons/like_gray.svg" alt="">
               <span>{{ praisedCount }}</span>
             </div>
@@ -240,14 +241,17 @@
   import { useRouter } from "vue-router"
   import { numFilter, sendTimeConversion, timeFilter, getDate } from "../../utils/num";
   import { getComment, getSongInfo, getFloorComment,getPlayListDetail } from "../../api/song";
+  import { getUserDetail } from "../../api/user";
   import { Toast } from "vant"
-  import { getVideoDetail, getVideoUrl, getVideoRelated } from "../../api/video"
+  import { getVideoDetail, getVideoUrl, getVideoRelated, getMvUrl, getMvDetail } from "../../api/video"
   interface creator {
     vid: string,
+    type: number,
     activeName: string
     url: string,
     followed: boolean,
-    userId: number,
+    userId: number | string,
+    fans: number,
     nickname: string,
     avatarUrl: string,
     identityIconUrl: string,
@@ -275,7 +279,7 @@
     showFloor: boolean,
     floorLoading: boolean,
     floorFinish: boolean,
-    floorError: false,
+    floorError: boolean,
     imgloading: boolean;
     arrloading: boolean;
     requestLoading: boolean, // 请求是否完成
@@ -290,10 +294,12 @@
       const vid: any=  router.currentRoute.value.query.vid;//获取参数
       const data = reactive<creator>({
         vid: '',
+        type: 5,
         activeName: '1',
         url: '',
         followed: false,
         userId: 0,
+        fans: 0,
         nickname: '',
         avatarUrl: '',
         identityIconUrl: '',
@@ -330,12 +336,26 @@
       })
 
       onBeforeMount(async () => {
+        if(Number.isNaN(Number(vid))) {
+          data.type = 5;
+        }else {
+          data.type = 1;
+        }
         data.vid = vid
-        // init()
         
+        // init()
+
+
+
+        data.arrloading = true;
         // 开始获取评论
-        let info = await getComment(vid, 5, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
-        data.commentTotal = info.data.totalCount;
+        let info = await getComment(vid, data.type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
+        data.arrloading = false;
+        if(info.code == 400 ) {
+          data.error = true;
+          return;
+        }
+        data.commentCount = info.data.totalCount;
         data.arr = info.data.comments;
         if(info.data.cursor) data.cursor = info.data.cursor;
         info.data.sortTypeList.forEach((item: any,index: number) => {
@@ -347,7 +367,7 @@
         // data.sortType = data.sortTypeList[0].value;
         console.log(data.sortTypeList);
         
-        data.arrloading = false;
+        
         data.pageNo +=1;
 
         if(!info.data.hasMore) {
@@ -377,33 +397,68 @@
 
       const init = async() => {
         data.videoGroup.splice(0)
-        let info = await getVideoDetail(data.vid)
-        data.vid = info.data.vid
-        data.followed = info.data.creator.followed
-        data.nickname = info.data.creator.nickname
-        data.userId = info.data.creator.userId
-        data.avatarUrl = info.data.creator.avatarUrl
-        data.identityIconUrl = info.data.creator.avatarDetail ? info.data.creator.avatarDetail.identityIconUrl : ''
-        data.title = info.data.title
-        data.description = info.data.description
-        data.durationms = info.data.durationms
-        data.playTime = info.data.playTime
-        data.praisedCount = info.data.praisedCount
-        data.commentCount = info.data.commentCount
-        data.shareCount = info.data.shareCount
-        data.subscribeCount = info.data.subscribeCount
-        data.publishTime = info.data.publishTime
-        data.videoGroup = info.data.videoGroup
-
-        info = await getVideoUrl(data.vid)
-        if(info.urls[0].needPay) {
-          Toast(`当前视频需付费观看`)
+        let info;
+        
+        if(data.type == 5) {
+          info = await getVideoDetail(data.vid)
+          data.vid = info.data.vid
+          data.followed = info.data.creator.followed
+          data.nickname = info.data.creator.nickname
+          data.userId = info.data.creator.userId
+          data.avatarUrl = info.data.creator.avatarUrl
+          data.identityIconUrl = info.data.creator.avatarDetail ? info.data.creator.avatarDetail.identityIconUrl : ''
+          data.title = info.data.title
+          data.description = info.data.description
+          data.durationms = info.data.durationms
+          data.playTime = info.data.playTime
+          data.praisedCount = info.data.praisedCount
+          // data.commentCount = info.data.commentCount
+          data.shareCount = info.data.shareCount
+          data.subscribeCount = info.data.subscribeCount
+          data.publishTime = info.data.publishTime
+          data.videoGroup = info.data.videoGroup
         }
-        data.url = info.urls[0].url
-        console.log(data.url);
+        if(data.type == 1) {
+          info = await getMvDetail(data.vid)
+          data.url = info.data.url
+          data.vid = info.data.id
+          data.followed = info.subed
+          data.nickname = info.data.artistName
+          data.userId = info.data.artistId
+          data.avatarUrl = info.data.cover
+          // data.identityIconUrl = info.data.avatarDetail ? info.data.creator.avatarDetail.identityIconUrl : ''
+          data.title = info.data.briefDesc
+          data.description = info.data.desc
+          data.durationms = info.data.duration
+          data.playTime = info.data.playCount
+          data.praisedCount = info.data.praisedCount || 0;
+          data.commentCount = info.data.commentCount
+          data.shareCount = info.data.shareCount
+          data.subscribeCount = info.data.subCount
+          data.publishTime = info.data.publishTime
+          data.videoGroup = info.data.videoGroup
+        }
+        
+        
 
+        if(data.type == 5) {
+          info = await getVideoUrl(data.vid)
+          data.url = info.urls[0].url
+          if(info.urls[0].needPay) {
+            Toast(`当前视频需付费观看`)
+          }
+        }
+        if(data.type == 1) {
+          info = await getMvUrl(data.vid)
+          data.url = info.data.url
+        }
+        
         info = await getVideoRelated(data.vid)
         data.videoRelated = info.data
+
+        // 获取用户详情，用来获取粉丝量
+        info = await getUserDetail(data.userId)
+        data.fans = info.profile.followeds
       }
 
       // 获取楼层评论
@@ -414,7 +469,12 @@
         data.floorArr = [];
         data.floorFinish = false;
         data.floorPageNo = 1;
-        let info = await getFloorComment(vid,parentCommentId,5,data.floorPageNo);
+        let info = await getFloorComment(vid,parentCommentId,data.type,data.floorPageNo);
+        data.floorLoading = false;
+        if(info.code == 400 ) {
+          data.floorError = true;
+          return;
+        }
         console.log(data.floorTopComment);
         data.floorArr = info.data.comments;
         data.floorPageNo +=1;
@@ -422,13 +482,19 @@
         if(!info.data.hasMore) {
           data.floorFinish = true;
         }
-        data.floorLoading = false;
+        
       }
 
       // 加载更多楼层评论
       const onLoadFloor = async () => {
+         data.floorError = false;
         data.floorLoading = true;
-        let info = await getFloorComment(vid,data.floorTopComment.commentId,0,data.floorPageNo);
+        let info = await getFloorComment(vid,data.floorTopComment.commentId,data.type,data.floorPageNo);
+        data.floorLoading = false;
+        if(info.code == 400 ) {
+          data.floorError = true;
+          return;
+        }
         data.floorArr = data.floorArr.concat(info.data.comments);
         data.floorPageNo +=1;
         data.floorLoading = false;
@@ -440,10 +506,16 @@
 
       // 加载更多评论
       const onLoad = async () => {
+        data.error = false;
         data.requestLoading = true;
-        let info = await getComment(vid, 5, data.pageNo, 20, data.sortType, data.cursor);
+        let info = await getComment(vid, data.type, data.pageNo, 20, data.sortType, data.cursor);
+        data.arrloading = false;
         data.requestLoading = false;
-        data.commentTotal = info.data.totalCount;
+        if(info.code == 400 ) {
+          data.error = true;
+          return;
+        }
+        data.commentCount = info.data.totalCount
         data.cursor = info.data.cursor;
         data.arr = data.arr.concat(info.data.comments);
         data.arrloading = false;
@@ -506,34 +578,38 @@
 .info {
   background-color: #fff;
   .author {
-    display: flex;
-    align-items: center;
+    // display: flex;
+    // align-items: center;
     height: 56px;
     box-sizing: border-box;
     padding: 8px;
     .img {
+      float: left;
       width: 40px;
       margin-right: 8px;
     }
     .detail {
+      float: left;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      margin-right: 200px;
       min-height: 10px;
       transition: all 0.3s;
+      white-space: nowrap;
       .fan {
         color: #ccc;
         font-size: 12px;
       }
     }
     .look {
+      float: right;
       height: 20px;
       padding: 2px;
       font-size: 14px;
       border-radius: 8px;
       color: orange;
       border: 1px solid orange;
+      white-space: nowrap;
     }
   }
   .vid_detail {

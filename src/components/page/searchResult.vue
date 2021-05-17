@@ -82,7 +82,7 @@
           <!-- 视频 -->
           <div class="video" v-if="video">
             <div class="title">视频</div>
-            <div class="item" v-for="(item, index) in video.videos" :key="index" @click="router.push({path: `/vid`, query: {vid: item.vid}})">
+            <div class="item" v-for="(item, index) in video.videos" :key="index" @click="router.push({path: `/vid`, query: {vid: item.vid, type: item.type}})">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.coverUrl" />
                 <img src="../../../public/img/icons/play_white.svg" alt="">
@@ -253,7 +253,7 @@
             </div>
           </template>
         <div class="video">
-            <div class="item" v-for="(item, index) in videos" :key="index">
+            <div class="item" v-for="(item, index) in videos" :key="index" @click="router.push({path: `/vid`, query: {vid: item.vid, type: item.type}})">
               <div class="left">
                 <van-image class="img" radius="8" :src="item.coverUrl" />
                 <img src="../../../public/img/icons/play_white.svg" alt="">
@@ -1029,6 +1029,14 @@
     .info {
       width: 100%;
       justify-content: space-around;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      .name {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
     }
    }
 }

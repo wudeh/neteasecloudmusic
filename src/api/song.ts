@@ -47,7 +47,7 @@ export function getSongComment(id: string,limit=20,offset?: number,before?: any)
  * @param cursor 当sortType为3时且页数不是第一页时需传入,值为上一条数据的time
  * @returns 
  */
-export function getComment(id: number,type: number,pageNo: number,pageSize=20,sortType: number,cursor?: any): any {
+export function getComment(id: number | string,type: number,pageNo: number,pageSize=20,sortType: number,cursor?: any): any {
   // if(sortType == 3) {
     return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}&cursor=${cursor}`);
   // }else {
@@ -67,7 +67,7 @@ export function getComment(id: number,type: number,pageNo: number,pageSize=20,so
  * @param limit 取出评论数量 , 默认为 20
  * @returns 
  */
-export function getFloorComment(id: number,parentCommentId: number,type: number,time?: any,limit?:number): any {
+export function getFloorComment(id: number | string,parentCommentId: number,type: number,time?: any,limit?:number): any {
   // return axios.post("/comment/floor",{id,parentCommentId,type,time,limit});
   return axios.get(`/comment/floor?parentCommentId=${parentCommentId}&id=${id}&type=${type}&time=${time}`);
 }
