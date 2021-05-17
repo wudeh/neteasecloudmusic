@@ -11,8 +11,10 @@
       <div class="song_img rotate" :style="{ animationPlayState: store.state.song_info.isPlaying ? 'running' : 'paused' }">
         <img :src="store.state.song_info.img" alt="" />
       </div>
-      <div class="song_name">{{ store.state.song_info.name }}</div>
-      <div class="song_author">-{{ store.state.song_info.author }}</div>
+      <div class="info">
+        <div class="song_name">{{ store.state.song_info.name }}</div>
+        <div class="song_author">-{{ store.state.song_info.author }}</div>
+      </div>
       <div class="icon" @click.stop="change_play()">
         <img :src="store.state.song_info.isPlaying ? stopIcon : playIcon" alt="" />
       </div>
@@ -226,10 +228,10 @@ export default defineComponent({
         console.log("监听到播放歌曲变更");
         audio.value.pause();
         // 请求URL
-        if(!store.state.song_info.url) {
+        // if(!store.state.song_info.url) {
           const info = await getSongUrl(store.state.song_info.id);
           store.commit("set_song_url",info.data[0].url);
-        }
+        // }
         
         audio.value.src = store.state.song_info.url;
         audio.value.play();
@@ -252,6 +254,7 @@ export default defineComponent({
         // console.log("====================");
         // console.log(from);
         // console.log(to);
+        store.commit("set_load", false)
 
         if (to.meta.level > from.meta.level) {
           if (from.name == "song") return;
@@ -473,22 +476,28 @@ export default defineComponent({
       border-radius: 50%;
     }
   }
-  .song_name {
-    margin: 0 3px;
-    white-space: nowrap;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .song_author {
-    font-size: 12px;
-    color: #ccc;
-    width: 200px;
+  .info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 8px 0;
+    width: 250px;
     height: 100%;
-    line-height: 50px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    .song_name {
+      margin: 0 3px;
+      white-space: nowrap;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .song_author {
+      font-size: 12px;
+      padding-left: 8px;
+      color: #ccc;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
   .icon {
     margin-right: 10px;

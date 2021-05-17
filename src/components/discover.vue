@@ -37,7 +37,7 @@
               class="icon_item"
               v-for="item in icon"
               :key="item.id"
-              @click="show(item.name)"
+              @click="ballClick(item.name)"
             >
               <div class="img_wrapper">
                 <img :src="item.iconUrl" alt="" />
@@ -951,8 +951,12 @@ export default defineComponent({
       // store.commit("play", true);
       }
     }
-    const show = function icon_click(a: string): void {
-      console.log(a);
+
+    // 点击圆形图标跳转
+    const ballClick = (a: string) => {
+      if(a == `排行榜`) {
+        router.push({path: `/rank`})
+      }
     };
 
     // 登录
@@ -1001,7 +1005,7 @@ export default defineComponent({
 
     return {
       active,
-      show,
+      ballClick,
       login,
       router,
       goSearch,

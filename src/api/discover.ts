@@ -49,3 +49,8 @@ export function getsearchResult(keywords: string,type=1,offset=0,limit=20): any 
     return axios.get(`/search?keywords=${keywords}&type=${type}&offset=${offset*limit}&limit=${limit}`)
   }
 }
+
+// 排行榜
+export function getRank(): any {
+  return axios.get(`/toplist/detail`);
+}
