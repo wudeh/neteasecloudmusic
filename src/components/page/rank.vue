@@ -1,47 +1,49 @@
 <template>
-  <van-sticky>
-    <div class="nav">
-      <div class="back" @click="router.go(-1)">
-        <img src="../../../public/img/icons/left_arrow_black.svg" alt="">
+  <div>
+    <van-sticky>
+      <div class="nav">
+        <div class="back" @click="router.go(-1)">
+          <img src="../../../public/img/icons/left_arrow_black.svg" alt="">
+        </div>
+        <div class="title">排行榜</div>
       </div>
-      <div class="title">排行榜</div>
+    </van-sticky>
+    <!-- 官方榜 -->
+    <div class="title">官方榜</div>
+    <div class="official">
+      <div class="official_item" @click="router.push({ path: `/songList`, query: {id: it.id }})" v-for="(it, i) in official" :key="i">
+        <div class="img_wrapper">
+          <van-image radius="8" class="img" :src="it.coverImgUrl" /> 
+          <div class="text">{{ it.updateFrequency }}</div>
+        </div>
+        <div class="info">
+          <span v-for="(sub, s) in it.tracks" :key="s">
+            {{ s +1 }}.{{ sub.first }}&nbsp;-&nbsp;{{ sub.second }}
+          </span>
+        </div>
+      </div>
+      <div class="official_item">
+        <div class="img_wrapper">
+          <van-image radius="8" class="img" :src="artistToplist.coverUrl" /> 
+          <div class="text">{{ artistToplist.upateFrequency }}</div>
+        </div>
+        <div class="info">
+          <span v-for="(it, i) in artistToplist.artists" :key="i">
+            {{ i + 1 }}.{{ it.first }}
+          </span>
+        </div>
+      </div>
     </div>
-  </van-sticky>
-  <!-- 官方榜 -->
-  <div class="title">官方榜</div>
-  <div class="official">
-    <div class="official_item" @click="router.push({ path: `/songList`, query: {id: it.id }})" v-for="(it, i) in official" :key="i">
-      <div class="img_wrapper">
-        <van-image radius="8" class="img" :src="it.coverImgUrl" /> 
-        <div class="text">{{ it.updateFrequency }}</div>
+    <!-- 其他榜单 -->
+    <div class="title">其他榜单</div>
+    <div class="other">
+      <div class="other_item" v-for="(it, i) in other" :key="i">
+        <div class="img_wrapper">
+          <van-image radius="8" class="img" :src="it.coverImgUrl" /> 
+          <span>{{ it.updateFrequency }}</span>
+        </div>
+        <span>{{ it.name }}</span>
       </div>
-      <div class="info">
-        <span v-for="(sub, s) in it.tracks" :key="s">
-          {{ s +1 }}.{{ sub.first }}&nbsp;-&nbsp;{{ sub.second }}
-        </span>
-      </div>
-    </div>
-    <div class="official_item">
-      <div class="img_wrapper">
-        <van-image radius="8" class="img" :src="artistToplist.coverUrl" /> 
-        <div class="text">{{ artistToplist.upateFrequency }}</div>
-      </div>
-      <div class="info">
-        <span v-for="(it, i) in artistToplist.artists" :key="i">
-           {{ i + 1 }}.{{ it.first }}
-        </span>
-      </div>
-    </div>
-  </div>
-  <!-- 其他榜单 -->
-  <div class="title">其他榜单</div>
-  <div class="other">
-    <div class="other_item" v-for="(it, i) in other" :key="i">
-      <div class="img_wrapper">
-        <van-image radius="8" class="img" :src="it.coverImgUrl" /> 
-        <span>{{ it.updateFrequency }}</span>
-      </div>
-      <span>{{ it.name }}</span>
     </div>
   </div>
 </template>

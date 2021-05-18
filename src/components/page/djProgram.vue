@@ -1,82 +1,84 @@
 <template>
-  <div class="top">
-    <div class="img_blur">
-      <img :src="img" alt="">
-    </div>
-    <div class="nav">
-      <div class="left_arrow" @click="router.go(-1)">
-        <img src="../../../public/img/icons/left_arrow.svg" alt="">
+  <div>
+    <div class="top">
+      <div class="img_blur">
+        <img :src="img" alt="">
       </div>
-      <div class="title">播单</div>
-      <div class="search">
-        <img src="../../../public/img/icons/search.svg" alt="">
-      </div>
-    </div>
-    <div class="info">
-      <div class="avatar">
-        <van-image radius="8" class="img" :src="img" />
-      </div>
-      <div class="detail">
-        <div class="title">{{title}}</div>
-        <div class="person">
-          <van-image radius="50%" class="img" :src="author.avatar" />
-          <span class="name">{{author.nickname}}</span>
-          <span class="Follow" v-if="author.followed">></span>
-          <span class="notFollow" v-else>+</span>
+      <div class="nav">
+        <div class="left_arrow" @click="router.go(-1)">
+          <img src="../../../public/img/icons/left_arrow.svg" alt="">
         </div>
-        <div class="des">
-          <div class="text">{{description}}</div>
-          <img  v-if="description" src="../../../public/img/icons/more.svg" alt="">
+        <div class="title">播单</div>
+        <div class="search">
+          <img src="../../../public/img/icons/search.svg" alt="">
         </div>
       </div>
-    </div>
-  </div>
-  <!-- 收藏 评论 分享 -->
-  <div class="count">
-    <div class="sub item">
-        <img :src="subscribed?subedIcon:subIcon" alt="">
-        <span>{{numFilter(subscribedCount)}}</span>
-    </div>
-    <div class="line"></div>
-    <div class="comment item">
-      <img src="../../../public/img/icons/comment.svg" alt="">
-        <span>{{numFilter(commentCount)}}</span>
-    </div>
-    <div class="line"></div>
-    <div class="share item">
-      <img src="../../../public/img/icons/share.svg" alt="">
-        <span>{{numFilter(shareCount)}}</span>
-    </div>
-  </div>
-  <!-- 全部播放 -->
-  <div class="playAll">
-    <div class="icon">
-      <img src="../../../public/img/icons/playAll.svg" alt="">
-    </div>
-    <div class="text">
-      <div class="play_all_title">播放全部</div>
-    </div>
-    <div class="play_count" v-if="songListInfo.length">({{songListInfo.length}})</div>
-  </div>
-  <!-- 歌曲列表 -->
-  <div class="songList">
-    <div class="song_item" v-for="(item,index) in songListInfo" :key="index">
-      <div class="index">
-        <img v-if="item.id == store.state.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="">
-        <span v-else>{{ songListInfo.length - index }}</span>
-      </div>
-      <div class="song_info" @click="playMusicSingle(item)">
-        <div class="info_top">
-          <div class="song_name">{{item.name}}</div>
+      <div class="info">
+        <div class="avatar">
+          <van-image radius="8" class="img" :src="img" />
         </div>
-        <div class="info_bottom">
-          播放量：{{ item.playCount}}&nbsp;
-           时长：{{ item.duration}}&nbsp;      
-          by：{{item.author}}
+        <div class="detail">
+          <div class="title">{{title}}</div>
+          <div class="person">
+            <van-image radius="50%" class="img" :src="author.avatar" />
+            <span class="name">{{author.nickname}}</span>
+            <span class="Follow" v-if="author.followed">></span>
+            <span class="notFollow" v-else>+</span>
+          </div>
+          <div class="des">
+            <div class="text">{{description}}</div>
+            <img  v-if="description" src="../../../public/img/icons/more.svg" alt="">
+          </div>
         </div>
       </div>
-      <div class="more">
-        <img src="../../../public/img/icons/songInfo.svg" alt="">
+    </div>
+    <!-- 收藏 评论 分享 -->
+    <div class="count">
+      <div class="sub item">
+          <img :src="subscribed?subedIcon:subIcon" alt="">
+          <span>{{numFilter(subscribedCount)}}</span>
+      </div>
+      <div class="line"></div>
+      <div class="comment item">
+        <img src="../../../public/img/icons/comment.svg" alt="">
+          <span>{{numFilter(commentCount)}}</span>
+      </div>
+      <div class="line"></div>
+      <div class="share item">
+        <img src="../../../public/img/icons/share.svg" alt="">
+          <span>{{numFilter(shareCount)}}</span>
+      </div>
+    </div>
+    <!-- 全部播放 -->
+    <div class="playAll">
+      <div class="icon">
+        <img src="../../../public/img/icons/playAll.svg" alt="">
+      </div>
+      <div class="text">
+        <div class="play_all_title">播放全部</div>
+      </div>
+      <div class="play_count" v-if="songListInfo.length">({{songListInfo.length}})</div>
+    </div>
+    <!-- 歌曲列表 -->
+    <div class="songList">
+      <div class="song_item" v-for="(item,index) in songListInfo" :key="index">
+        <div class="index">
+          <img v-if="item.id == store.state.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="">
+          <span v-else>{{ songListInfo.length - index }}</span>
+        </div>
+        <div class="song_info" @click="playMusicSingle(item)">
+          <div class="info_top">
+            <div class="song_name">{{item.name}}</div>
+          </div>
+          <div class="info_bottom">
+            播放量：{{ item.playCount}}&nbsp;
+            时长：{{ item.duration}}&nbsp;      
+            by：{{item.author}}
+          </div>
+        </div>
+        <div class="more">
+          <img src="../../../public/img/icons/songInfo.svg" alt="">
+        </div>
       </div>
     </div>
   </div>

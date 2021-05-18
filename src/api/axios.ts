@@ -15,14 +15,14 @@ axios.interceptors.request.use((config) => {
   console.log(config);
   // if (!config.url?.startsWith("https")) {
   // 加上时间戳
-  // const timestamp = new Date().getTime();
-  // if (config.url?.indexOf("?") != -1) {
-  //   config.url = config.url + `&timestamp=${timestamp}`;
-  // } else {
-  //   config.url = config.url + `?timestamp=${timestamp}`;
-  // }
-  // config.data = Object.assign({}, config.data);
-  // config.data.timestamp = timestamp;
+  const timestamp = new Date().getTime();
+  if (config.url?.indexOf("?") != -1) {
+    config.url = config.url + `&timestamp=${timestamp}`;
+  } else {
+    config.url = config.url + `?timestamp=${timestamp}`;
+  }
+  config.data = Object.assign({}, config.data);
+  config.data.timestamp = timestamp;
   // // 手动传cookie
   const cookieDD = localStorage.getItem("cookieMusic");
   if (cookieDD) {

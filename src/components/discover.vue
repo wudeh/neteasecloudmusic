@@ -1,560 +1,562 @@
 <template>
-<!-- 导航栏 -->
-  <div :class="{nav: true, red: scrollY >= 50}" @click="goSearch()">
-    <div class="pop">
-      <van-icon name="chat-o" badge="" />
-    </div>
-    <div class="search">
-      <van-icon name="search" />
-      <p>{{ searchWord }}</p>
-    </div>
-    <img @click.stop="router.push({path: `/download`})" src="../../public/img/icons/download.svg" alt="">
-  </div>
-  <div class="discover" v-if="swiper.length">
-    <bsscroll :scrollY="true" name="discover_scroll" :scrollData="swiper" :pulldown="true">
-      <div class="top">
-      <!-- 轮播图 -->
-      <div class="swiper">
-        <van-swipe
-          class="my-swipe"
-          :autoplay="3000"
-          indicator-color="white"
-          :lazy-render="true"
-          @change="onChange"
-        >
-          <van-swipe-item v-for="(item, index) in swiper" :key="index">
-            <img :src="item.pic" />
-          </van-swipe-item>
-        </van-swipe>
+  <div>
+    <!-- 导航栏 -->
+    <div :class="{nav: true, red: scrollY >= 50}" @click="goSearch()">
+      <div class="pop">
+        <van-icon name="chat-o" badge="" />
       </div>
-      <!-- 模糊背景图 -->
-      <div class="top_blur" ref="topBg"></div>
-      <!-- 圆形图标区域 -->
-      <div class="icon_top">
-        <bsscroll :scrollX="true" :scrollData="icon" name="icon_scroll">
-          <div class="icon_wrapper">
-            <div
-              class="icon_item"
-              v-for="item in icon"
-              :key="item.id"
-              @click="ballClick(item.name)"
-            >
-              <div class="img_wrapper">
-                <img :src="item.iconUrl" alt="" />
+      <div class="search">
+        <van-icon name="search" />
+        <p>{{ searchWord }}</p>
+      </div>
+      <img @click.stop="router.push({path: `/download`})" src="../../public/img/icons/download.svg" alt="">
+    </div>
+    <div class="discover" v-if="swiper.length">
+      <bsscroll :scrollY="true" name="discover_scroll" :scrollData="swiper" :pulldown="true">
+        <div class="top">
+        <!-- 轮播图 -->
+        <div class="swiper">
+          <van-swipe
+            class="my-swipe"
+            :autoplay="3000"
+            indicator-color="white"
+            :lazy-render="true"
+            @change="onChange"
+          >
+            <van-swipe-item v-for="(item, index) in swiper" :key="index">
+              <img :src="item.pic" />
+            </van-swipe-item>
+          </van-swipe>
+        </div>
+        <!-- 模糊背景图 -->
+        <div class="top_blur" ref="topBg"></div>
+        <!-- 圆形图标区域 -->
+        <div class="icon_top">
+          <bsscroll :scrollX="true" :scrollData="icon" name="icon_scroll">
+            <div class="icon_wrapper">
+              <div
+                class="icon_item"
+                v-for="item in icon"
+                :key="item.id"
+                @click="ballClick(item.name)"
+              >
+                <div class="img_wrapper">
+                  <img :src="item.iconUrl" alt="" />
+                </div>
+                <span class="des">{{ item.name }}</span>
               </div>
-              <span class="des">{{ item.name }}</span>
+            </div>
+          </bsscroll>
+        </div>
+      </div>
+      <!-- 推荐歌单 -->
+      <div class="recommend">
+        <div class="rec_title" @click="logoutDD()">
+          <div class="rec_des">{{ recommend.titleTex }}</div>
+          <div class="rec_more">
+            <span>{{ recommend.button.text }}</span>
+            <img src="../../public/img/icons/more.svg" alt="" />
+          </div>
+        </div>
+        <bsscroll
+          :scrollX="true"
+          :scrollData="recommend.arrData"
+          name="recommend_scroll"
+        >
+          <div class="rec_song">
+            <div
+              class="rec_item"
+              v-for="item in recommend.arrData"
+              :key="item.creativeId"
+              @click="goSongList(item.resources[0].resourceId)"
+            >
+              <van-image
+                class="img"
+                show-loading
+                radius="8"
+                :src="item.uiElement.image.imageUrl"
+              />
+              <span>{{ item.uiElement.mainTitle.title }}</span>
+              <div class="playCount">
+                <img src="../../public/img/icons/play.svg" alt="" />
+                <span>{{
+                  numFilter(item.resources[0].resourceExtInfo.playCount)
+                }}</span>
+              </div>
             </div>
           </div>
         </bsscroll>
       </div>
-    </div>
-    <!-- 推荐歌单 -->
-    <div class="recommend">
-      <div class="rec_title" @click="logoutDD()">
-        <div class="rec_des">{{ recommend.titleTex }}</div>
-        <div class="rec_more">
-          <span>{{ recommend.button.text }}</span>
-          <img src="../../public/img/icons/more.svg" alt="" />
-        </div>
-      </div>
-      <bsscroll
-        :scrollX="true"
-        :scrollData="recommend.arrData"
-        name="recommend_scroll"
-      >
-        <div class="rec_song">
-          <div
-            class="rec_item"
-            v-for="item in recommend.arrData"
-            :key="item.creativeId"
-            @click="goSongList(item.resources[0].resourceId)"
-          >
-            <van-image
-              class="img"
-              show-loading
-              radius="8"
-              :src="item.uiElement.image.imageUrl"
-            />
-            <span>{{ item.uiElement.mainTitle.title }}</span>
-            <div class="playCount">
-              <img src="../../public/img/icons/play.svg" alt="" />
-              <span>{{
-                numFilter(item.resources[0].resourceExtInfo.playCount)
-              }}</span>
-            </div>
+      <!-- 较长的区域 -->
+      <div class="long">
+        <div class="rec_title">
+          <div class="rec_des">{{ long.uiElement.subTitle.title }}</div>
+          <div class="rec_more" @click="add_song_list">
+            <img src="../../public/img/icons/videoPlay.svg" alt="" />
+            <span>{{ long.uiElement.button.text }}</span>
           </div>
         </div>
-      </bsscroll>
-    </div>
-    <!-- 较长的区域 -->
-    <div class="long">
-      <div class="rec_title">
-        <div class="rec_des">{{ long.uiElement.subTitle.title }}</div>
-        <div class="rec_more" @click="add_song_list">
-          <img src="../../public/img/icons/videoPlay.svg" alt="" />
-          <span>{{ long.uiElement.button.text }}</span>
-        </div>
-      </div>
-      <bsscroll :scrollX="true" :scrollData="long.creatives" name="long_scroll">
-        <div class="swiper">
-          <div
-            class="swiper_item"
-            v-for="(item, index) in long.creatives"
-            :key="index"
-          >
+        <bsscroll :scrollX="true" :scrollData="long.creatives" name="long_scroll">
+          <div class="swiper">
             <div
-              class="item"
-              v-for="subItem in item.resources"
-              :key="subItem.resourceId"
-              @click="playMusicSingle(subItem)"
+              class="swiper_item"
+              v-for="(item, index) in long.creatives"
+              :key="index"
+            >
+              <div
+                class="item"
+                v-for="subItem in item.resources"
+                :key="subItem.resourceId"
+                @click="playMusicSingle(subItem)"
+              >
+                <div class="img_wrapper">
+                  <van-image class="img" :src="subItem.uiElement.image.imageUrl">
+                    <template v-slot:loading>
+                      <van-loading type="spinner" size="20" />
+                    </template>
+                  </van-image>
+                </div>
+                <div class="info">
+                  <div class="song_title">
+                    <div class="song_name">
+                      {{ subItem.uiElement.mainTitle.title }}
+                    </div>
+                    <span style="color: #ccc; margin: 0 2px">-</span>
+                    <div
+                      class="song_author"
+                      v-for="(author_title, index) in subItem.resourceExtInfo
+                        .artists"
+                      :key="author_title.id"
+                    >
+                      {{ author_title.name }}
+                      <span
+                        v-if="index < subItem.resourceExtInfo.artists.length - 1"
+                        >/</span
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="song_subTitle"
+                    :class="{
+                      percent:
+                        subItem.uiElement.subTitle.title.indexOf('%') != -1,
+                    }"
+                    v-if="subItem.uiElement.subTitle"
+                  >
+                    <span class="SQ" v-if="subItem.resourceExtInfo.songPrivilege.maxbr >= 999000">SQ</span>
+                    <span class="vip" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">vip</span>
+                    <span class="hear_try" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">试听</span>
+                    <span class="dujia" v-if="subItem.resourceExtInfo.songPrivilege.flag == 1092">独家</span>
+                    {{ subItem.uiElement.subTitle.title }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </bsscroll>
+      </div>
+      <!-- 精选音乐视频 -->
+      <div class="recommend MUSIC_MLOG" v-if="HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title">
+        <div class="rec_title">
+          <div class="rec_des">
+            {{ HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title }}
+          </div>
+          <div class="rec_more">
+            <span>{{ HOMEPAGE_MUSIC_MLOG.uiElement.button.text }}</span>
+            <img src="../../public/img/icons/more.svg" alt="" />
+          </div>
+        </div>
+        <bsscroll
+          :scrollX="true"
+          :scrollData="HOMEPAGE_MUSIC_MLOG.extInfo"
+          name="HOMEPAGE_MUSIC_MLOG_scroll"
+        >
+          <div class="rec_song">
+            <div
+              class="rec_item"
+              v-for="item in HOMEPAGE_MUSIC_MLOG.extInfo"
+              :key="item.creativeId"
+              @click="show(item.creativeId)"
+            >
+              <van-image
+                class="img"
+                show-loading
+                radius="8"
+                :src="item.resource.mlogBaseData.coverUrl"
+              />
+              <span>{{ item.resource.mlogBaseData.text }}</span>
+              <div class="playCount">
+                <img src="../../public/img/icons/play.svg" alt="" />
+                <span>{{ numFilter(item.resource.mlogExtVO.playCount) }}</span>
+              </div>
+            </div>
+          </div>
+        </bsscroll>
+      </div>
+      <!-- 雷达歌单 -->
+      <div class="recommend">
+        <div class="rec_title">
+          <div class="rec_des">
+            {{ HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle.title }}
+          </div>
+          <div class="rec_more">
+            <span>{{ HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.button.text }}</span>
+            <img src="../../public/img/icons/more.svg" alt="" />
+          </div>
+        </div>
+        <bsscroll
+          :scrollX="true"
+          :scrollData="HOMEPAGE_BLOCK_MGC_PLAYLIST.extInfo"
+          name="HOMEPAGE_BLOCK_MGC_PLAYLIST_scroll"
+        >
+          <div class="rec_song">
+            <div
+              class="rec_item"
+              v-for="item in HOMEPAGE_BLOCK_MGC_PLAYLIST.creatives"
+              :key="item.creativeId"
+              @click="goSongList(item.resources[0].resourceId)"
+            >
+              <van-image
+                class="img"
+                show-loading
+                radius="8"
+                :src="item.uiElement.image.imageUrl"
+              />
+              <span>{{ item.uiElement.mainTitle.title }}</span>
+              <div class="playCount">
+                <img src="../../public/img/icons/play.svg" alt="" />
+                <span>{{
+                  numFilter(item.resources[0].resourceExtInfo.playCount)
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </bsscroll>
+      </div>
+      <!-- 视频合辑 -->
+      <div class="video">
+        <div class="rec_title">
+          <div class="rec_des">
+            {{ HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle.title }}
+          </div>
+          <div class="rec_more">
+            <span>{{
+              HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.button.text
+            }}</span>
+            <img src="../../public/img/icons/more.svg" alt="" />
+          </div>
+        </div>
+        <bsscroll
+          :scrollX="true"
+          :scrollData="HOMEPAGE_BLOCK_VIDEO_PLAYLIST.creatives"
+          name="HOMEPAGE_BLOCK_VIDEO_PLAYLIST_scroll"
+        >
+          <div class="rec_song">
+            <div
+              class="rec_item"
+              v-for="item in HOMEPAGE_BLOCK_VIDEO_PLAYLIST.creatives"
+              :key="item.creativeId"
+              @click="show(item.creativeId)"
             >
               <div class="img_wrapper">
-                <van-image class="img" :src="subItem.uiElement.image.imageUrl">
-                  <template v-slot:loading>
-                    <van-loading type="spinner" size="20" />
-                  </template>
-                </van-image>
-              </div>
-              <div class="info">
-                <div class="song_title">
-                  <div class="song_name">
-                    {{ subItem.uiElement.mainTitle.title }}
-                  </div>
-                  <span style="color: #ccc; margin: 0 2px">-</span>
-                  <div
-                    class="song_author"
-                    v-for="(author_title, index) in subItem.resourceExtInfo
-                      .artists"
-                    :key="author_title.id"
-                  >
-                    {{ author_title.name }}
-                    <span
-                      v-if="index < subItem.resourceExtInfo.artists.length - 1"
-                      >/</span
-                    >
-                  </div>
-                </div>
-                <div
-                  class="song_subTitle"
-                  :class="{
-                    percent:
-                      subItem.uiElement.subTitle.title.indexOf('%') != -1,
-                  }"
-                  v-if="subItem.uiElement.subTitle"
-                >
-                  <span class="SQ" v-if="subItem.resourceExtInfo.songPrivilege.maxbr >= 999000">SQ</span>
-                  <span class="vip" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">vip</span>
-                  <span class="hear_try" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">试听</span>
-                  <span class="dujia" v-if="subItem.resourceExtInfo.songPrivilege.flag == 1092">独家</span>
-                  {{ subItem.uiElement.subTitle.title }}
+                <van-image class="img" radius="8" :src="item.uiElement.image.imageUrl"/>
+                <div class="mirror">
+                  <van-image class="img_mirror" show-loading radius="8" :src="item.uiElement.image.imageUrl"/>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </bsscroll>
-    </div>
-    <!-- 精选音乐视频 -->
-    <div class="recommend MUSIC_MLOG" v-if="HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title">
-      <div class="rec_title">
-        <div class="rec_des">
-          {{ HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title }}
-        </div>
-        <div class="rec_more">
-          <span>{{ HOMEPAGE_MUSIC_MLOG.uiElement.button.text }}</span>
-          <img src="../../public/img/icons/more.svg" alt="" />
-        </div>
-      </div>
-      <bsscroll
-        :scrollX="true"
-        :scrollData="HOMEPAGE_MUSIC_MLOG.extInfo"
-        name="HOMEPAGE_MUSIC_MLOG_scroll"
-      >
-        <div class="rec_song">
-          <div
-            class="rec_item"
-            v-for="item in HOMEPAGE_MUSIC_MLOG.extInfo"
-            :key="item.creativeId"
-            @click="show(item.creativeId)"
-          >
-            <van-image
-              class="img"
-              show-loading
-              radius="8"
-              :src="item.resource.mlogBaseData.coverUrl"
-            />
-            <span>{{ item.resource.mlogBaseData.text }}</span>
-            <div class="playCount">
-              <img src="../../public/img/icons/play.svg" alt="" />
-              <span>{{ numFilter(item.resource.mlogExtVO.playCount) }}</span>
-            </div>
-          </div>
-        </div>
-      </bsscroll>
-    </div>
-    <!-- 雷达歌单 -->
-    <div class="recommend">
-      <div class="rec_title">
-        <div class="rec_des">
-          {{ HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle.title }}
-        </div>
-        <div class="rec_more">
-          <span>{{ HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.button.text }}</span>
-          <img src="../../public/img/icons/more.svg" alt="" />
-        </div>
-      </div>
-      <bsscroll
-        :scrollX="true"
-        :scrollData="HOMEPAGE_BLOCK_MGC_PLAYLIST.extInfo"
-        name="HOMEPAGE_BLOCK_MGC_PLAYLIST_scroll"
-      >
-        <div class="rec_song">
-          <div
-            class="rec_item"
-            v-for="item in HOMEPAGE_BLOCK_MGC_PLAYLIST.creatives"
-            :key="item.creativeId"
-            @click="goSongList(item.resources[0].resourceId)"
-          >
-            <van-image
-              class="img"
-              show-loading
-              radius="8"
-              :src="item.uiElement.image.imageUrl"
-            />
-            <span>{{ item.uiElement.mainTitle.title }}</span>
-            <div class="playCount">
-              <img src="../../public/img/icons/play.svg" alt="" />
-              <span>{{
-                numFilter(item.resources[0].resourceExtInfo.playCount)
-              }}</span>
-            </div>
-          </div>
-        </div>
-      </bsscroll>
-    </div>
-    <!-- 视频合辑 -->
-    <div class="video">
-      <div class="rec_title">
-        <div class="rec_des">
-          {{ HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle.title }}
-        </div>
-        <div class="rec_more">
-          <span>{{
-            HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.button.text
-          }}</span>
-          <img src="../../public/img/icons/more.svg" alt="" />
-        </div>
-      </div>
-      <bsscroll
-        :scrollX="true"
-        :scrollData="HOMEPAGE_BLOCK_VIDEO_PLAYLIST.creatives"
-        name="HOMEPAGE_BLOCK_VIDEO_PLAYLIST_scroll"
-      >
-        <div class="rec_song">
-          <div
-            class="rec_item"
-            v-for="item in HOMEPAGE_BLOCK_VIDEO_PLAYLIST.creatives"
-            :key="item.creativeId"
-            @click="show(item.creativeId)"
-          >
-            <div class="img_wrapper">
-              <van-image class="img" radius="8" :src="item.uiElement.image.imageUrl"/>
-              <div class="mirror">
-                <van-image class="img_mirror" show-loading radius="8" :src="item.uiElement.image.imageUrl"/>
+              <span>{{ item.uiElement.mainTitle.title }}</span>
+              <div class="playCount">
+                <img src="../../public/img/icons/play.svg" alt="" />
+                <span>{{
+                  numFilter(item.resources[0].resourceExtInfo.playCount)
+                }}</span>
               </div>
             </div>
-            <span>{{ item.uiElement.mainTitle.title }}</span>
-            <div class="playCount">
-              <img src="../../public/img/icons/play.svg" alt="" />
-              <span>{{
-                numFilter(item.resources[0].resourceExtInfo.playCount)
-              }}</span>
+          </div>
+        </bsscroll>
+      </div>
+      <!-- 音乐日历 -->
+      <div class="calendar" v-if="HOMEPAGE_MUSIC_CALENDAR">
+        <div class="rec_title" @click="logoutDD()">
+          <div class="rec_des">
+            {{ HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle.title }}
+          </div>
+          <div class="rec_more">
+            <span>{{ HOMEPAGE_MUSIC_CALENDAR.uiElement.button.text }}</span>
+            <img src="../../public/img/icons/more.svg" alt="" />
+          </div>
+        </div>
+        <!-- 今天 -->
+        <div
+          class="item_calendar"
+          v-for="item in HOMEPAGE_MUSIC_CALENDAR.creatives"
+          :key="item.creativeId"
+        >
+          <div class="left">
+            <div class="left_top">
+              <span class="day">{{item.resources[0].uiElement.labelTexts ? "今天" : "明天"}}</span>
+              <span class="label" v-if="item.resources[0].uiElement.labelTexts">{{item.resources[0].uiElement.labelTexts[0]}}</span>
+              <span class="label_tomrrow" v-else>预告</span>
+            </div>
+            <div class="left_bottom">
+              {{ item.resources[0].uiElement.mainTitle.title }}
             </div>
           </div>
-        </div>
-      </bsscroll>
-    </div>
-    <!-- 音乐日历 -->
-    <div class="calendar" v-if="HOMEPAGE_MUSIC_CALENDAR">
-      <div class="rec_title" @click="logoutDD()">
-        <div class="rec_des">
-          {{ HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle.title }}
-        </div>
-        <div class="rec_more">
-          <span>{{ HOMEPAGE_MUSIC_CALENDAR.uiElement.button.text }}</span>
-          <img src="../../public/img/icons/more.svg" alt="" />
-        </div>
-      </div>
-      <!-- 今天 -->
-      <div
-        class="item_calendar"
-        v-for="item in HOMEPAGE_MUSIC_CALENDAR.creatives"
-        :key="item.creativeId"
-      >
-        <div class="left">
-          <div class="left_top">
-            <span class="day">{{item.resources[0].uiElement.labelTexts ? "今天" : "明天"}}</span>
-            <span class="label" v-if="item.resources[0].uiElement.labelTexts">{{item.resources[0].uiElement.labelTexts[0]}}</span>
-            <span class="label_tomrrow" v-else>预告</span>
-          </div>
-          <div class="left_bottom">
-            {{ item.resources[0].uiElement.mainTitle.title }}
+          <div class="right_img">
+            <img :src="item.resources[0].uiElement.image.imageUrl" alt="" />
           </div>
         </div>
-        <div class="right_img">
-          <img :src="item.resources[0].uiElement.image.imageUrl" alt="" />
-        </div>
       </div>
-    </div>
-    <!-- 专属场景歌单 -->
-    <div class="recommend">
-      <div class="rec_title">
-        <div class="rec_des">
-          {{ HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.subTitle.title }}
-        </div>
-        <div class="rec_more">
-          <span>{{
-            HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.button.text
-          }}</span>
-          <img src="../../public/img/icons/more.svg" alt="" />
-        </div>
-      </div>
-      <bsscroll
-        :scrollX="true"
-        :scrollData="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.creatives"
-        name="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST_scroll"
-      >
-        <div class="rec_song">
-          <div
-            class="rec_item"
-            v-for="item in HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.creatives"
-            :key="item.creativeId"
-            @click="goSongList(item.resources[0].resourceId)"
-          >
-            <van-image
-              class="img"
-              show-loading
-              radius="8"
-              :src="item.uiElement.image.imageUrl"
-            />
-            <span>{{ item.uiElement.mainTitle.title }}</span>
-            <div class="playCount">
-              <img src="../../public/img/icons/play.svg" alt="" />
-              <span>{{
-                numFilter(item.resources[0].resourceExtInfo.playCount)
-              }}</span>
-            </div>
+      <!-- 专属场景歌单 -->
+      <div class="recommend">
+        <div class="rec_title">
+          <div class="rec_des">
+            {{ HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.subTitle.title }}
+          </div>
+          <div class="rec_more">
+            <span>{{
+              HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.button.text
+            }}</span>
+            <img src="../../public/img/icons/more.svg" alt="" />
           </div>
         </div>
-      </bsscroll>
-    </div>
-    <!-- 新歌，新碟，数字专辑 -->
-    <div class="new">
-      <div class="rec_title">
-        <div class="rec_des">
-          <span
-            @click="change_new(0)"
-            :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 0 }"
-            >新歌</span
-          >
-          <span style="color: #ccc; margin: 0 3px">|</span>
-          <span
-            @click="change_new(1)"
-            :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 1 }"
-            >新碟</span
-          >
-          <span style="color: #ccc; margin: 0 3px">|</span>
-          <span
-            @click="change_new(2)"
-            :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 2 }"
-            >数字专辑</span
-          >
-        </div>
-        <div class="rec_more">
-          <img src="../../public/img/icons/videoPlay.svg" alt="" />
-          <span>更多</span>
-        </div>
-      </div>
-      <bsscroll
-        :scrollX="true"
-        :scrollData="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData"
-        name="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG_scroll"
-      >
-        <div class="swiper">
-          <div
-            class="swiper_item"
-            v-for="(item, index) in HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[
-              HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index
-            ]"
-            :key="index"
-          >
+        <bsscroll
+          :scrollX="true"
+          :scrollData="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.creatives"
+          name="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST_scroll"
+        >
+          <div class="rec_song">
             <div
-              class="item"
-              v-for="subItem in item.resources"
-              :key="subItem.resourceId"
+              class="rec_item"
+              v-for="item in HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.creatives"
+              :key="item.creativeId"
+              @click="goSongList(item.resources[0].resourceId)"
             >
-              <div class="img_wrapper">
-                <van-image class="img" :src="subItem.uiElement.image.imageUrl">
-                  <template v-slot:loading>
-                    <van-loading type="spinner" size="20" />
-                  </template>
-                </van-image>
+              <van-image
+                class="img"
+                show-loading
+                radius="8"
+                :src="item.uiElement.image.imageUrl"
+              />
+              <span>{{ item.uiElement.mainTitle.title }}</span>
+              <div class="playCount">
+                <img src="../../public/img/icons/play.svg" alt="" />
+                <span>{{
+                  numFilter(item.resources[0].resourceExtInfo.playCount)
+                }}</span>
               </div>
-              <div class="info">
-                <div class="song_title">
-                  <div class="song_name">
-                    {{ subItem.uiElement.mainTitle.title }}
-                  </div>
-                  <span style="color: #ccc; margin: 0 2px">-</span>
-                  <div
-                    class="song_author"
-                    v-for="(author_title, index) in subItem.resourceExtInfo
-                      .artists"
-                    :key="author_title.id"
-                  >
-                    {{ author_title.name }}
-                    <span
-                      v-if="index < subItem.resourceExtInfo.artists.length - 1"
-                      >/</span
+            </div>
+          </div>
+        </bsscroll>
+      </div>
+      <!-- 新歌，新碟，数字专辑 -->
+      <div class="new">
+        <div class="rec_title">
+          <div class="rec_des">
+            <span
+              @click="change_new(0)"
+              :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 0 }"
+              >新歌</span
+            >
+            <span style="color: #ccc; margin: 0 3px">|</span>
+            <span
+              @click="change_new(1)"
+              :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 1 }"
+              >新碟</span
+            >
+            <span style="color: #ccc; margin: 0 3px">|</span>
+            <span
+              @click="change_new(2)"
+              :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 2 }"
+              >数字专辑</span
+            >
+          </div>
+          <div class="rec_more">
+            <img src="../../public/img/icons/videoPlay.svg" alt="" />
+            <span>更多</span>
+          </div>
+        </div>
+        <bsscroll
+          :scrollX="true"
+          :scrollData="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData"
+          name="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG_scroll"
+        >
+          <div class="swiper">
+            <div
+              class="swiper_item"
+              v-for="(item, index) in HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[
+                HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index
+              ]"
+              :key="index"
+            >
+              <div
+                class="item"
+                v-for="subItem in item.resources"
+                :key="subItem.resourceId"
+              >
+                <div class="img_wrapper">
+                  <van-image class="img" :src="subItem.uiElement.image.imageUrl">
+                    <template v-slot:loading>
+                      <van-loading type="spinner" size="20" />
+                    </template>
+                  </van-image>
+                </div>
+                <div class="info">
+                  <div class="song_title">
+                    <div class="song_name">
+                      {{ subItem.uiElement.mainTitle.title }}
+                    </div>
+                    <span style="color: #ccc; margin: 0 2px">-</span>
+                    <div
+                      class="song_author"
+                      v-for="(author_title, index) in subItem.resourceExtInfo
+                        .artists"
+                      :key="author_title.id"
                     >
+                      {{ author_title.name }}
+                      <span
+                        v-if="index < subItem.resourceExtInfo.artists.length - 1"
+                        >/</span
+                      >
+                    </div>
                   </div>
-                </div>
-                <div
-                  class="song_subTitle"
-                  :class="{percent:subItem.uiElement.subTitle.title.indexOf('%') != -1}"
-                  v-if="subItem.uiElement.subTitle"
-                >
-                  <span class="SQ" v-if="subItem.resourceExtInfo.songPrivilege && subItem.resourceExtInfo.songPrivilege.maxbr >= 999000">SQ</span>
-                  {{ subItem.uiElement.subTitle.title }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </bsscroll>
-    </div>
-    <!-- 推荐新歌云贝广告 -->
-    <div class="yunbei" v-if="HOMEPAGE_YUNBEI_NEW_SONG.uiElement.subTitle.title">
-      <div class="rec_title">
-        <div class="rec_des">{{ HOMEPAGE_YUNBEI_NEW_SONG.uiElement.subTitle.title }}</div>
-      </div>
-      <bsscroll :scrollX="true" :scrollData="HOMEPAGE_YUNBEI_NEW_SONG.creatives" name="yunbei_scroll">
-        <div class="swiper">
-          <div class="swiper_item" v-for="(item, index) in HOMEPAGE_YUNBEI_NEW_SONG.creatives" :key="index">
-            <div class="item">
-              <div class="img_wrapper">
-                <van-image class="img" :src="item.resources[0].uiElement.image.imageUrl">
-                  <template v-slot:loading>
-                    <van-loading type="spinner" size="20" />
-                  </template>
-                </van-image>
-              </div>
-              <div class="info">
-                <div class="song_title">
-                  <div class="song_name">
-                    {{ item.resources[0].uiElement.mainTitle.title }}
-                  </div>
-                  <span style="color: #ccc; margin: 0 2px">-</span>
                   <div
-                    class="song_author"
-                    v-for="(author_title, index) in item.resources[0].resourceExtInfo.artists"
-                    :key="author_title.id"
+                    class="song_subTitle"
+                    :class="{percent:subItem.uiElement.subTitle.title.indexOf('%') != -1}"
+                    v-if="subItem.uiElement.subTitle"
                   >
-                    {{ author_title.name }}
-                    <span v-if="index < item.resources[0].resourceExtInfo.artists.length - 1">/</span>
+                    <span class="SQ" v-if="subItem.resourceExtInfo.songPrivilege && subItem.resourceExtInfo.songPrivilege.maxbr >= 999000">SQ</span>
+                    {{ subItem.uiElement.subTitle.title }}
                   </div>
-                </div>
-                <div
-                  class="song_subTitle"
-                  :class="{percent:item.uiElement.subTitle.title.indexOf('%') != -1}"
-                  v-if="item.uiElement.subTitle"
-                >
-                  <span class="SQ" v-if="item.resourceExtInfo.songPrivilege.maxbr >= 999000">SQ</span>
-                  {{ item.uiElement.subTitle.title }}
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </bsscroll>
-    </div>
-    <!-- 播客合辑 -->
-    <div class="recommend">
-      <div class="rec_title">
-        <div class="rec_des">
-          {{ HOMEPAGE_VOICELIST_RCMD.uiElement.subTitle.title }}
-        </div>
-        <div class="rec_more">
-          <span>{{
-            HOMEPAGE_VOICELIST_RCMD.uiElement.button.text
-          }}</span>
-          <img src="../../public/img/icons/more.svg" alt="" />
-        </div>
+        </bsscroll>
       </div>
-      <bsscroll
-        :scrollX="true"
-        :scrollData="HOMEPAGE_VOICELIST_RCMD.creatives"
-        name="HOMEPAGE_VOICELIST_RCMD_scroll"
-      >
-        <div class="rec_song">
-          <div
-            class="rec_item"
-            v-for="item in HOMEPAGE_VOICELIST_RCMD.creatives"
-            :key="item.creativeId"
-            @click="show(item.creativeId)"
-          >
-            <van-image
-              class="img"
-              show-loading
-              radius="8"
-              :src="item.uiElement.image.imageUrl"
-            />
-            <span>{{ item.uiElement.mainTitle.title }}</span>
-            <div class="playCount">
-              <img src="../../public/img/icons/play.svg" alt="" />
-              <span>{{
-                numFilter(item.creativeExtInfoVO.playCount)
-              }}</span>
+      <!-- 推荐新歌云贝广告 -->
+      <div class="yunbei" v-if="HOMEPAGE_YUNBEI_NEW_SONG.uiElement.subTitle.title">
+        <div class="rec_title">
+          <div class="rec_des">{{ HOMEPAGE_YUNBEI_NEW_SONG.uiElement.subTitle.title }}</div>
+        </div>
+        <bsscroll :scrollX="true" :scrollData="HOMEPAGE_YUNBEI_NEW_SONG.creatives" name="yunbei_scroll">
+          <div class="swiper">
+            <div class="swiper_item" v-for="(item, index) in HOMEPAGE_YUNBEI_NEW_SONG.creatives" :key="index">
+              <div class="item">
+                <div class="img_wrapper">
+                  <van-image class="img" :src="item.resources[0].uiElement.image.imageUrl">
+                    <template v-slot:loading>
+                      <van-loading type="spinner" size="20" />
+                    </template>
+                  </van-image>
+                </div>
+                <div class="info">
+                  <div class="song_title">
+                    <div class="song_name">
+                      {{ item.resources[0].uiElement.mainTitle.title }}
+                    </div>
+                    <span style="color: #ccc; margin: 0 2px">-</span>
+                    <div
+                      class="song_author"
+                      v-for="(author_title, index) in item.resources[0].resourceExtInfo.artists"
+                      :key="author_title.id"
+                    >
+                      {{ author_title.name }}
+                      <span v-if="index < item.resources[0].resourceExtInfo.artists.length - 1">/</span>
+                    </div>
+                  </div>
+                  <div
+                    class="song_subTitle"
+                    :class="{percent:item.uiElement.subTitle.title.indexOf('%') != -1}"
+                    v-if="item.uiElement.subTitle"
+                  >
+                    <span class="SQ" v-if="item.resourceExtInfo.songPrivilege.maxbr >= 999000">SQ</span>
+                    {{ item.uiElement.subTitle.title }}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </bsscroll>
-    </div>
-    <!-- 24 小时播客 -->
-    <div class="podcast24" v-if="false">
-      <div class="rec_title">
-        <div class="rec_des">
-          {{ HOMEPAGE_PODCAST24.uiElement.subTitle.title }}
-        </div>
+        </bsscroll>
       </div>
-      <bsscroll
-        :scrollX="true"
-        :scrollData="HOMEPAGE_PODCAST24.creatives"
-        name="HOMEPAGE_PODCAST24_scroll"
-      >
-        <div class="rec_song">
-          <div
-            class="rec_item"
-            v-for="item in HOMEPAGE_PODCAST24.creatives"
-            :key="item.creativeId"
-            @click="show(item.creativeId)"
-          >
-            <van-image
-              class="img"
-              show-loading
-              radius="50%"
-              :src="item.uiElement.image.imageUrl"
-            />
-            <span style="text-align:center">{{ item.uiElement.mainTitle.title }}</span>
-            <div class="play">
-              <img src="../../public/img/icons/play_white.svg" style="color: #fff" />
-            </div>
+      <!-- 播客合辑 -->
+      <div class="recommend">
+        <div class="rec_title">
+          <div class="rec_des">
+            {{ HOMEPAGE_VOICELIST_RCMD.uiElement.subTitle.title }}
+          </div>
+          <div class="rec_more">
+            <span>{{
+              HOMEPAGE_VOICELIST_RCMD.uiElement.button.text
+            }}</span>
+            <img src="../../public/img/icons/more.svg" alt="" />
           </div>
         </div>
+        <bsscroll
+          :scrollX="true"
+          :scrollData="HOMEPAGE_VOICELIST_RCMD.creatives"
+          name="HOMEPAGE_VOICELIST_RCMD_scroll"
+        >
+          <div class="rec_song">
+            <div
+              class="rec_item"
+              v-for="item in HOMEPAGE_VOICELIST_RCMD.creatives"
+              :key="item.creativeId"
+              @click="show(item.creativeId)"
+            >
+              <van-image
+                class="img"
+                show-loading
+                radius="8"
+                :src="item.uiElement.image.imageUrl"
+              />
+              <span>{{ item.uiElement.mainTitle.title }}</span>
+              <div class="playCount">
+                <img src="../../public/img/icons/play.svg" alt="" />
+                <span>{{
+                  numFilter(item.creativeExtInfoVO.playCount)
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </bsscroll>
+      </div>
+      <!-- 24 小时播客 -->
+      <div class="podcast24" v-if="false">
+        <div class="rec_title">
+          <div class="rec_des">
+            {{ HOMEPAGE_PODCAST24.uiElement.subTitle.title }}
+          </div>
+        </div>
+        <bsscroll
+          :scrollX="true"
+          :scrollData="HOMEPAGE_PODCAST24.creatives"
+          name="HOMEPAGE_PODCAST24_scroll"
+        >
+          <div class="rec_song">
+            <div
+              class="rec_item"
+              v-for="item in HOMEPAGE_PODCAST24.creatives"
+              :key="item.creativeId"
+              @click="show(item.creativeId)"
+            >
+              <van-image
+                class="img"
+                show-loading
+                radius="50%"
+                :src="item.uiElement.image.imageUrl"
+              />
+              <span style="text-align:center">{{ item.uiElement.mainTitle.title }}</span>
+              <div class="play">
+                <img src="../../public/img/icons/play_white.svg" style="color: #fff" />
+              </div>
+            </div>
+          </div>
+        </bsscroll>
+      </div>
       </bsscroll>
+      
     </div>
-    </bsscroll>
-    
   </div>
 </template>
 
@@ -692,7 +694,7 @@ export default defineComponent({
     });
 
     // 简单的节流
-    const decrease = (i: number) => {      
+    const decrease = (i: number) => {            
       let isDoing = false;
       return () => {
         let timer: number|undefined;
@@ -710,7 +712,7 @@ export default defineComponent({
 
     // 数据请求
     onMounted(async () => {
-      window.addEventListener("scroll", () => {
+      window.addEventListener("scroll", () => { 
         decrease(window.scrollY)()
       })
       store.commit("set_load", true)

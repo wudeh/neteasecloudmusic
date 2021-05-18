@@ -176,7 +176,7 @@ export default defineComponent({
     }
     // 获取评论
     const commentRequest = async () => {
-      const info = await getComment(store.state.song_info.id, store.state.song_info.type, 1, 20, 1, '');
+      const info = await getComment(store.state.song_info.id, 0, 1, 20, 3, '');
       let total = info.data.totalCount
         if (total >= 100 && total < 1000) {
           commentNum.value = '99+'

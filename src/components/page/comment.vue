@@ -1,195 +1,197 @@
 <template>
-<van-list
-  v-model:loading="requestLoading"
-  v-model:error="error"
-  :finished="finish"
-  :immediate-check="false"
-  error-text="请求失败，点击重新加载"
-  finished-text="已经到底啦"
-  @load="onLoad"
->
- <template v-slot:loading>
-      <div style="display:flex;align-items:center;justify-content:center;">
-        <img width="18" src="../../../public/img/icons/loading.svg" alt="">
-        <span>加载中...</span>
-      </div>
- </template>
-
-<!-- 导航 -->
-<van-sticky>
-  <div class="nav">
-    <div class="back" @click="router.go(-1)">
-      <img src="../../../public/img/icons/left_arrow_black.svg" alt="" />
-    </div>
-    <div class="comment_count">评论({{ commentTotal }})</div>
-  </div>
-</van-sticky>
-  <!-- 音乐信息 -->
-  <div class="song_info">
-    <div class="img">
-      <van-image radius="8" class="song_img" :src="img" />
-    </div>
-    <van-skeleton title :row="3" :loading="name == ``" />
-    <div class="info" v-if="name">
-      <div class="title">{{ name }}</div>
-      <div class="singer"><span style="color: black">by&nbsp;</span>{{ singer }}</div>
-    </div>
-  </div>
-  <!-- </van-skeleton> -->
-  <!-- 评论选择区 -->
-  <van-sticky :offset-top="50">
-    <div class="comment_choose">
-      <div class="title">评论区</div>
-      <div class="choose" v-show="!arrloading">
-        <span :class="{choosed: sortType == 1}" @click="change_sortType(1)">推荐</span>
-        <span :class="{choosed: sortType == 2}" @click="change_sortType(2)">最热</span>
-        <span :class="{choosed: sortType == 3}" @click="change_sortType(3)">最新</span>
-        <!-- <van-dropdown-menu >
-          <van-dropdown-item @change="change_sortType()" v-model="sortType" :options="sortTypeList" />
-        </van-dropdown-menu> -->
-      </div>
-    </div>
-  </van-sticky>
-  <!-- 评论区 -->
-  <van-skeleton title avatar :row="3" :loading="arrloading">
-    <div class="comment_area">
-      <div class="comment_item" v-for="item in arr" :key="item.commentId">
-        <div class="avatar">
-          <van-image round width="30" height="30" :src="item.user.avatarUrl" />
-        </div>
-        <div class="info">
-          <div class="top">
-            <div class="top_left">
-              <div class="name">
-                {{ item.user.nickname }} &nbsp; 
-                <span v-if="item.user.vipRights" style="display:flex;align-items: center">
-                  <img src="../../../public/img/icons/1.png" alt="">
-                  <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 5"  class="level">·伍</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 4"  class="level">·肆</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 3" class="level">·仨</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 2" class="level">·贰</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 1" class="level">·一</span>
-                </span>
-              </div>
-              <div class="time">
-                <span class="time">{{ sendTimeConversion(item.time) }}</span>
-                <span v-if="item.tag.datas" style="margin: 0 2px">-</span>
-                <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span>
-              </div>
-            </div>
-            <div class="like_count">
-              <span class="count">{{ numFilter(item.likedCount) }}</span>
-              <img v-if="item.liked" src="../../../public/img/icons/liked.svg" alt="" />
-              <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
-            </div>
-          </div>
-          <div class="text">{{ item.content }}</div>
-          <div class="reply_count" @click="floorRequest(item,item.commentId)" v-if="item.showFloorComment.showReplyCount">{{ item.showFloorComment.replyCount }}条回复&nbsp;></div>
-        </div>
-      </div>
-    </div>
-  </van-skeleton>
-  <van-skeleton title avatar :row="3" :loading="arrloading" />
-  <van-skeleton title avatar :row="3" :loading="arrloading" />
-  <van-skeleton title avatar :row="3" :loading="arrloading" />
-</van-list>
-
-  <!-- 楼层弹出评论 -->
-  <van-popup
-    v-model:show="store.state.showFloor"
-    closeable
-    round
-    @close="store.commit(`close`)"
-    :close-on-popstate="true"
-    close-icon-position="top-left"
-    position="bottom"
-    :style="{ height: '80%' }"
-  >
-    
+<div>
   <van-list
-    v-model:loading="floorLoading"
-    v-model:error="floorError"
+    v-model:loading="requestLoading"
+    v-model:error="error"
+    :finished="finish"
     :immediate-check="false"
-    :finished="floorFinish"
     error-text="请求失败，点击重新加载"
     finished-text="已经到底啦"
-    @load="onLoadFloor"
+    @load="onLoad"
   >
-    <template v-slot:loading>
-      <div style="display:flex;align-items:center;justify-content:center;">
-        <img width="18" src="../../../public/img/icons/loading.svg" alt="">
-        <span>加载中...</span>
+  <template v-slot:loading>
+        <div style="display:flex;align-items:center;justify-content:center;">
+          <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+          <span>加载中...</span>
+        </div>
+  </template>
+
+  <!-- 导航 -->
+  <van-sticky>
+    <div class="nav">
+      <div class="back" @click="router.go(-1)">
+        <img src="../../../public/img/icons/left_arrow_black.svg" alt="" />
       </div>
-    </template>
-    <div class="floor">
-      <div class="reply_count">回复({{floorArr.length}})</div>
-      <div class="comment_item floor_top">
-        <div class="avatar">
-          <van-image round width="30" height="30" :src="floorTopComment.user.avatarUrl" />
-        </div>
-        <div class="info">
-          <div class="top">
-            <div class="top_left">
-              <div class="name">{{ floorTopComment.user.nickname }}</div>
-              <div class="time">
-                <span class="time">{{ sendTimeConversion(floorTopComment.time) }}</span>
-                <!-- <span v-if="item.tag.datas" style="margin: 0 2px">-</span> -->
-                <!-- <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span> -->
-              </div>
-            </div>
-            <div class="like_count">
-              <span class="count">{{ numFilter(floorTopComment.likedCount) }}</span>
-              <img v-if="floorTopComment.liked" src="../../../public/img/icons/liked.svg" alt="" />
-              <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
-            </div>
-          </div>
-          <div class="text">{{ floorTopComment.content }}</div>
-        </div>
+      <div class="comment_count">评论({{ commentTotal }})</div>
+    </div>
+  </van-sticky>
+    <!-- 音乐信息 -->
+    <div class="song_info">
+      <div class="img">
+        <van-image radius="8" class="song_img" :src="img" />
       </div>
-      <div class="all_reply">全部回复</div>
-      <div class="comment_item" v-for="item in floorArr" :key="item.commentId">
-        <div class="avatar">
-          <van-image round width="30" height="30" :src="item.user.avatarUrl" />
-        </div>
-        <div class="info">
-          <div class="top">
-            <div class="top_left">
-              <div class="name">
-                {{ item.user.nickname }} &nbsp; 
-                <span v-if="item.user.vipRights" style="display:flex;align-items: center">
-                  <img src="../../../public/img/icons/1.png" alt="">
-                  <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 5"  class="level">·伍</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 4"  class="level">·肆</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 3" class="level">·仨</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 2" class="level">·贰</span>
-                  <span v-if="item.user.vipRights.redVipLevel == 1" class="level">·壹</span>
-                </span>
-              </div>
-              <div class="time">
-                <span class="time">{{ sendTimeConversion(item.time) }}</span>
-                <!-- <span v-if="item.tag.datas" style="margin: 0 2px">-</span> -->
-                <!-- <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span> -->
-              </div>
-            </div>
-            <div class="like_count">
-              <span class="count">{{ numFilter(item.likedCount) }}</span>
-              <img v-if="item.liked" src="../../../public/img/icons/liked.svg" alt="" />
-              <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
-            </div>
-          </div>
-          <div class="text">{{ item.content }}</div>
-          <div class="beReplied_item" v-if="item.beReplied[0].beRepliedCommentId != floorTopComment.commentId">
-            <span class="beReplied_name">@{{item.beReplied[0].user.nickname}}：</span>
-            <span class="beReplied_content" v-if="item.beReplied[0].content">{{item.beReplied[0].content}}</span>
-            <span class="beReplied_content" v-else>该评论已删除</span>
-          </div>
-        </div>
+      <van-skeleton title :row="3" :loading="name == ``" />
+      <div class="info" v-if="name">
+        <div class="title">{{ name }}</div>
+        <div class="singer"><span style="color: black">by&nbsp;</span>{{ singer }}</div>
       </div>
     </div>
+    <!-- </van-skeleton> -->
+    <!-- 评论选择区 -->
+    <van-sticky :offset-top="50">
+      <div class="comment_choose">
+        <div class="title">评论区</div>
+        <div class="choose" v-show="!arrloading">
+          <!-- <span :class="{choosed: sortType == 1}" @click="change_sortType(1)">推荐</span> -->
+          <span :class="{choosed: sortType == 2}" @click="change_sortType(2)">最热</span>
+          <span :class="{choosed: sortType == 3}" @click="change_sortType(3)">最新</span>
+          <!-- <van-dropdown-menu >
+            <van-dropdown-item @change="change_sortType()" v-model="sortType" :options="sortTypeList" />
+          </van-dropdown-menu> -->
+        </div>
+      </div>
+    </van-sticky>
+    <!-- 评论区 -->
+    <van-skeleton title avatar :row="3" :loading="arrloading">
+      <div class="comment_area">
+        <div class="comment_item" v-for="item in arr" :key="item.commentId">
+          <div class="avatar">
+            <van-image round width="30" height="30" :src="item.user.avatarUrl" />
+          </div>
+          <div class="info">
+            <div class="top">
+              <div class="top_left">
+                <div class="name">
+                  {{ item.user.nickname }} &nbsp; 
+                  <span v-if="item.user.vipRights" style="display:flex;align-items: center">
+                    <img src="../../../public/img/icons/1.png" alt="">
+                    <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 5"  class="level">·伍</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 4"  class="level">·肆</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 3" class="level">·仨</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 2" class="level">·贰</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 1" class="level">·一</span>
+                  </span>
+                </div>
+                <div class="time">
+                  <span class="time">{{ sendTimeConversion(item.time) }}</span>
+                  <span v-if="item.tag.datas" style="margin: 0 2px">-</span>
+                  <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span>
+                </div>
+              </div>
+              <div class="like_count">
+                <span class="count">{{ numFilter(item.likedCount) }}</span>
+                <img v-if="item.liked" src="../../../public/img/icons/liked.svg" alt="" />
+                <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
+              </div>
+            </div>
+            <div class="text">{{ item.content }}</div>
+            <div class="reply_count" @click="floorRequest(item,item.commentId)" v-if="item.showFloorComment.showReplyCount">{{ item.showFloorComment.replyCount }}条回复&nbsp;></div>
+          </div>
+        </div>
+      </div>
+    </van-skeleton>
+    <van-skeleton title avatar :row="3" :loading="arrloading" />
+    <van-skeleton title avatar :row="3" :loading="arrloading" />
+    <van-skeleton title avatar :row="3" :loading="arrloading" />
   </van-list>
-  </van-popup>
+
+    <!-- 楼层弹出评论 -->
+    <van-popup
+      v-model:show="store.state.showFloor"
+      closeable
+      round
+      @close="store.commit(`close`)"
+      :close-on-popstate="true"
+      close-icon-position="top-left"
+      position="bottom"
+      :style="{ height: '80%' }"
+    >
+      
+    <van-list
+      v-model:loading="floorLoading"
+      v-model:error="floorError"
+      :immediate-check="false"
+      :finished="floorFinish"
+      error-text="请求失败，点击重新加载"
+      finished-text="已经到底啦"
+      @load="onLoadFloor"
+    >
+      <template v-slot:loading>
+        <div style="display:flex;align-items:center;justify-content:center;">
+          <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+          <span>加载中...</span>
+        </div>
+      </template>
+      <div class="floor">
+        <div class="reply_count">回复({{floorArr.length}})</div>
+        <div class="comment_item floor_top">
+          <div class="avatar">
+            <van-image round width="30" height="30" :src="floorTopComment.user.avatarUrl" />
+          </div>
+          <div class="info">
+            <div class="top">
+              <div class="top_left">
+                <div class="name">{{ floorTopComment.user.nickname }}</div>
+                <div class="time">
+                  <span class="time">{{ sendTimeConversion(floorTopComment.time) }}</span>
+                  <!-- <span v-if="item.tag.datas" style="margin: 0 2px">-</span> -->
+                  <!-- <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span> -->
+                </div>
+              </div>
+              <div class="like_count">
+                <span class="count">{{ numFilter(floorTopComment.likedCount) }}</span>
+                <img v-if="floorTopComment.liked" src="../../../public/img/icons/liked.svg" alt="" />
+                <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
+              </div>
+            </div>
+            <div class="text">{{ floorTopComment.content }}</div>
+          </div>
+        </div>
+        <div class="all_reply">全部回复</div>
+        <div class="comment_item" v-for="item in floorArr" :key="item.commentId">
+          <div class="avatar">
+            <van-image round width="30" height="30" :src="item.user.avatarUrl" />
+          </div>
+          <div class="info">
+            <div class="top">
+              <div class="top_left">
+                <div class="name">
+                  {{ item.user.nickname }} &nbsp; 
+                  <span v-if="item.user.vipRights" style="display:flex;align-items: center">
+                    <img src="../../../public/img/icons/1.png" alt="">
+                    <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 5"  class="level">·伍</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 4"  class="level">·肆</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 3" class="level">·仨</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 2" class="level">·贰</span>
+                    <span v-if="item.user.vipRights.redVipLevel == 1" class="level">·壹</span>
+                  </span>
+                </div>
+                <div class="time">
+                  <span class="time">{{ sendTimeConversion(item.time) }}</span>
+                  <!-- <span v-if="item.tag.datas" style="margin: 0 2px">-</span> -->
+                  <!-- <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span> -->
+                </div>
+              </div>
+              <div class="like_count">
+                <span class="count">{{ numFilter(item.likedCount) }}</span>
+                <img v-if="item.liked" src="../../../public/img/icons/liked.svg" alt="" />
+                <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
+              </div>
+            </div>
+            <div class="text">{{ item.content }}</div>
+            <div class="beReplied_item" v-if="item.beReplied[0].beRepliedCommentId != floorTopComment.commentId">
+              <span class="beReplied_name">@{{item.beReplied[0].user.nickname}}：</span>
+              <span class="beReplied_content" v-if="item.beReplied[0].content">{{item.beReplied[0].content}}</span>
+              <span class="beReplied_content" v-else>该评论已删除</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </van-list>
+    </van-popup>
+</div>
   
 </template>
 
@@ -239,7 +241,7 @@ export default defineComponent({
       commentTotal: 0,
       pageNo: 1,
       floorPageNo: 1,
-      sortType: 1,
+      sortType: 2,
       sortTypeName: "",
       sortTypeList: [],
       cursor: "",

@@ -1,19 +1,21 @@
 <template>
-  <div class="nav">
-    <div class="back" @click="router.go(-1)">
-      <img src="../../../public/img/icons/left_arrow_black.svg" alt="">
-    </div>
-    <div class="title">下载页面</div>
-  </div>
-  <div class="info">
-    <div class="item" v-for="(it,i) in store.state.download_list" :key="i">
-      <div class="text">
-        <span class="name">{{ it.name }}</span>
-        <span class="middle">-</span>
-        <span>{{ it.author }}</span>
+  <div>
+    <div class="nav">
+      <div class="back" @click="router.go(-1)">
+        <img src="../../../public/img/icons/left_arrow_black.svg" alt="">
       </div>
-      <van-progress :percentage="it.progress" />
-  </div>
+      <div class="title">下载页面</div>
+    </div>
+    <div class="info">
+      <div class="item" v-for="(it,i) in store.state.download_list" :key="i">
+        <div class="text">
+          <span class="name">{{ it.name }}</span>
+          <span class="middle">-</span>
+          <span>{{ it.author }}</span>
+        </div>
+        <van-progress :percentage="it.progress" />
+    </div>
+    </div>
   </div>
 </template>
 

@@ -1,9 +1,13 @@
 <template>
   <div class="home">
     <router-view v-slot="{ Component }">
+      <transition :name="transition_name">
       <keep-alive :include="include">
-        <component :is="Component" />
+        
+          <component :is="Component" />
+        
       </keep-alive>
+      </transition>
     </router-view>
     <!-- 用来撑开底部的盒子 -->
     <div class="songDiv" v-if="store.state.song_info.id && router.currentRoute.value.name != 'song'"></div>
@@ -41,20 +45,20 @@
             <img src="../../public/img/icons/collect_gray.svg" alt="">
             <img class="finger" src="../../public/img/icons/finger.svg" alt="">
             <span>收藏全部</span>
-            <img class="del_list" @click="store.dispatch(`delete`, -1)" src="../../public/img/icons/delete_gray.svg" alt="">
+            <img class="del_list" @click="store.dispatch(`delete_all`)" src="../../public/img/icons/delete_gray.svg" alt="">
           </div>
         </div>
         <div class="list">
-          <div class="item" v-for="(it, i) in store.state.song_info.list" :key="i">
-            <div :class="{ info: true, red: i == store.state.song_info.listIndex }" @click="store.dispatch(`play_next`, i)">
+          <div class="item" v-for="(it) in store.state.song_info.list" :key="it.id">
+            <div :class="{ info: true, red: it.id == store.state.song_info.id }" @click="store.dispatch(`play_by_id`, it.id)">
               <div class="icon">
-                <img v-if="i == store.state.song_info.listIndex" src="../../public/img/icons/loading.svg" alt="" />
+                <img v-if="it.id == store.state.song_info.id" src="../../public/img/icons/loading.svg" alt="" />
               </div>
-              <span :class="{ name: true, red: i == store.state.song_info.listIndex }">{{ it.name }}</span>
+              <span :class="{ name: true, red: it.id == store.state.song_info.id }">{{ it.name }}</span>
               <span>&nbsp;-&nbsp;</span>
               <span class="author">{{ it.author }}</span>
             </div>
-            <img class="delete"  @click="store.dispatch(`delete`, i)" src="../../public/img/icons/delete.svg" alt="" />
+            <img class="delete"  @click="store.dispatch(`delete`, it.id)" src="../../public/img/icons/delete.svg" alt="" />
           </div>
         </div>
       </div>
@@ -175,9 +179,11 @@ export default defineComponent({
     const stopWhite = require("../../public/img/icons/stop_white.svg");
     let timerSong = ref(); // 定时计算当前播放时间
     let current_song_time = ref("00:00.00");
-    let lyric: Array<{ time: string; lyric: string }> = reactive([]);
+    // let lyric: Array<{ time: string; lyric: string }> = reactive([]);
     let lyricTime: Array<string> = reactive([]);
     let lyricRef = ref();
+
+    const transition_name = ref('')
 
     const include = reactive(["song", "discover"]);
 
@@ -236,6 +242,7 @@ export default defineComponent({
         audio.value.src = store.state.song_info.url;
         audio.value.play();
         store.commit("play", true);
+        lyricRequest();
       }
     );
 
@@ -259,14 +266,83 @@ export default defineComponent({
         if (to.meta.level > from.meta.level) {
           if (from.name == "song") return;
           include.push(to.name);
+          transition_name.value = `slide-left`
           console.log(include);
         } else {
           // if(to.name == "song") return;
           include.splice(include.indexOf(from.name), 1);
+          transition_name.value = `slide-right`
           console.log(include);
         }
       }
     );
+
+    // 监听歌曲时间，用来设置歌词滚动和圆点移动
+    watch(() => store.state.song_info.currentTime, (value) => {
+        // 歌词滚动
+        store.state.song_info.lyricAll.forEach((i:any,index: number,arr: any[]) => {
+          if(value >= i.time && value <= arr[index+1].time) {
+            store.commit(`set_lyric`, i.lyric)
+          }
+        })
+    })
+
+    // 监听歌词变更 console 歌词
+    watch(() => store.state.song_info.lyric, (value) => {
+      console.info(`%c > ${value}`, 'color:#db2c1f;background:rgba(0,0,0,0.2);font-size:25px;border-radius:6px')
+    })
+
+    const lyricRequest = async () => {
+      let lyric: { lyric: string; }[]|{ time: string|number; lyric: any; }[] = []
+      const data = await getLyric(store.state.song_info.id);
+      console.log(data);
+      // console.log(data.lrc.lyric.split("["));
+      if(data.lrc) {
+        let i = data.lrc.lyric.split("[");
+        i.forEach((item:any,index: number) => {
+          let temp = {
+            time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 ,
+            lyric: item.split("]")[1] || i[index+1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
+          };
+          if(temp.lyric != "\n" && !Number.isNaN(temp.time)) lyric.push(temp);           
+        });
+        // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
+        lyric.push({
+          time: `9999`,
+          lyric: 'wudeh'
+        })
+        
+
+        
+        lyric.sort((a: any,b: any) => {
+          return a.time - b.time;
+        })
+        console.log(lyric);
+        console.log("这是歌词");
+        // 如果有翻译歌词
+        if(data.tlyric.lyric) {
+          let i = data.tlyric.lyric.split("[");
+          i.forEach((item:any,index: number) => {
+            let temp = {
+              time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 || 0,
+              lyric: item.split("]")[1] || i[index+1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
+            };
+            lyric.forEach((item: any,index: number) => {
+              if(item.time == temp.time) {
+                lyric[index].lyric += `<br>${temp.lyric}`
+              }
+            })          
+
+          });
+        }
+      }else {
+        lyric.push({
+          time: `9999`,
+          lyric: '当前音乐暂无歌词'
+        })
+      }
+      store.commit(`set_all_lyric`, lyric)
+    }
 
     onMounted(async () => {
       if (store.state.song_info.id) {
@@ -336,6 +412,7 @@ export default defineComponent({
       // });
       audio.value.addEventListener("play", () => {
         console.log("<-- 播放 -->");
+        console.info(`%c > console 歌词系统工作 ing`, 'color:#db2c1f;background:rgba(0,0,0,0.2);font-size:25px;border-radius:6px')
         // this.SET_PAGE_DATA(['audio', 'isPlaying', true])
         // this.sendCurrentTime('set')
       });
@@ -348,9 +425,11 @@ export default defineComponent({
         store.commit("play", false);
         store.dispatch("play_next");
       });
+
+      lyricRequest();
     });
 
-    const route = useRoute();
+    
     const animation = ref("slide");
     animation.value = "slide-left";
 
@@ -368,14 +447,6 @@ export default defineComponent({
       console.log("3553434344");
     };
     
-
-    // const onChange = (index: number) => {
-    //   index === 0 && router.push({ path: "/" });
-    //   index === 1 && router.push({ path: "/boke" });
-    //   index === 2 && router.push({ path: "/person" });
-    //   index === 3 && router.push({ path: "/Ksing" });
-    //   index === 4 && router.push({ path: "/cloud" });
-    // };
     return {
       animation,
       active,
@@ -389,8 +460,9 @@ export default defineComponent({
       store,
       linePast,
       point,
+      transition_name,
       img_pop,
-      lyric,
+      // lyric,
       lyricTime,
       lyricRef,
       downloadFile,
@@ -411,7 +483,7 @@ export default defineComponent({
 .home {
   width: 100vw;
   height: 100vh;
-  // overflow: hidden;
+  // overflow-x: hidden;
 }
 .slide-right-enter-active,
 .slide-right-leave-active,
@@ -425,19 +497,19 @@ export default defineComponent({
 }
 .slide-right-enter-active {
   opacity: 0;
-  transform: translate3d(-100%, 0, 0);
+  transform: translate(-100%);
 }
 .slide-right-leave-active {
   opacity: 0;
-  transform: translate3d(100%, 0, 0);
+  transform: translate(100%);
 }
 .slide-left-enter-active {
   opacity: 0;
-  transform: translate3d(100%, 0, 0);
+  transform: translate(100%);
 }
 .slide-left-leave-active {
   opacity: 0;
-  transform: translate3d(-100%, 0, 0);
+  transform: translate(-100%);
 }
 @keyframes rotate_img {
   0% {

@@ -11,7 +11,8 @@ interface song {
     url: string,
     type: number | string,
     isPlaying: boolean,
-    lyric: any[],
+    lyric: string,
+    lyricAll: any[],
     currentTime: number | string, // 当前播放时间
     progressTime: number, // 进度条拖动时间
     duration: number,
@@ -54,7 +55,8 @@ export default createStore<song>({
       url: '',
       type: localStorage.getItem("songType") || `0`,
       isPlaying: false,
-      lyric: [],
+      lyric: ``, // 当前歌词
+      lyricAll: [], // 全部歌词
       currentTime: localStorage.getItem("songPlayTime") || 0, // 当前播放时间
       progressTime: 0, // 进度条拖动时间
       duration: 0,
@@ -86,6 +88,14 @@ export default createStore<song>({
     // 设置加载中
     set_load(state, i) {
       state.showLoading = i;
+    },
+    // 设置歌词
+    set_all_lyric(state, i) {
+      state.song_info.lyricAll = i;
+    },
+    // 设置当前歌词
+    set_lyric(state, i) {
+      state.song_info.lyric = i;
     },
     // 设置歌曲信息
     setSongInfo(state, song) {
@@ -193,6 +203,11 @@ export default createStore<song>({
         Toast("当前列表只有一首歌")
         return
       }
+      ctx.state.song_info.list.forEach((item: any, index: number) => {
+        if(item.id == ctx.state.song_info.id) {
+          ctx.state.song_info.listIndex = index;          
+        }
+      });
       console.log("正在检查是否播放下一首");
       ctx.state.song_info.isPlaying = false
       ctx.commit(`set_song_time`,0)
@@ -206,13 +221,23 @@ export default createStore<song>({
         }else if(i >=0 ) {
           // 播放指定歌曲
           ctx.state.song_info.listIndex = i;
+        }else if(i) {
+          ctx.state.song_info.list.forEach((item: any, index: number) => {
+            if(item.id == i) {
+              ctx.state.song_info.listIndex = index;          
+            }
+          });
         }else {
           // 播放下一首
+          console.log(`正在播放下一首`);
+          
           if(++ctx.state.song_info.listIndex > ctx.state.song_info.list.length -1 ) {
             ctx.state.song_info.listIndex = 0;
           }
         }
       }
+      console.log(`要播放的歌曲索引为${ctx.state.song_info.listIndex}`);
+      
 
       // 如果是随机播放
       if(ctx.state.song_info.playMode == 2) {
@@ -238,6 +263,34 @@ export default createStore<song>({
         ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
         ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
       }else {
+        console.log(`要播放的歌曲名为${ctx.state.song_info.list[ctx.state.song_info.listIndex].name}`);
+        
+        const info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
+        ctx.state.song_info.url = info.data[0].url
+        ctx.state.song_info.list[ctx.state.song_info.listIndex].url = info.data[0].url
+        ctx.state.song_info.id = ctx.state.song_info.list[ctx.state.song_info.listIndex].id;
+        ctx.state.song_info.name = ctx.state.song_info.list[ctx.state.song_info.listIndex].name;
+        ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
+        ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
+      }
+    },
+    // 通过 id 播放指定歌曲
+    async play_by_id(ctx, id) {
+      ctx.state.song_info.list.forEach((item: any, index: number) => {
+        if(item.id == id) {
+          ctx.state.song_info.listIndex = index;          
+        }
+      });
+
+      if(ctx.state.song_info.list[ctx.state.song_info.listIndex].url) {
+        ctx.state.song_info.url = ctx.state.song_info.list[ctx.state.song_info.listIndex].url;
+        ctx.state.song_info.id = ctx.state.song_info.list[ctx.state.song_info.listIndex].id;
+        ctx.state.song_info.name = ctx.state.song_info.list[ctx.state.song_info.listIndex].name;
+        ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
+        ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
+      }else {
+        console.log(`要播放的歌曲名为${ctx.state.song_info.list[ctx.state.song_info.listIndex].name}`);
+        
         const info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
         ctx.state.song_info.url = info.data[0].url
         ctx.state.song_info.list[ctx.state.song_info.listIndex].url = info.data[0].url
@@ -265,10 +318,20 @@ export default createStore<song>({
         ctx.state.song_pop_detail.url = info.data[0].url
       }
     },
-    // 删除列表歌曲
-    delete(ctx, i) {
-      // i 小于 0，或者当前列表只有一首歌，删除全部
-      if(i < 0 || (i == ctx.state.song_info.listIndex && ctx.state.song_info.list.length == 1)) {
+    // 删除一首列表歌曲
+    async delete(ctx, id) {
+      let i = 0;
+      ctx.state.song_info.list.forEach((item: any, index: number) => {
+        if(item.id == id) {
+          console.log(`要删除的歌曲名为$${item.name}`);
+          
+          i = index;
+          console.log(i);
+          
+        }
+      });
+      // 当前列表只有一首歌，删除全部
+      if(ctx.state.song_info.list.length == 1) {
         ctx.state.song_info.list.splice(0)
         ctx.state.song_info.listIndex = 0;
         ctx.state.song_info.isPlaying = false;
@@ -286,12 +349,48 @@ export default createStore<song>({
         router.go(-1)
       }else {
         // 如果删除的是当前播放的歌曲，先播放下一首歌
-        if(i == ctx.state.song_info.listIndex) {
-          ctx.dispatch(`play_next`)
+        if(id == ctx.state.song_info.id) {
+          console.log(`删除当前播放歌曲`);
+          i++
+          if(i > ctx.state.song_info.list.length - 1 ) i = 0;
+          const info = await getSongUrl(ctx.state.song_info.list[i].id);
+          ctx.state.song_info.url = info.data[0].url
+          ctx.state.song_info.list[i].url = info.data[0].url
+          ctx.state.song_info.id = ctx.state.song_info.list[i].id;
+          ctx.state.song_info.name = ctx.state.song_info.list[i].name;
+          ctx.state.song_info.author = ctx.state.song_info.list[i].author;
+          ctx.state.song_info.img = ctx.state.song_info.list[i].img;
         }
-        // 再删除
+        ctx.state.song_info.list.forEach((item: any, index: number) => {
+          if(item.id == id) {
+            i = index;
+          }
+        });
         ctx.state.song_info.list.splice(i, 1)
+        ctx.state.song_info.list.forEach((item: any, index: number) => {
+          if(item.id == ctx.state.song_info.id) {
+            ctx.state.song_info.listIndex = index;
+          }
+        });
       }
+    },
+    // 删除全部列表歌曲
+    delete_all(ctx) {
+      ctx.state.song_info.list.splice(0)
+      ctx.state.song_info.listIndex = 0;
+      ctx.state.song_info.isPlaying = false;
+      // ctx.state.song_info.url = '' 不删除 URL，造成所有歌曲被删除的假象就行
+      ctx.state.song_info.name = ''
+      ctx.state.song_info.author = ''
+      ctx.state.song_info.type = 0
+      ctx.state.song_info.id = ''
+      localStorage.removeItem("songId");
+      localStorage.removeItem("songName");
+      localStorage.removeItem("songAuthor");
+      localStorage.removeItem("songImg");
+      localStorage.removeItem("songType");
+      ctx.commit(`close`)
+      router.go(-1)
     }
   },
   modules: {

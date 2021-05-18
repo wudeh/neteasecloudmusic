@@ -1,87 +1,89 @@
 <template>
-  <div class="top">
-    <div class="img_blur">
-      <img :src="img" alt="">
-    </div>
-    <div class="nav">
-      <div class="left_arrow" @click="router.go(-1)">
-        <img src="../../../public/img/icons/left_arrow.svg" alt="">
+  <div>
+    <div class="top">
+      <div class="img_blur">
+        <img :src="img" alt="">
       </div>
-      <div class="title">歌单</div>
-      <div class="search">
-        <img src="../../../public/img/icons/search.svg" alt="">
-      </div>
-    </div>
-    <div class="info">
-      <div class="avatar">
-        <van-image radius="8" class="img" :src="img" />
-      </div>
-      <div class="detail">
-        <div class="title">{{title}}</div>
-        <div class="person">
-          <van-image radius="50%" class="img" :src="author.avatar" />
-          <span class="name">{{author.nickname}}</span>
-          <span class="Follow" v-if="author.followed">></span>
-          <span class="notFollow" v-else>+</span>
+      <div class="nav">
+        <div class="left_arrow" @click="router.go(-1)">
+          <img src="../../../public/img/icons/left_arrow.svg" alt="">
         </div>
-        <div class="des">
-          <div class="text">{{description}}</div>
-          <img v-if="description" src="../../../public/img/icons/more.svg" alt="">
+        <div class="title">歌单</div>
+        <div class="search">
+          <img src="../../../public/img/icons/search.svg" alt="">
         </div>
       </div>
-    </div>
-  </div>
-  <!-- 收藏 评论 分享 -->
-  <div class="count">
-    <div class="sub item">
-        <img :src="subscribed?subedIcon:subIcon" alt="">
-        <span>{{numFilter(subscribedCount)}}</span>
-    </div>
-    <div class="line"></div>
-    <div class="comment item" @click="router.push({path: `/comment`, query: {id: id, type: 2}})">
-      <img src="../../../public/img/icons/comment.svg" alt="">
-        <span>{{numFilter(commentCount)}}</span>
-    </div>
-    <div class="line"></div>
-    <div class="share item">
-      <img src="../../../public/img/icons/share.svg" alt="">
-        <span>{{numFilter(shareCount)}}</span>
-    </div>
-  </div>
-  <!-- 全部播放 -->
-  <div class="playAll">
-    <div class="icon">
-      <img src="../../../public/img/icons/playAll.svg" alt="">
-    </div>
-    <div class="text">
-      <div class="play_all_title">播放全部</div>
-    </div>
-    <div class="play_count">({{songListInfo.length}})</div>
-  </div>
-  <!-- 歌曲列表 -->
-  <div class="songList">
-    <div class="song_item" v-for="(item,index) in songListInfo" :key="index">
-      <div class="index">
-        <img v-if="item.id == store.state.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="">
-        <span v-else>{{index + 1}}</span>
-      </div>
-      <div class="song_info" @click="playMusicSingle(item)">
-        <div class="info_top">
-          <div class="song_name">{{item.name}}</div>
-          <div class="song_TV" v-if="item.Tv">&nbsp;-&nbsp;{{item.Tv}}</div>
+      <div class="info">
+        <div class="avatar">
+          <van-image radius="8" class="img" :src="img" />
         </div>
-        <div class="info_bottom">
-          <span class="vip" v-if="item.vip">vip</span>
-          <span class="hear_try" v-if="item.vip">试听</span>
-          <span class="dujia" v-if="item.dujia">独家</span>
-          <span class="sq" v-if="item.sq">SQ</span>
-          {{item.author}}
-          -
-          {{item.des}}
+        <div class="detail">
+          <div class="title">{{title}}</div>
+          <div class="person">
+            <van-image radius="50%" class="img" :src="author.avatar" />
+            <span class="name">{{author.nickname}}</span>
+            <span class="Follow" v-if="author.followed">></span>
+            <span class="notFollow" v-else>+</span>
+          </div>
+          <div class="des">
+            <div class="text">{{description}}</div>
+            <img v-if="description" src="../../../public/img/icons/more.svg" alt="">
+          </div>
         </div>
       </div>
-      <div class="more">
-        <img src="../../../public/img/icons/songInfo.svg" alt="">
+    </div>
+    <!-- 收藏 评论 分享 -->
+    <div class="count">
+      <div class="sub item">
+          <img :src="subscribed?subedIcon:subIcon" alt="">
+          <span>{{numFilter(subscribedCount)}}</span>
+      </div>
+      <div class="line"></div>
+      <div class="comment item" @click="router.push({path: `/comment`, query: {id: id, type: 2}})">
+        <img src="../../../public/img/icons/comment.svg" alt="">
+          <span>{{numFilter(commentCount)}}</span>
+      </div>
+      <div class="line"></div>
+      <div class="share item">
+        <img src="../../../public/img/icons/share.svg" alt="">
+          <span>{{numFilter(shareCount)}}</span>
+      </div>
+    </div>
+    <!-- 全部播放 -->
+    <div class="playAll">
+      <div class="icon">
+        <img src="../../../public/img/icons/playAll.svg" alt="">
+      </div>
+      <div class="text">
+        <div class="play_all_title">播放全部</div>
+      </div>
+      <div class="play_count">({{songListInfo.length}})</div>
+    </div>
+    <!-- 歌曲列表 -->
+    <div class="songList">
+      <div class="song_item" v-for="(item,index) in songListInfo" :key="index">
+        <div class="index">
+          <img v-if="item.id == store.state.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="">
+          <span v-else>{{index + 1}}</span>
+        </div>
+        <div class="song_info" @click="playMusicSingle(item)">
+          <div class="info_top">
+            <div class="song_name">{{item.name}}</div>
+            <div class="song_TV" v-if="item.Tv">&nbsp;-&nbsp;{{item.Tv}}</div>
+          </div>
+          <div class="info_bottom">
+            <span class="vip" v-if="item.vip">vip</span>
+            <span class="hear_try" v-if="item.vip">试听</span>
+            <span class="dujia" v-if="item.dujia">独家</span>
+            <span class="sq" v-if="item.sq">SQ</span>
+            {{item.author}}
+            -
+            {{item.des}}
+          </div>
+        </div>
+        <div class="more">
+          <img src="../../../public/img/icons/songInfo.svg" alt="">
+        </div>
       </div>
     </div>
   </div>

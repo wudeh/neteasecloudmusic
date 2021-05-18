@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div style="width: 100vw">
     <form action="/">
       <van-search
         v-model="word"
