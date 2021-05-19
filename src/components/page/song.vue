@@ -291,7 +291,7 @@ export default defineComponent({
         // 歌词滚动
         lyric.forEach((i:any,index,arr) => {
           if(current_song_time.value >= i.time && current_song_time.value <= arr[index+1].time) {
-            lyricScorll.bs.scrollToElement(`#s${index}`,300)
+            lyricScorll.bs.scrollToElement(`#s${index}`,300, true,true)
           }
         })
       }

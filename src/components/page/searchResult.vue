@@ -9,8 +9,30 @@
         @search="onSearch"
       />
     </form>
-    <van-tabs ref="tab" v-model:active="activeName"  sticky @click="onClick">
+    <van-tabs ref="tab" v-model:active="activeName"  sticky>
       <van-tab title="综合" name="1018">
+        <van-pull-refresh v-model="allRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
+        <van-list
+          v-model:loading="allLoading"
+          v-model:error="allError"
+          :immediate-check="false"
+          :finished="allFinish"
+          error-text="请求失败，点击重新加载"
+          finished-text="已经到底啦"
+          @load="loadMore"
+        >
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
         <div class="wrapper" v-if="song.songs.length">
           <!-- 单曲 -->
           <div class="song" v-if="song">
@@ -155,8 +177,17 @@
               <div v-if="user.more" @click="changeActive(`1002`)"  v-word="word" class="more">{{ user.moreText }}&nbsp;></div>
           </div>
         </div>
+        </van-list>
+        </van-pull-refresh>
       </van-tab>
       <van-tab title="单曲" name="1">
+        <van-pull-refresh v-model="songRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
         <van-list
           v-model:loading="Loading"
           v-model:error="Error"
@@ -204,8 +235,16 @@
             </div>
           </div>
         </van-list>
+        </van-pull-refresh>
       </van-tab>
       <van-tab title="专辑" name="10">
+        <van-pull-refresh v-model="albumRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
         <van-list
           v-model:loading="albumLoading"
           v-model:error="Error"
@@ -235,8 +274,16 @@
             </div>
           </div>
         </van-list>
+        </van-pull-refresh>
       </van-tab>
       <van-tab title="视频" name="1014">
+        <van-pull-refresh v-model="videoRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
         <van-list
           v-model:loading="videoLoading"
           v-model:error="Error"
@@ -267,8 +314,16 @@
             </div>
           </div>
         </van-list>
+        </van-pull-refresh>
       </van-tab>
       <van-tab title="歌手" name="100">
+        <van-pull-refresh v-model="artistRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
         <van-list
           v-model:loading="artistLoading"
           v-model:error="Error"
@@ -301,8 +356,16 @@
               </div>
           </div>
           </van-list>
+          </van-pull-refresh>
       </van-tab>
       <van-tab title="歌单" name="1000">
+        <van-pull-refresh v-model="playListRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
         <van-list
           v-model:loading="playListLoading"
           v-model:error="Error"
@@ -332,8 +395,16 @@
             </div>
           </div>
         </van-list>
+        </van-pull-refresh>
       </van-tab>
       <van-tab title="用户" name="1002">
+        <van-pull-refresh v-model="userRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
         <van-list
           v-model:loading="userLoading"
           v-model:error="Error"
@@ -368,8 +439,16 @@
               </div>
           </div>
           </van-list>
+          </van-pull-refresh>
       </van-tab>
       <van-tab title="MV" name="1004">
+        <van-pull-refresh v-model="MVRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
         <van-list
           v-model:loading="mvLoading"
           v-model:error="Error"
@@ -400,9 +479,17 @@
             </div>
           </div>
         </van-list>
+        </van-pull-refresh>
       </van-tab>
-      <van-tab title="歌词" name="1006">歌词 3</van-tab>
+      <!-- <van-tab title="歌词" name="1006">歌词 3</van-tab> -->
       <van-tab title="电台" name="1009">
+        <van-pull-refresh v-model="djRadioRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
         <van-list
           v-model:loading="djRadioLoading"
           v-model:error="Error"
@@ -432,11 +519,12 @@
             </div>
           </div>
         </van-list>
+        </van-pull-refresh>
       </van-tab>
     </van-tabs>
     <!-- 搜索建议 -->
     <div class="suggest" v-if="suggestWord.length">
-      <div class="item" v-for="(item,index) in suggestWord" :key="index" v-html="item"></div>
+      <div class="item" v-for="(item,index) in suggestWord" :key="index" v-html="item" @click="suggestClick(index)"></div>
     </div>
   </div>
 </template>
@@ -453,9 +541,13 @@
     activeName: number,
     pageNo: number,
     Loading: boolean,
+    allLoading: boolean,
     Error: boolean,
+    allError: boolean,
     Finish: boolean,
+    allFinish: boolean,
     hotWord: Array<any>,
+    suggestWordOrigin: Array<any>,
     suggestWord: Array<any>,
     timer: any,
     song: any,
@@ -493,7 +585,17 @@
     lyric: any,
     lyrics: Array<any>,
     lyricPageNo: number,
-    lyricLoading: boolean
+    lyricLoading: boolean,
+    allRefreshing: boolean,
+    songRefreshing: boolean,
+    playListRefreshing: boolean,
+    videoRefreshing: boolean,
+    albumRefreshing: boolean,
+    djRadioRefreshing: boolean,
+    userRefreshing: boolean,
+    artistRefreshing: boolean,
+    MVRefreshing: boolean,
+    // lyricRefreshing: boolean,
   }
   export default defineComponent({
     name: "searchResult",
@@ -507,10 +609,14 @@
         activeName: 1018,                                        
         pageNo: 0,
         Loading: true,
+        allLoading: false,
         Error: false,
+        allError: false,
         Finish: false,
+        allFinish: false,
         hotWord: [],
         suggestWord: [],
+        suggestWordOrigin: [],
         timer: null,
         song: {songs:[]},
         songs: [],
@@ -547,22 +653,24 @@
         lyric: {},
         lyrics: [],
         lyricPageNo: 0,
-        lyricLoading: false
+        lyricLoading: false,
+        allRefreshing: false,
+        songRefreshing: false,
+        playListRefreshing: false,
+        videoRefreshing: false,
+        albumRefreshing: false,
+        djRadioRefreshing: false,
+        userRefreshing: false,
+        artistRefreshing: false,
+        MVRefreshing: false,
+        // lyricRefreshing: false,
       })
 
       onBeforeMount(async () => {
         // store.commit("set_load", true)
+        console.log(`onbeforemount`);
+        
         data.word = id;
-        // let info = await getsearchResult(data.word,data.activeName,data.pageNo);
-        // data.song = info.result.song;
-        // data.playList = info.result.playList;
-        // data.video = info.result.video;
-        // data.sim_query = info.result.sim_query;
-        // data.album = info.result.album;
-        // data.djRadio = info.result.djRadio;
-        // data.user = info.result.user;
-        // data.artist = info.result.artist;
-        // store.commit("set_load", false)
       })
 
       const suggest = async (i: string) => {
@@ -572,6 +680,7 @@
         data.timer = setTimeout(async () => {
           let info = await getSuggest(data.word);
           if(info.result) {
+            data.suggestWordOrigin = info.result.allMatch
             info.result.allMatch.forEach((item: any) => {
               data.suggestWord.push(item.keyword.replace(data.word,`<span style="color: red">${data.word}</span>`))
             });
@@ -579,33 +688,137 @@
         }, 500);
       }
 
-      const onSearch = () => {
-        router.push({path: "/searchResult", query: {word: data.word}})
+      // 下拉刷新
+      const onRefresh = () => {
+        if(data.activeName == 1 && data.songs.length) {
+          data.songs.splice(0)
+          data.songPageNo = 0,
+          data.Loading = false
+        }
+        if(data.activeName == 10 && data.albums.length) {
+          data.albums.splice(0)
+          data.albumPageNo = 0,
+          data.albumLoading = false
+        }
+        if(data.activeName == 100 && data.artists.length) {
+          data.artists.splice(0)
+          data.artistPageNo = 0,
+          data.artistLoading = false
+        }
+        if(data.activeName == 1000 && data.playLists.length) {
+          data.playLists.splice(0)
+          data.playLists = [],
+          data.playListLoading = false
+        }
+        if(data.activeName == 1002 && data.users.length) {
+          data.users.splice(0)
+          data.userPageNo = 0,
+          data.userLoading = false
+        }
+        if(data.activeName == 1004 && data.mvs.length) {
+          data.mvs.splice(0)
+          data.mvLoading = false
+          data.mvsPageNo = 0
+        }
+        // if(data.activeName == 1006 && data.lyric.length) {
+        //   data.lyric.splice(0)
+        // }
+        if(data.activeName == 1009 && data.djRadios.length) {
+          data.djRadios.splice(0)
+          data.djRadioPageNo = 0,
+          data.djRadioLoading = false
+        }
+        if(data.activeName == 1014 && data.videos.length) {
+          data.videos.splice(0)
+          data.videoPageNo = 0,
+          data.videoLoading = false
+        }
+        if(data.activeName == 1018 && data.song.songs.length) {
+           data.song = {songs:[]}
+           data.playList = {playLists:[]}
+           data.sim_query = {sim_querys:[]}
+           data.video = {videos:[]}
+           data.djRadio = {djRadios:[]}
+           data.album = {albums:[]}
+           data.user = {userprofiles:[]}
+           data.artist = {artists:[]}
+           data.MV = {mvs:[]}
+        }
+        data.pageNo = 0;  
+        loadMore()
       }
 
-      const onClick = async (name: number, title: string) => {
-        // console.log(name);
-        // data.song = {songs:[]}
-        // data.playList = {playLists:[]}
-        // data.video = {videos:[]}
-        // data.sim_query = {sim_querys:[]}
-        // data.album = {albums:[]}
-        // data.djRadio = {djRadios:[]}
-        // data.user = {userprofiles:[]}
-        // data.MV = {mvs:[]}
-        // data.artist = {artists:[]}
-        // data.lyric = [];
-        // data.pageNo = 0;
-        // data.Finish = false;
-        // loadMore();
+      const suggestClick = (i: number) => {
+        data.word = data.suggestWordOrigin[i].keyword
+        onSearch()
       }
+
+      // 重新搜索
+      const onSearch = () => {
+        console.log(`重新搜索`);
+        console.log(data.word);
+        data.suggestWord.splice(0)
+        
+        data.allLoading = false,
+        data.allError = false,
+        data.allFinish = false,
+                                            
+        data.pageNo = 0,
+        data.Loading =  true,
+        data.Error = false,
+        data.Finish = false,
+        data.hotWord = [],
+        data.suggestWord = [],
+        data.timer = null,
+        data.song = {songs:[]},
+        data.songs = [],
+        data.songPageNo = 0,
+        data.playList = {playLists:[]},
+        data.playLists = [],
+        data.playListPageNo = 0,
+        data.playListLoading = false,
+        data.video = {videos:[]},
+        data.videoPageNo = 0,
+        data.videos = [],
+        data.videoLoading = false,
+        data.sim_query = {sim_querys:[]},
+        data.album = {albums:[]},
+        data.albumPageNo = 0,
+        data.albums = [],
+        data.albumLoading = false,
+        data.djRadio = {djRadios:[]},
+        data.djRadioPageNo = 0,
+        data.djRadios = [],
+        data.djRadioLoading = false,
+        data.user = {userprofiles:[]},
+        data.userPageNo = 0,
+        data.users = [],
+        data.userLoading = false,
+        data.artist = {artists:[]},
+        data.artistPageNo = 0,
+        data.artists = [],
+        data.artistLoading = false,
+        data.MV = {mvs:[]},
+        data.mvs = [],
+        data.mvLoading = false,
+        data.mvsPageNo = 0,
+        // data.lyric =  {},
+        // data.lyrics =  [],
+        // data.lyricPageNo =  0,
+        // data.lyricLoading = false
+        data.activeName = 1018    
+        // changeActive(data.activeName);
+        // loadMore
+      }
+
 
       const loadMore = async () => {
         console.log("触发加载更多");
-        
+        console.log(data.word);
         if(data.activeName == 1) {
           data.Loading = true;
           let info = await getsearchResult(data.word,data.activeName,data.songPageNo);
+          data.songRefreshing = false
           data.songs = data.songs.concat(info.result.songs);
           data.Loading = false;
           data.songPageNo += 1;
@@ -616,6 +829,7 @@
         if(data.activeName == 10) {
           data.albumLoading = true;
           let info = await getsearchResult(data.word,data.activeName,data.albumPageNo);
+          data.albumRefreshing = false
           data.albums = data.albums.concat(info.result.albums);
           data.albumLoading = false;
           data.albumPageNo += 1;
@@ -626,6 +840,7 @@
         if(data.activeName == 100) {
           data.artistLoading = true
           let info = await getsearchResult(data.word,data.activeName,data.artistPageNo);
+          data.artistRefreshing = false
           data.artists = data.artists.concat( info.result.artists);
           data.artistLoading = false
           data.artistPageNo += 1;
@@ -636,6 +851,7 @@
         if(data.activeName == 1000) {
           data.playListLoading = true;
           let info = await getsearchResult(data.word,data.activeName,data.playListPageNo);
+          data.playListRefreshing = false
           data.playLists = data.playLists.concat( info.result.playlists);
           data.playListLoading = false;
           data.playListPageNo += 1;
@@ -646,6 +862,7 @@
         if(data.activeName == 1002) {
           data.userLoading = true;
           let info = await getsearchResult(data.word,data.activeName,data.userPageNo);
+          data.userRefreshing = false
           data.users = data.users.concat(info.result.userprofiles);
           data.userPageNo += 1;
           data.userLoading = false;
@@ -656,6 +873,7 @@
         if(data.activeName == 1004) {
           data.mvLoading = true
           let info = await getsearchResult(data.word,data.activeName,data.mvsPageNo);
+          data.MVRefreshing = false
           if(info.result.mvs) {
             data.mvs = data.mvs.concat(info.result.mvs);
           }
@@ -678,6 +896,7 @@
         if(data.activeName == 1009) {
           data.djRadioLoading = true
           let info = await getsearchResult(data.word,data.activeName,data.djRadioPageNo);
+          data.djRadioRefreshing = false
           data.djRadios = data.djRadios.concat(info.result.djRadios);
           data.djRadioLoading = false
           data.djRadioPageNo += 1;
@@ -688,17 +907,30 @@
         if(data.activeName == 1014) {
           data.videoLoading = true;
           let info = await getsearchResult(data.word,data.activeName,data.videoPageNo);
-          data.videos =  data.videos.concat(info.result.videos);
+          data.videoRefreshing = false
           data.videoLoading = false;
+          if(info.code != 200) {
+            data.Error = true
+            return
+          }
+          data.videos =  data.videos.concat(info.result.videos);
           data.videoPageNo += 1;
           if(data.videos.length >= info.result.videoCount) {
             data.video.Finish = true;
           }
         }
         if(data.activeName == 1018) {
-          store.commit("set_load", true)
-          data.word = id;
+          // store.commit("set_load", true)
+          data.allFinish = false
+          data.allLoading = true
           let info = await getsearchResult(data.word,data.activeName,data.pageNo);
+          data.allRefreshing = false
+          data.allLoading = false;
+          data.allFinish = true
+          if(info.code != 200) {
+            data.allError = true
+            return
+          }
           data.song = info.result.song;
           data.playList = info.result.playList;
           data.video = info.result.video;
@@ -707,13 +939,16 @@
           data.djRadio = info.result.djRadio;
           data.user = info.result.user;
           data.artist = info.result.artist;
-          store.commit("set_load", false)
+          // store.commit("set_load", false)
         }
+        
         data.pageNo +=1;
         
       }
 
       const changeActive = (i: any) => {
+        console.log(`触发了changeactive`);
+        
         tab.value.scrollTo(i);
         if(data.activeName == 1 && data.songs.length) {
           return
@@ -753,6 +988,8 @@
       }
 
       watch(() => data.activeName, (value) => {
+        console.log(`监听到watch改变了`);
+        
         console.log(value);
         changeActive(value)
       })
@@ -800,13 +1037,15 @@
         let a = new Date(i);       
         return `${a.getFullYear()}.${a.getMonth() + 1}.${a.getDate()}`
       }
+
       return {
         suggest,
         onSearch,
         tab,
+        suggestClick,
+        onRefresh,
         numFilter,
         timeFilter,
-        onClick,
         playMusicSingle,
         router,
         store,
@@ -876,6 +1115,7 @@
   right: 0;
   bottom: 0;
   background-color: rgba(0,0,0,0.2);
+  z-index: 11;
   .item {
     padding-left: 40px;
     padding-top: 8px;

@@ -2,7 +2,7 @@ import axios from "axios";
 import { Toast } from "vant";
 //  import router from '../router'
 
-axios.defaults.baseURL = process.env.NODE_ENV == "development" ? "http://39.108.136.207:3000/" : "http://39.108.136.207:3000/";
+axios.defaults.baseURL = process.env.NODE_ENV == "development" ? "https://netease-cloud-music-api-jet.vercel.app/" : "https://netease-cloud-music-api-jet.vercel.app/";
 // axios.defaults.withCredentials = true;
 
 // axios.defaults.headers["X-Requested-With"] = "XMLHttpRequest";
@@ -55,8 +55,9 @@ axios.interceptors.response.use(
     // 获取错误状态码
     // const { status } = error.response;
     console.log("拦截到错误");
+    Toast("网络错误，请重试");
     console.log(error);
-    return Promise.reject(error);
+    return { msg: `网络错误`, code: 400 };
   }
 );
 

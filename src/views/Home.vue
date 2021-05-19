@@ -232,17 +232,19 @@ export default defineComponent({
       () => store.state.song_info.id,
       async (value, pre) => {
         console.log("监听到播放歌曲变更");
-        audio.value.pause();
-        // 请求URL
-        // if(!store.state.song_info.url) {
-          const info = await getSongUrl(store.state.song_info.id);
-          store.commit("set_song_url",info.data[0].url);
-        // }
-        
-        audio.value.src = store.state.song_info.url;
-        audio.value.play();
-        store.commit("play", true);
-        lyricRequest();
+        if(value) {
+          audio.value.pause();
+          // 请求URL
+          // if(!store.state.song_info.url) {
+            const info = await getSongUrl(store.state.song_info.id);
+            store.commit("set_song_url",info.data[0].url);
+          // }
+          
+          audio.value.src = store.state.song_info.url;
+          audio.value.play();
+          store.commit("play", true);
+          lyricRequest();
+        }
       }
     );
 
@@ -426,7 +428,7 @@ export default defineComponent({
         store.dispatch("play_next");
       });
 
-      lyricRequest();
+      // lyricRequest();
     });
 
     
@@ -496,20 +498,20 @@ export default defineComponent({
   backface-visibility: hidden;
 }
 .slide-right-enter-active {
-  opacity: 0;
-  transform: translate(-100%);
+  opacity: 1;
+  // transform: translate(-100%);
 }
 .slide-right-leave-active {
   opacity: 0;
-  transform: translate(100%);
+  // transform: translate(100%);
 }
 .slide-left-enter-active {
-  opacity: 0;
-  transform: translate(100%);
+  opacity: 1;
+  // transform: translate(100%);
 }
 .slide-left-leave-active {
   opacity: 0;
-  transform: translate(-100%);
+  // transform: translate(-100%);
 }
 @keyframes rotate_img {
   0% {

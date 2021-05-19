@@ -1,4 +1,5 @@
 <template>
+
   <div>
     <!-- 导航栏 -->
     <div :class="{nav: true, red: scrollY >= 50}" @click="goSearch()">
@@ -11,6 +12,7 @@
       </div>
       <img @click.stop="router.push({path: `/download`})" src="../../public/img/icons/download.svg" alt="">
     </div>
+    <van-pull-refresh v-model="loading" @refresh="onRefresh">
     <div class="discover" v-if="swiper.length">
       <bsscroll :scrollY="true" name="discover_scroll" :scrollData="swiper" :pulldown="true">
         <div class="top">
@@ -256,7 +258,7 @@
               class="rec_item"
               v-for="item in HOMEPAGE_BLOCK_VIDEO_PLAYLIST.creatives"
               :key="item.creativeId"
-              @click="show(item.creativeId)"
+              @click="goSongList(item.creativeId)"
             >
               <div class="img_wrapper">
                 <van-image class="img" radius="8" :src="item.uiElement.image.imageUrl"/>
@@ -557,7 +559,10 @@
       </bsscroll>
       
     </div>
+    </van-pull-refresh>
   </div>
+
+  
 </template>
 
 <script lang="ts">
@@ -602,6 +607,7 @@ export default defineComponent({
     const topBg = ref<HTMLElement>();
     const store = useStore()
     const info = reactive<any>({
+      loading: false,
       scrollY: 0,
       cursor: {},  // 首页在登录状态下需要带上上一次请求回来的 cursor，作用相当于分页的页数
       numFilter: numFilter,// 播放量过滤函数
@@ -806,91 +812,7 @@ export default defineComponent({
       })
       // 只要有分页数据就继续请求数据
       while(info.cursor) {
-        discoverInfo = await getDiscoverInfo(info.cursor);
-      // 分页数据
-      info.cursor = discoverInfo.data.cursor;
-        // 分配数据
-      discoverInfo.data.blocks.map((item: any) => {
-        // 轮播图
-        if(item.blockCode == "HOMEPAGE_BANNER") {
-          info["swiper"] = item.extInfo.banners;
-        }
-        // 推荐歌单
-        if(item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
-          console.log("这是推荐歌单");
-          info.recommend.arrData = item.creatives;
-          info.recommend.titleTex = item.uiElement.subTitle.title;
-          info.recommend.button = item.uiElement.button;
-        }
-        if(item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
-          console.log("这是较长的推荐区域");
-          // 较长的推荐区域
-          info.long = item;
-        }
-        if(item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
-          console.log("这是精选音乐视频");
-          // 精选音乐视频
-          info.HOMEPAGE_MUSIC_MLOG = item;
-          info.HOMEPAGE_MUSIC_MLOG.extInfo.map((i: any) => {
-            console.log('开始处理');
-          })
-        }
-        if(item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
-          console.log("这是雷达歌单");
-          // 雷达歌单
-         info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
-        }
-        if(item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
-          console.log("这是音乐日历");
-          // 音乐日历
-         info.HOMEPAGE_MUSIC_CALENDAR = item;
-        }
-        if(item.blockCode == "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST") {
-          // 专属场景歌单
-         info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST = item;
-        }
-        if(item.blockCode == "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG") {
-          // 新歌，新碟，数字专辑
-         info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri =
-            item.creatives;
-          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri.map(
-            (item: { creativeType: string }) => {
-              // 如果是新歌
-              if (item.creativeType == "NEW_SONG_HOMEPAGE") {
-                info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].push(item);
-              }
-              // 新碟
-              if (item.creativeType == "NEW_ALBUM_HOMEPAGE") {
-                info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[1].push(item);
-              }
-              // 数字专辑
-              if (item.creativeType == "DIGITAL_ALBUM_HOMEPAGE") {
-                info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[2].push(item);
-              }
-            }
-          );
-        }
-        if(item.blockCode == "HOMEPAGE_YUNBEI_NEW_SONG") {
-          // 推荐新歌云贝广告
-         info.HOMEPAGE_YUNBEI_NEW_SONG = item;
-        }
-        if(item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
-          // 播客合辑
-         info.HOMEPAGE_VOICELIST_RCMD = item;
-        }
-        if(item.blockCode == "HOMEPAGE_PODCAST24") {
-          // 24小时播客
-         info.HOMEPAGE_PODCAST24 = item;
-        }
-        if(item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
-          // 视频合集
-         info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = item;
-         console.log("这是视频合集");
-         
-         console.log(info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST);
-         
-        }
-      })
+       
       
       }
       const iconInfo = await getIconInfo();
@@ -899,6 +821,92 @@ export default defineComponent({
       let word = await getSearchWord();
       info.searchWord = word.data.showKeyword;
     });
+
+    const onRefresh = async () => {
+        let discoverInfo = await getDiscoverInfo(info.cursor);
+        // 分页数据
+        info.cursor = discoverInfo.data.cursor;
+          // 分配数据
+        discoverInfo.data.blocks.map((item: any) => {
+          // 轮播图
+          if(item.blockCode == "HOMEPAGE_BANNER") {
+            info["swiper"] = item.extInfo.banners;
+          }
+          // 推荐歌单
+          if(item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
+            console.log("这是推荐歌单");
+            info.recommend.arrData = item.creatives;
+            info.recommend.titleTex = item.uiElement.subTitle.title;
+            info.recommend.button = item.uiElement.button;
+          }
+          if(item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
+            console.log("这是较长的推荐区域");
+            // 较长的推荐区域
+            info.long = item;
+          }
+          if(item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
+            console.log("这是精选音乐视频");
+            // 精选音乐视频
+            info.HOMEPAGE_MUSIC_MLOG = item;
+            info.HOMEPAGE_MUSIC_MLOG.extInfo.map((i: any) => {
+              console.log('开始处理');
+            })
+          }
+          if(item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
+            console.log("这是雷达歌单");
+            // 雷达歌单
+          info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
+          }
+          if(item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
+            console.log("这是音乐日历");
+            // 音乐日历
+          info.HOMEPAGE_MUSIC_CALENDAR = item;
+          }
+          if(item.blockCode == "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST") {
+            // 专属场景歌单
+          info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST = item;
+          }
+          if(item.blockCode == "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG") {
+            // 新歌，新碟，数字专辑
+          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri =
+              item.creatives;
+            info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri.map(
+              (item: { creativeType: string }) => {
+                // 如果是新歌
+                if (item.creativeType == "NEW_SONG_HOMEPAGE") {
+                  info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].push(item);
+                }
+                // 新碟
+                if (item.creativeType == "NEW_ALBUM_HOMEPAGE") {
+                  info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[1].push(item);
+                }
+                // 数字专辑
+                if (item.creativeType == "DIGITAL_ALBUM_HOMEPAGE") {
+                  info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[2].push(item);
+                }
+              }
+            );
+          }
+          if(item.blockCode == "HOMEPAGE_YUNBEI_NEW_SONG") {
+            // 推荐新歌云贝广告
+          info.HOMEPAGE_YUNBEI_NEW_SONG = item;
+          }
+          if(item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
+            // 播客合辑
+          info.HOMEPAGE_VOICELIST_RCMD = item;
+          }
+          if(item.blockCode == "HOMEPAGE_PODCAST24") {
+            // 24小时播客
+          info.HOMEPAGE_PODCAST24 = item;
+          }
+          if(item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
+            // 视频合集
+          info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = item;
+          
+          }
+          info.loading = false;
+        })
+    }
 
     // 获取 top 的dom 元素, 根据轮播图轮播事件动态改变背景图片模糊
     
@@ -1011,6 +1019,7 @@ export default defineComponent({
       login,
       router,
       goSearch,
+      onRefresh,
       logoutDD,
       onChange,
       topBg,
@@ -1440,5 +1449,8 @@ export default defineComponent({
       }
     }
   }
+}
+.van-pull-refresh {
+  overflow: visible;
 }
 </style>

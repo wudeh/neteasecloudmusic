@@ -170,7 +170,7 @@ export default createStore<song>({
       let have = false
       state.download_list.forEach((item: any) => {
         if(item.id == i.id) {
-          item.progress = i.progress >= 100 ? `下载完成` : i.progress
+          item.progress = i.progress
           have = true
           return
         }
