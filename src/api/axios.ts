@@ -8,6 +8,7 @@ axios.defaults.baseURL = process.env.NODE_ENV == "development" ? "https://neteas
 // axios.defaults.headers["X-Requested-With"] = "XMLHttpRequest";
 //  axios.defaults.headers['token'] = localStorage.getItem('token') || ''  https://nicemusic-api.lxhcool.cn/   http://39.108.136.207:3000/
 // axios.defaults.headers.post["Content-Type"] = "application/json";
+axios.defaults.timeout = 30000
 
 // 请求拦截
 axios.interceptors.request.use((config) => {
@@ -37,6 +38,9 @@ axios.interceptors.request.use((config) => {
   // }
 
   return config;
+}, (err) => {
+  console.log(err);
+  return Promise.reject(err)
 });
 
 //  响应拦截
@@ -57,7 +61,7 @@ axios.interceptors.response.use(
     console.log("拦截到错误");
     Toast("网络错误，请重试");
     console.log(error);
-    return { msg: `网络错误`, code: 400 };
+    return Promise.resolve({ msg: `网络错误`, code: 400 });
   }
 );
 

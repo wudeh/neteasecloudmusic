@@ -508,10 +508,10 @@ export default defineComponent({
 .slide-right-leave-active,
 .slide-left-enter-active,
 .slide-left-leave-active {
-  height: 100%;
+  // height: 100%;
   will-change: transform;
   transition: all 500ms cubic-bezier(0.55, 0, 0.1, 1);
-  position: absolute;
+  position: fixed;
   backface-visibility: hidden;
 }
 .slide-right-enter-active {

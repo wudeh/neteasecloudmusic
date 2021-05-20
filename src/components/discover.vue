@@ -13,6 +13,21 @@
       <img @click.stop="router.push({path: `/download`})" src="../../public/img/icons/download.svg" alt="">
     </div>
     <van-pull-refresh v-model="loading" @refresh="onRefresh">
+      <van-list
+          v-model:loading="listLoading"
+          v-model:error="listError"
+          :immediate-check="false"
+          :finished="true"
+          error-text="请求失败，点击重新加载"
+          finished-text=""
+          @load="load"
+        >
+        <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../public/img/icons/loading.svg" alt="">
+              <span>加载中...</span>
+            </div>
+          </template>
     <div class="discover" v-if="swiper.length">
       <bsscroll :scrollY="true" name="discover_scroll" :scrollData="swiper" :pulldown="true">
         <div class="top">
@@ -559,6 +574,7 @@
       </bsscroll>
       
     </div>
+    </van-list>
     </van-pull-refresh>
   </div>
 
@@ -608,6 +624,9 @@ export default defineComponent({
     const store = useStore()
     const info = reactive<any>({
       loading: false,
+      listLoading: false,
+      listError: false,
+      listFinish: false,
       scrollY: 0,
       cursor: {},  // 首页在登录状态下需要带上上一次请求回来的 cursor，作用相当于分页的页数
       numFilter: numFilter,// 播放量过滤函数
@@ -721,6 +740,9 @@ export default defineComponent({
       window.addEventListener("scroll", () => { 
         decrease(window.scrollY)()
       })
+
+      
+      
       store.commit("set_load", true)
       let discoverInfo = await getDiscoverInfo(info.cursor);
       store.commit("set_load", false)
@@ -908,6 +930,109 @@ export default defineComponent({
         })
     }
 
+    const load = async () => {
+      info.listLoading = true
+      let discoverInfo = await getDiscoverInfo(info.cursor);
+      info.listLoading = false
+      if(discoverInfo.code == 400) {
+        info.listError = true;
+        return
+      }
+      info.listFinish = true
+      // 分页数据
+      info.cursor = discoverInfo.data.cursor;
+      discoverInfo.data.blocks.map((item: any) => {
+        // 轮播图
+        if(item.blockCode == "HOMEPAGE_BANNER") {
+          info["swiper"] = item.extInfo.banners;
+          nextTick(() => {
+            topBg.value?.setAttribute(
+            "style",
+            `background-image:url(${info.swiper[0].pic});background-color:red`
+          );
+          })
+        }
+        // 推荐歌单
+        if(item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
+          console.log("这是推荐歌单");
+          info.recommend.arrData = item.creatives;
+          info.recommend.titleTex = item.uiElement.subTitle.title;
+          info.recommend.button = item.uiElement.button;
+        }
+        if(item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
+          console.log("这是较长的推荐区域");
+          // 较长的推荐区域
+          info.long = item;
+        }
+        if(item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
+          console.log("这是精选音乐视频");
+          // 精选音乐视频
+          info.HOMEPAGE_MUSIC_MLOG = item;
+        }
+        if(item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
+          console.log("这是雷达歌单");
+          // 雷达歌单
+         info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
+        }
+        if(item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
+          console.log("这是音乐日历");
+          // 音乐日历
+         info.HOMEPAGE_MUSIC_CALENDAR = item;
+        }
+        if(item.blockCode == "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST") {
+          // 专属场景歌单
+         info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST = item;
+        }
+        if(item.blockCode == "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG") {
+          // 新歌，新碟，数字专辑
+         info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri =
+            item.creatives;
+          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri.map(
+            (item: { creativeType: string }) => {
+              // 如果是新歌
+              if (item.creativeType == "NEW_SONG_HOMEPAGE") {
+                info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].push(item);
+              }
+              // 新碟
+              if (item.creativeType == "NEW_ALBUM_HOMEPAGE") {
+                info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[1].push(item);
+              }
+              // 数字专辑
+              if (item.creativeType == "DIGITAL_ALBUM_HOMEPAGE") {
+                info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[2].push(item);
+              }
+            }
+          );
+        }
+        if(item.blockCode == "HOMEPAGE_YUNBEI_NEW_SONG") {
+          // 推荐新歌云贝广告
+         info.HOMEPAGE_YUNBEI_NEW_SONG = item;
+        }
+        if(item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
+          // 播客合辑
+         info.HOMEPAGE_VOICELIST_RCMD = item;
+        }
+        if(item.blockCode == "HOMEPAGE_PODCAST24") {
+          // 24小时播客
+         info.HOMEPAGE_PODCAST24 = item;
+        }
+        if(item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
+          // 视频合集
+         info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = item;
+         console.log("这是视频合集");
+         
+         console.log(info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST);
+         
+        }
+      })
+      const iconInfo = await getIconInfo();
+      // 圆形图标
+      info.icon = iconInfo.data;
+      let word = await getSearchWord();
+      info.searchWord = word.data.showKeyword;
+      
+    }
+
     // 获取 top 的dom 元素, 根据轮播图轮播事件动态改变背景图片模糊
     
     const onChange = (index: number) => {
@@ -1028,7 +1153,8 @@ export default defineComponent({
       goSongList,
       recentcontactDD,
       ...toRefs(info),
-      playMusicSingle
+      playMusicSingle,
+      load,
     };
   },
 });
@@ -1041,9 +1167,12 @@ export default defineComponent({
     z-index: 1111;
     top: 0;
     padding: 0 8px;
+    box-sizing: border-box;
     height: 40px;
+    width: 100vw;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     .pop {
       font-size: 16px;
       .van-icon {
@@ -1052,10 +1181,9 @@ export default defineComponent({
       }
     }
     .search {
-      width: 300px;
+      width: 280px;
       height: 30px;
       border-radius: 30px;
-      margin-left: 8px;
       display: flex;
       align-items: center;
       background-color: #fff;

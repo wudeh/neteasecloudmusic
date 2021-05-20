@@ -17,7 +17,7 @@
             <img src="../../../public/img/icons/share.svg" alt="">
           </div>
         </div>
-        <div class="volume">
+        <div class="volume" :class="{hidden: !showLyric}">
           <div class="img">
             <img src="../../../public/img/icons/volume.svg" alt="">
           </div>
@@ -603,7 +603,7 @@ export default defineComponent({
       }
       .lyric_white {
         color: #fff;
-        font-size: 15px;
+        font-size: 14px;
       }
       .lyric_bottom {
         height: 180px;
@@ -706,12 +706,14 @@ export default defineComponent({
   }
   .volume {
     .progress;
+    transition: all 0.3s;
     position: fixed;
     top: -73%;
     display: flex;
     .line {
       .past {
         width: 100%;
+        transition: all 0s;
       }
       .circle_point {
         left: 100%;

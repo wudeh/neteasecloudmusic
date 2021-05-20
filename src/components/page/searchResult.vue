@@ -24,7 +24,7 @@
           :immediate-check="false"
           :finished="allFinish"
           error-text="请求失败，点击重新加载"
-          finished-text="已经到底啦"
+          finished-text=""
           @load="loadMore"
         >
           <template v-slot:loading>
