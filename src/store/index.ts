@@ -17,6 +17,7 @@ interface song {
     progressTime: number, // 进度条拖动时间
     duration: number,
     buffered: number, // 缓冲时间
+    volume: number,
     commentcount: number, // 评论数量
     list: any[], // 播放列表
     listIndex: number,
@@ -61,6 +62,7 @@ export default createStore<song>({
       progressTime: 0, // 进度条拖动时间
       duration: 0,
       buffered: 0, // 缓冲时间
+      volume: 1,
       commentcount: 0, // 评论数量
       list:[], // 播放列表
       listIndex: 0,
@@ -139,6 +141,10 @@ export default createStore<song>({
     // 设置歌曲缓冲时间
     set_song_buffered(state, time) {
       state.song_info.buffered = time;
+    },
+    // 设置歌曲声音大小
+    set_volume(state, i) {
+      state.song_info.volume = i;
     },
     // 播放歌曲列表
     add_songList(state, list) {

@@ -1,10 +1,16 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw, createMemoryHistory } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
+  // {
+  //   path: "/",
+  //   name: "person",
+  //   // redirect: `/discover`,
+  //   component: () => import(/* webpackChunkName: "login" */ "@/components/person.vue"),
+  // },
   {
     path: "/",
     name: "Home",
-    redirect: `/discover`,
+    // redirect: `/discover`,
     component: () => import(/* webpackChunkName: "login" */ "@/views/Home.vue"),
     meta: {
       keepAlive: true,

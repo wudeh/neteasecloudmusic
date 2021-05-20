@@ -289,6 +289,11 @@ export default defineComponent({
         })
     })
 
+    // 监听歌曲声音，用来设置声音
+    watch(() => store.state.song_info.volume, (value) => {
+        audio.value.volume = store.state.song_info.volume
+    })
+
     // 监听歌词变更 console 歌词
     watch(() => store.state.song_info.lyric, (value) => {
       console.info(`%c > ${value}`, 'color:#db2c1f;background:rgba(0,0,0,0.2);font-size:25px;border-radius:6px')
@@ -363,6 +368,13 @@ export default defineComponent({
       }
 
       audio.value.preload = `auto`
+      audio.value.load()
+      // setTimeout(() => {
+      //   audio.value.play()
+      //   audio.value.pause()
+      //   console.log(audio.value.duration);
+      // }, 10);
+      
 
       audio.value.addEventListener("progress", () => {
         console.log("<-- 请求缓冲数据 ing -->");
@@ -395,11 +407,11 @@ export default defineComponent({
           store.commit("set_song_allTime", 0);
         }
       });
-      // audio.value.addEventListener("waiting", () => {
-      //   console.log("<-- 等待数据 ing -->");
-      //   // store.commit("play",false);
-      //   // this.SET_PAGE_DATA(['audio', 'isLoading', true])
-      // });
+      audio.value.addEventListener("waiting", () => {
+        console.log("<-- 等待数据 ing -->");
+        // store.commit("play",false);
+        // this.SET_PAGE_DATA(['audio', 'isLoading', true])
+      });
       // audio.value.addEventListener("canplaythrough", () => {
       //   console.log("<-- 加载完毕，可以播放 -->");
       //   console.log(audio.value.networkState);
@@ -420,12 +432,17 @@ export default defineComponent({
       });
       audio.value.addEventListener("pause", () => {
         console.log("<-- 暂停 -->");
+        console.log(audio.value.volume);
+        
         // this.sendCurrentTime('clear')
       });
       audio.value.addEventListener("ended", () => {
         console.log("<-- 播放结束 -->");
         store.commit("play", false);
         store.dispatch("play_next");
+      });
+      audio.value.addEventListener("ready", () => {
+        console.log("<-- 准备完毕 -->");
       });
 
       // lyricRequest();

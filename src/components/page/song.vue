@@ -17,6 +17,19 @@
             <img src="../../../public/img/icons/share.svg" alt="">
           </div>
         </div>
+        <div class="volume">
+          <div class="img">
+            <img src="../../../public/img/icons/volume.svg" alt="">
+          </div>
+          <div class="line" ref="volume_line" @touchstart="processControlStart_volume($event)" @touchmove="processControlMove_volume($event)">
+            <div class="past" ref="volume_linePast"></div>
+            <div class="circle_point" ref="volume_point"></div>
+            <div class="not_play"></div>
+          </div>
+          <div class="img" v-show="false">
+            <img src="../../../public/img/icons/volume.svg" alt="">
+          </div>
+        </div>
         <img class="needle" :class="{needle_play: store.state.song_info.isPlaying,hidden: showLyric}" src="../../../public/img/player/needle.png" alt="">
         <!-- 旋转唱片 -->
         <div class="rotate" :class="{hidden: showLyric}" :style="{animationPlayState: store.state.song_info.isPlaying ? 'running' : 'paused'}" @click="showAllLyric()"> 
@@ -291,7 +304,7 @@ export default defineComponent({
         // 歌词滚动
         lyric.forEach((i:any,index,arr) => {
           if(current_song_time.value >= i.time && current_song_time.value <= arr[index+1].time) {
-            lyricScorll.bs.scrollToElement(`#s${index}`,300, true,true)
+            lyricScorll.bs.scrollToElement(`#s${index}`,300)
           }
         })
       }
@@ -382,6 +395,41 @@ export default defineComponent({
       // this.SET_PAGE_DATA(['trigger', 'process', this.tempCurrentTime])
     };
 
+    const volume_line = ref()
+    const volume_linePast = ref()
+    const volume_point = ref()
+    // 进度条拖动部分，ev 是事件对象，用来获取点击的位置
+    const processControlStart_volume = (ev: any) => {
+      // 获得总进度条宽度
+      let barOffsetWidth = volume_line.value.offsetWidth
+      // 算出点击位置距离总进度条左边的距离
+      // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
+      let slideLength = ev.touches[0].clientX - volume_line.value.offsetLeft
+      console.log(slideLength);
+      
+      // 算出点击位置距离总进度条左边距离的百分比
+      let slidePercent = slideLength / barOffsetWidth
+      console.log(slidePercent.toFixed(1));
+      
+      store.commit("set_volume",slidePercent.toFixed(1))
+      
+      volume_point.value.style.left = `${slidePercent * 100}%`
+      volume_linePast.value.style.width = `${slidePercent * 100}%`
+    };
+    // 圆点进度移动过程中
+    const processControlMove_volume = (ev:any) => {
+      let barOffsetWidth = volume_line.value.offsetWidth
+      // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
+      let slideLength = ev.touches[0].clientX - volume_line.value.offsetLeft
+      let slidePercent = slideLength / barOffsetWidth
+      if(slidePercent >= 0 && slidePercent <= 1) {
+        store.commit("set_volume",slidePercent.toFixed(1))
+        volume_point.value.style.left = `${slidePercent * 100}%`
+        volume_linePast.value.style.width = `${slidePercent * 100}%`
+      }
+      
+    };
+
     return {
       goComment,
       back,
@@ -404,7 +452,12 @@ export default defineComponent({
       current_song_time,
       showAllLyric,
       download,
-      showLyric
+      showLyric,
+      processControlMove_volume,
+      processControlStart_volume,
+      volume_line,
+      volume_point,
+      volume_linePast
     }
   }
 });
@@ -651,5 +704,21 @@ export default defineComponent({
       width: 40px;
     }
   }
+  .volume {
+    .progress;
+    position: fixed;
+    top: -73%;
+    display: flex;
+    .line {
+      .past {
+        width: 100%;
+      }
+      .circle_point {
+        left: 100%;
+      }
+    }
+  }
 }
+
+
 </style>
