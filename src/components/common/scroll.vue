@@ -133,10 +133,10 @@ export default defineComponent({
     //   });
     // });
 
-    onUpdated(() => {
-      data.bs.refresh();
-      console.log("再次计算滚动距离");
-    });
+    // onUpdated(() => {
+    //   data.bs.refresh();
+    //   console.log("再次计算滚动距离");
+    // });
 
     return {
       initScroll,

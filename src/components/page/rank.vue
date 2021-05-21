@@ -22,7 +22,7 @@
           </span>
         </div>
       </div>
-      <div class="official_item">
+      <div class="official_item" @click="router.push({ path: `/singer`})">
         <div class="img_wrapper">
           <van-image radius="8" class="img" :src="artistToplist.coverUrl" /> 
           <div class="text">{{ artistToplist.upateFrequency }}</div>
@@ -39,7 +39,7 @@
     <div class="other">
       <div class="other_item" v-for="(it, i) in other" :key="i">
         <div class="img_wrapper">
-          <van-image radius="8" class="img" :src="it.coverImgUrl" /> 
+          <van-image lazy-load radius="8" class="img" :src="it.coverImgUrl" /> 
           <span>{{ it.updateFrequency }}</span>
         </div>
         <span>{{ it.name }}</span>
@@ -53,6 +53,7 @@
   import { useStore } from "vuex"
   import { useRouter } from "vue-router"
   import { getRank  } from "../../api/discover"
+  import { Lazyload } from "vant"
 
   interface info {
     official: Array<any>,

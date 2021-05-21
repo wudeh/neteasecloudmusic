@@ -101,3 +101,8 @@ export function getPlayListDetail(id: number): any {
 export function getAlbumDetail(id: number): any {
   return axios.get(`/album?id=${id}`);
 }
+
+// 歌手排行榜
+export function getTopList(type: number): any {
+  return axios.get(`/toplist/artist?type=${type}`);
+}

@@ -271,7 +271,6 @@ export default defineComponent({
           transition_name.value = `slide-left`
           console.log(include);
         } else {
-          // if(to.name == "song") return;
           include.splice(include.indexOf(from.name), 1);
           transition_name.value = `slide-right`
           console.log(include);
@@ -515,20 +514,20 @@ export default defineComponent({
   backface-visibility: hidden;
 }
 .slide-right-enter-active {
-  opacity: 1;
-  // transform: translate(-100%);
+  // opacity: 1;
+  transform: translate(-100%);
 }
 .slide-right-leave-active {
-  opacity: 0;
-  // transform: translate(100%);
+  // opacity: 0;
+  transform: translate(100%);
 }
 .slide-left-enter-active {
-  opacity: 1;
-  // transform: translate(100%);
+  opacity: 0;
+  transform: translate(100%);
 }
 .slide-left-leave-active {
   opacity: 0;
-  // transform: translate(-100%);
+  transform: translate(-100%);
 }
 @keyframes rotate_img {
   0% {

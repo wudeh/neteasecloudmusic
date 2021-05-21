@@ -114,7 +114,16 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "login" */ "@/components/page/rank.vue"),
         meta: {
           keepAlive: true,
-          level: 9,
+          level: 5,
+        },
+      },
+      {
+        path: "/singer",
+        name: "singer",
+        component: () => import(/* webpackChunkName: "login" */ "@/components/page/singer.vue"),
+        meta: {
+          keepAlive: true,
+          level: 6,
         },
       },
     ],

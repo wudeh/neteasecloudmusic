@@ -14,6 +14,7 @@ import {
   Image as VanImage,
 } from "vant";
 import Vant from "vant";
+import { Lazyload } from 'vant';
 import "vant/lib/index.css";
 
 const app = createApp(App);
@@ -57,5 +58,6 @@ app.directive('word',(el,binding) => {
 // app.use(VanImage);
 // app.use(VanImage);
 // app.use(Toast);
+app.use(Lazyload);
 app.use(Vant);
 app.use(store).use(router).mount("#app");
