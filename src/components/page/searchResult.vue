@@ -9,7 +9,8 @@
         @search="onSearch"
       />
     </form>
-    <van-tabs ref="tab" v-model:active="activeName"  sticky>
+    <van-tabs ref="tab" v-model:active="activeName"
+     sticky>
       <van-tab title="综合" name="1018">
         <van-pull-refresh v-model="allRefreshing" @refresh="onRefresh">
           <template v-slot:loading>
@@ -926,11 +927,11 @@
           let info = await getsearchResult(data.word,data.activeName,data.pageNo);
           data.allRefreshing = false
           data.allLoading = false;
-          data.allFinish = true
           if(info.code != 200) {
             data.allError = true
             return
           }
+          data.allFinish = true
           data.song = info.result.song;
           data.playList = info.result.playList;
           data.video = info.result.video;

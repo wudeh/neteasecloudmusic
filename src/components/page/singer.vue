@@ -1,9 +1,7 @@
 <template>
   <div>
       <div class="nav">
-        <div class="back" @click="router.go(-1)">
-          <img src="../../../public/img/icons/left_arrow_black.svg" alt="">
-        </div>
+        <img @click="router.go(-1)" src="../../../public/img/icons/left_arrow_black.svg" alt="">
         <div class="title">歌手榜单</div>
       </div>
     <van-tabs v-model:active="activeName">
@@ -248,8 +246,10 @@
   box-sizing: border-box;
   height: 50px;
   padding: 8px;
-  .back {
+  font-size: 22px;
+  img {
     margin-right: 10px;
+    width: 25px;
   }
 }
 .wrapper {
