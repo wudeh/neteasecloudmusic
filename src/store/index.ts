@@ -317,10 +317,11 @@ export default createStore<song>({
         ctx.state.song_pop_detail.img = item.al.picUrl
       
         // 获取一下评论数量
-        let info = await getComment(item.id,0,1,20,1);
+        let info = await getComment(item.id,0,1,20,3);
         ctx.state.song_pop_detail.commentCount = info.data.totalCount
         // 获取URL，以供下载
-        info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
+        info = await getSongUrl(item.id);
+        Toast(`已获取到下载链接，可以下载了`)
         ctx.state.song_pop_detail.url = info.data[0].url
       }
     },
@@ -346,13 +347,15 @@ export default createStore<song>({
         ctx.state.song_info.author = ''
         ctx.state.song_info.type = 0
         ctx.state.song_info.id = ''
+        ctx.state.song_info.img = ''
         localStorage.removeItem("songId");
         localStorage.removeItem("songName");
         localStorage.removeItem("songAuthor");
         localStorage.removeItem("songImg");
         localStorage.removeItem("songType");
         ctx.commit(`close`)
-        router.go(-1)
+        if(router.currentRoute.value.name == 'song') router.go(-1)
+        
       }else {
         // 如果删除的是当前播放的歌曲，先播放下一首歌
         if(id == ctx.state.song_info.id) {
@@ -390,13 +393,14 @@ export default createStore<song>({
       ctx.state.song_info.author = ''
       ctx.state.song_info.type = 0
       ctx.state.song_info.id = ''
+      ctx.state.song_info.img = ''
       localStorage.removeItem("songId");
       localStorage.removeItem("songName");
       localStorage.removeItem("songAuthor");
       localStorage.removeItem("songImg");
       localStorage.removeItem("songType");
       ctx.commit(`close`)
-      router.go(-1)
+      if(router.currentRoute.value.name == 'song') router.go(-1)
     }
   },
   modules: {

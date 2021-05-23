@@ -2,6 +2,10 @@ import { Toast } from "vant";
 import store from "../store";
 // 点击下载文件
 export default function downloadFile(url: string, item: any) {
+  if(!url) {
+    Toast(`还未获取到下载链接，请稍后`)
+    return
+  }
   // 音视频下载
   if (url.indexOf("http://") >= 0 || url.indexOf("https://") >= 0) {
     let handleUrl = "";

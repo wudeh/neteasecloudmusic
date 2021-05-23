@@ -13,7 +13,9 @@
           <span class="middle">-</span>
           <span>{{ it.author }}</span>
         </div>
-        <van-progress :percentage="it.progress" />
+        <div class="progress">
+          <van-progress stroke-width="10" :percentage="it.progress" />
+        </div>
     </div>
     </div>
   </div>
@@ -71,6 +73,9 @@
       .middle {
         margin: 0 2px;
       }
+    }
+    .progress {
+      width: 330px;
     }
   }
 }

@@ -52,7 +52,7 @@
     <!-- 全部播放 -->
     <div class="playAll">
       <div class="icon">
-        <img src="../../../public/img/icons/playAll.svg" alt="">
+        <img @click="add_song_list" src="../../../public/img/icons/playAll.svg" alt="">
       </div>
       <div class="text">
         <div class="play_all_title">播放全部</div>
@@ -90,6 +90,7 @@ import { useRouter } from "vue-router"
 import {getSongListInfo,getSongInfo,getSongUrl, getDjProgram, getDjDetail} from "../../api/song"
 import { numFilter, getTime } from "../../utils/num";
 import { useStore } from 'vuex'
+import { Toast } from "vant"
 
 // 歌单
 interface songList {
@@ -156,7 +157,7 @@ interface author {
     const id: any=  router.currentRoute.value.query.id;//获取参数
     onBeforeMount(async () => {
       console.log(router.currentRoute.value);
-      
+      store.commit("set_load", true)
       // 得到基本信息
       const songList = await getDjDetail(id);
       console.log(songList);
@@ -198,6 +199,7 @@ interface author {
           img: item.coverUrl
         })
       })
+      store.commit("set_load", false)
     })
 
     // 点击播放歌曲
@@ -231,12 +233,33 @@ interface author {
       }
     }
 
+    // 播放列表
+    const add_song_list = () => {
+      if(data.songListInfo.length == 0) {
+        Toast(`还未获取到音乐列表，请稍后`)
+        return
+      }
+      let list: any[] = [];
+      data.songListInfo.forEach((item: any, index: number) => {
+          list.push({
+            id: item.id,
+            type: 0,
+            name: item.name,
+            author: item.author,
+            img: item.img
+          })
+      })
+      console.log(list);
+      store.commit(`add_songList`, list)
+    }
+
     return {
       ...toRefs(data),
       author,
       router,
       store,
-      playMusicSingle
+      playMusicSingle,
+      add_song_list
     }
 
     }

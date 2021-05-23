@@ -107,16 +107,16 @@ export default defineComponent({
       // })
     }
 
-    // watch(
-    //   () => props.scrollData.length,
-    //   () => {
-    //     nextTick(() => {
-    //       data.bs.refresh();
-    //       console.log("数据改变了");
+    watch(
+      () => props.scrollData.length,
+      () => {
+        nextTick(() => {
+          data.bs.refresh();
+          console.log("数据改变了");
           
-    //     });
-    //   }
-    // );
+        });
+      }
+    );
 
     onMounted(() => {
       // 在 DOM 渲染完毕后初始化 better-scroll

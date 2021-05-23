@@ -198,7 +198,7 @@ export default defineComponent({
     // 定时方法，用来设置歌词滚动和圆点移动
     function interval(): void {
       timerSong.value = setInterval(() => {
-        console.log(audio.value.currentTime);
+        // console.log(audio.value.currentTime);
         store.commit("set_song_time", audio.value.currentTime);
         store.commit("set_song_allTime", audio.value.duration);
       }, 1000);
@@ -236,7 +236,15 @@ export default defineComponent({
           audio.value.pause();
           // 请求URL
           // if(!store.state.song_info.url) {
+            Toast.loading({
+              message: `获取音乐中，请稍后`,
+              overlay: true,
+              duration: 0,
+              forbidClick: true,
+
+            })
             const info = await getSongUrl(store.state.song_info.id);
+            Toast.clear()
             store.commit("set_song_url",info.data[0].url);
           // }
           
@@ -295,7 +303,7 @@ export default defineComponent({
 
     // 监听歌词变更 console 歌词
     watch(() => store.state.song_info.lyric, (value) => {
-      console.info(`%c > ${value}`, 'color:#db2c1f;background:rgba(0,0,0,0.2);font-size:25px;border-radius:6px')
+      console.info(`%c > ${value.replace(`<br>`,` > `)}`, 'color:#db2c1f;background:rgba(0,0,0,0.2);font-size:25px;border-radius:6px')
     })
 
     const lyricRequest = async () => {
@@ -376,16 +384,19 @@ export default defineComponent({
       
 
       audio.value.addEventListener("progress", () => {
-        console.log("<-- 请求缓冲数据 ing -->");
+        // console.log("<-- 请求缓冲数据 ing -->");
         store.commit("set_song_allTime", audio.value.duration);
         // store.commit("play",false);
-        let currentBuffered = audio.value.buffered.end(audio.value.buffered.length - 1);
-        console.log(currentBuffered);
-        store.commit("set_song_buffered", currentBuffered);
+        // console.log(audio.value.buffered);
+        // 判断一下有缓冲数据段才获取缓冲数据
+        if(audio.value.buffered.length > 0) {
+          let currentBuffered = audio.value.buffered.end(audio.value.buffered.length - 1);
+          store.commit("set_song_buffered", currentBuffered);
+        }
       });
       audio.value.addEventListener("loadstart", () => {
         console.log("<-- 开始请求数据 -->");
-        console.log(audio.value.networkState);
+        // console.log(audio.value.networkState);
 
         // store.commit("play",false);
         // this.SET_PAGE_DATA(['audio', 'isLoading', true])
@@ -444,7 +455,7 @@ export default defineComponent({
         console.log("<-- 准备完毕 -->");
       });
 
-      // lyricRequest();
+      lyricRequest();
     });
 
     

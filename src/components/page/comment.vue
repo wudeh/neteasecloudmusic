@@ -356,6 +356,7 @@ export default defineComponent({
 
     const change_sortType = async (index: any) => {
       data.sortType = index;
+      data.finish = false
       console.log(data.sortType);
       
       data.pageNo = 1;

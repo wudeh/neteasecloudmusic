@@ -30,7 +30,7 @@
           </template>
           <div v-if="!swiper.length" style="height: 45vh"></div>
     <div class="discover" v-if="swiper.length">
-      <bsscroll :scrollY="true" name="discover_scroll" :scrollData="swiper" :pulldown="true">
+      <!-- <bsscroll :scrollY="true" name="discover_scroll" :scrollData="swiper" :pulldown="true"> -->
         <div class="top">
         <!-- 轮播图 -->
         <div class="swiper">
@@ -69,7 +69,7 @@
       </div>
       <!-- 推荐歌单 -->
       <div class="recommend">
-        <div class="rec_title" @click="logoutDD()">
+        <div class="rec_title">
           <div class="rec_des">{{ recommend.titleTex }}</div>
           <div class="rec_more">
             <span>{{ recommend.button.text }}</span>
@@ -414,6 +414,7 @@
                 class="item"
                 v-for="subItem in item.resources"
                 :key="subItem.resourceId"
+                @click="new_three(subItem)"
               >
                 <div class="img_wrapper">
                   <van-image class="img" lazy-load :src="subItem.uiElement.image.imageUrl">
@@ -463,7 +464,7 @@
         <bsscroll :scrollX="true" :scrollData="HOMEPAGE_YUNBEI_NEW_SONG.creatives" name="yunbei_scroll">
           <div class="swiper">
             <div class="swiper_item" v-for="(item, index) in HOMEPAGE_YUNBEI_NEW_SONG.creatives" :key="index">
-              <div class="item">
+              <div class="item" @click="playMusicSingle(item.resources[0])">
                 <div class="img_wrapper">
                   <van-image class="img" lazy-load :src="item.resources[0].uiElement.image.imageUrl">
                     <template v-slot:loading>
@@ -523,7 +524,7 @@
               class="rec_item"
               v-for="item in HOMEPAGE_VOICELIST_RCMD.creatives"
               :key="item.creativeId"
-              @click="show(item.creativeId)"
+              @click="router.push({path: `/djProgram`, query: {id: item.creativeId}})"
             >
               <van-image
                 class="img"
@@ -544,7 +545,7 @@
         </bsscroll>
       </div>
       <!-- 24 小时播客 -->
-      <div class="podcast24" v-if="false">
+      <div class="podcast24">
         <div class="rec_title">
           <div class="rec_des">
             {{ HOMEPAGE_PODCAST24.uiElement.subTitle.title }}
@@ -570,14 +571,14 @@
                 :src="item.uiElement.image.imageUrl"
               />
               <span style="text-align:center">{{ item.uiElement.mainTitle.title }}</span>
-              <div class="play">
+              <!-- <div class="play">
                 <img src="../../public/img/icons/play_white.svg" style="color: #fff" />
-              </div>
+              </div> -->
             </div>
           </div>
         </bsscroll>
       </div>
-      </bsscroll>
+      <!-- </bsscroll> -->
       
     </div>
     </van-list>
@@ -1102,19 +1103,24 @@ export default defineComponent({
       }
     }
 
+    // 点击新歌 新碟 新专辑
+    const new_three = (item: any) => {
+      if(item.resourceType == `song`) {
+        playMusicSingle(item)
+      }else {
+        router.push({path: `/album`, query: {id: item.resourceId}})
+      }
+      // if(item.resourceType == `album`) {
+        
+      // }
+    }
+
     // 点击圆形图标跳转
     const ballClick = (a: string) => {
       if(a == `排行榜`) {
         router.push({path: `/rank`})
       }
     };
-
-    // 登录
-    async function login(): Promise<void> {
-      const info = await loginByPhoneAndPassword();
-      localStorage.setItem("cookieMusic", info.cookie);
-      localStorage.setItem("tokenMusic", info.token);
-    }
 
     const goSearch = () => {
       router.push({path: "/search", query: {}})
@@ -1156,11 +1162,10 @@ export default defineComponent({
     return {
       active,
       ballClick,
-      login,
       router,
+      new_three,
       goSearch,
       onRefresh,
-      logoutDD,
       onChange,
       topBg,
       add_song_list,
@@ -1220,7 +1225,7 @@ export default defineComponent({
   // overflow: hidden;
   background-color: rgb(245,245,245);
   width: 100vw;
-  height: 617px;
+  // height: 617px;
   
   
   .top {

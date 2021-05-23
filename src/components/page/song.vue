@@ -30,7 +30,7 @@
             <img src="../../../public/img/icons/volume.svg" alt="">
           </div>
         </div>
-        <img class="needle" :class="{needle_play: store.state.song_info.isPlaying,hidden: showLyric}" src="../../../public/img/player/needle.png" alt="">
+        <img class="needle" v-if="!showLyric" :class="{needle_play: store.state.song_info.isPlaying,hidden: showLyric}" src="../../../public/img/player/needle.png" alt="">
         <!-- 旋转唱片 -->
         <div class="rotate" :class="{hidden: showLyric}" :style="{animationPlayState: store.state.song_info.isPlaying ? 'running' : 'paused'}" @click="showAllLyric()"> 
           <div class="middle">
@@ -39,8 +39,10 @@
         </div>
         <!-- 歌词 -->
         <div class="lyric_wrapper" :class="{show_all_lyric: showLyric}" @click="showAllLyric()">
+            <div class="lyric_line" :class="{lyric_lineTime_show: showLyricLine}"></div>
             <div class="lyric_line_time" :class="{lyric_lineTime_show: showLyricLine}">{{getTime(current_song_time)}}</div>
-            <div class="lyric" :class="{lyric_show: showLyric,lyric_line:showLyricLine}">
+            <div class="lyric" :class="{lyric_show: showLyric}">
+              <span v-if="lyric.length == 0">获取歌词中</span>
               <div  ref="lyricRef">
                 <div v-for="(item,index) in lyric" :key="index" :id=" `s` + index" :class="{lyric_base:true,lyric_white: item.time <= current_song_time && current_song_time < lyric[index+1].time}" v-html="item.lyric"></div>
                 <div class="lyric_bottom"></div>
@@ -249,15 +251,17 @@ export default defineComponent({
         // console.log(lyricScorll.bs.maxScrollY);
         // console.log(lyricRef.value.children[0].offsetHeight);
         let index = Math.abs(position.y) / lyricRef.value.children[0].offsetHeight
-        console.log(`当前拖动为第${Math.ceil(index)}句歌词`);
+        // console.log(`当前拖动为第${Math.ceil(index)}句歌词`);
         
-        current_song_time.value = lyric[Math.ceil(index) - 1].time;
-        console.log(current_song_time.value);
+        current_song_time.value = lyric[Math.ceil(index) - 1 <= 0 ? 0 : Math.ceil(index) - 1].time;
+        // console.log(current_song_time.value);
       })
       lyricScorll.bs.on("scrollEnd", () => {
+        // 由于 better-scroll 插件自动滚动也会触发滚动结束事件，所以这里判断一下是不是手动滑动的，手动滑动才设置时间，否则自动滑动也设置的话会造成音乐播放卡顿
+        if(showLyricLine.value) store.commit("set_progress_time",current_song_time.value)
         showLyricLine.value = false;
-        // 设置拖动进度条时间
-      store.commit("set_progress_time",current_song_time.value)
+      //   // 设置拖动进度条时间
+      // 
       })
       lyricScorll.bs.disable();
       
@@ -304,7 +308,7 @@ export default defineComponent({
         // 歌词滚动
         lyric.forEach((i:any,index,arr) => {
           if(current_song_time.value >= i.time && current_song_time.value <= arr[index+1].time) {
-            lyricScorll.bs.scrollToElement(`#s${index}`,300)
+            lyricScorll.bs.scrollToElement(`#s${index}`,100)
           }
         })
       }
@@ -411,10 +415,11 @@ export default defineComponent({
       let slidePercent = slideLength / barOffsetWidth
       console.log(slidePercent.toFixed(1));
       
-      store.commit("set_volume",slidePercent.toFixed(1))
-      
-      volume_point.value.style.left = `${slidePercent * 100}%`
-      volume_linePast.value.style.width = `${slidePercent * 100}%`
+      if(slidePercent >= 0 && slidePercent <= 1) {
+        store.commit("set_volume",slidePercent.toFixed(1))
+        volume_point.value.style.left = `${slidePercent * 100}%`
+        volume_linePast.value.style.width = `${slidePercent * 100}%`
+      }
     };
     // 圆点进度移动过程中
     const processControlMove_volume = (ev:any) => {
@@ -619,12 +624,16 @@ export default defineComponent({
       transform: translate(-50%);
     }
     .lyric_line {
+      width: 90%;
+      position: absolute;
+      top: 48.4%;
       border-top: 1px solid #fff;
+      opacity: 0;
     }
     .lyric_line_time {
       position: absolute;
       left: 90%;
-      top: 48.4%;
+      top: 47%;
       font-size: 12px;
       color: #fff;
       opacity: 0;
@@ -635,7 +644,7 @@ export default defineComponent({
   }
   .show_all_lyric {
     height: 410px;
-    top: 40%;
+    top: 45%;
   }
   .icon_top {
     display: flex;
@@ -711,6 +720,8 @@ export default defineComponent({
     top: -73%;
     display: flex;
     .line {
+      z-index: 1111;
+      height: 10px;
       .past {
         width: 100%;
         transition: all 0s;

@@ -1,5 +1,6 @@
 <template>
-  <div class="top">
+  <div>
+    <div class="top">
     <div class="img_blur">
       <img :src="img" alt="">
     </div>
@@ -51,7 +52,7 @@
   <!-- 全部播放 -->
   <div class="playAll">
     <div class="icon">
-      <img src="../../../public/img/icons/playAll.svg" alt="">
+      <img @click="add_song_list" src="../../../public/img/icons/playAll.svg" alt="">
     </div>
     <div class="text">
       <div class="play_all_title">播放全部</div>
@@ -81,9 +82,10 @@
         </div>
       </div>
       <div class="more">
-        <img src="../../../public/img/icons/songInfo.svg" alt="">
+        <img @click="store.dispatch(`set_pop_detail`, item)" src="../../../public/img/icons/songInfo.svg" alt="">
       </div>
     </div>
+  </div>
   </div>
 </template>
 
@@ -93,6 +95,7 @@ import { useRouter } from "vue-router"
 import {getSongListInfo,getSongInfo,getAlbumDetail} from "../../api/song"
 import { numFilter } from "../../utils/num";
 import { useStore } from 'vuex'
+import { Toast } from "vant"
 
 // 歌单
 interface songList {
@@ -191,6 +194,7 @@ interface author {
           name: item.name,
           Tv: item.alia.join("/"), // 歌曲可能会有剧名
           author: item.ar.map((item:any) => item.name).join("/"),
+          img: item.al.picUrl,
           des: item.al.name,
           ar: item.ar,
           al: item.al,
@@ -241,12 +245,33 @@ interface author {
       }
     }
 
+    // 播放列表
+    const add_song_list = () => {
+      if(data.songListInfo.length == 0) {
+        Toast(`还未获取到音乐列表，请稍后`)
+        return
+      }
+      let list: any[] = [];
+      data.songListInfo.forEach((item: any, index: number) => {
+          list.push({
+            id: item.id,
+            type: 0,
+            name: item.name,
+            author: item.author,
+            img: item.img
+          })
+      })
+      console.log(list);
+      store.commit(`add_songList`, list)
+    }
+
     return {
       ...toRefs(data),
       author,
       store,
       router,
-      playMusicSingle
+      playMusicSingle,
+      add_song_list
     }
 
     }

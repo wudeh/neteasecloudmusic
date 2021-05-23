@@ -7,8 +7,8 @@ export function getSongListInfo(id:string): any {
 
 // 获取歌曲URL
 export function getSongUrl(id: string): any {
-  // return axios.post("/song/url",{id,realIP:'116.25.146.177'});
-  return axios.post("/song/url",{id});
+  return axios.post("/song/url",{id,realIP:'116.25.146.177'});
+  // return axios.post("/song/url",{id});
 }
 
 
