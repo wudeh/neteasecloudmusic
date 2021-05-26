@@ -46,13 +46,8 @@ axios.interceptors.request.use((config) => {
 //  响应拦截
 axios.interceptors.response.use(
   (res) => {
-    // console.log("响应拦截");
-    // console.log(res);
-    if (res.data.code == "301") {
-      Toast("登录已过期");
-      localStorage.removeItem("cookieMusic");
-      localStorage.removeItem("tokenMusic");
-    }
+    console.log("响应拦截");
+    console.log(res);
     return res.data;
   },
   (error) => {

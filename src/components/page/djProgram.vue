@@ -25,7 +25,7 @@
             <span class="Follow" v-if="author.followed">></span>
             <span class="notFollow" v-else>+</span>
           </div>
-          <div class="des">
+          <div class="des" @click="show = true">
             <div class="text">{{description}}</div>
             <img  v-if="description" src="../../../public/img/icons/more.svg" alt="">
           </div>
@@ -81,6 +81,17 @@
         </div>
       </div>
     </div>
+    <van-overlay :show="show" @click="show = false">
+      <div class="wrapper" @click="show = false">
+        <van-image radius="8" class="img" :src="img" />
+        <span class="title">{{ title }}</span>
+        <div class="babel" v-if="tags.length">
+          <span>标签：</span>
+          <span class="babel_item" v-for="(it, i) in tags" :key="i">{{ it }}</span>
+        </div>
+        <p>{{ description }}</p>
+      </div>
+    </van-overlay>
   </div>
 </template>
 
@@ -98,6 +109,7 @@ interface songList {
   title: string,
   img: string,
   description: string,
+  tags: Array<string>,
   subscribed: boolean, // 是否收藏
   songListInfo: Array<song>,
   shareCount:number,
@@ -105,6 +117,7 @@ interface songList {
   commentCount:number,
   subedIcon: string,
   subIcon: string,
+  show: boolean, // 控制歌单详情遮罩层
   asc: boolean // 排序方式,默认为 false (新 => 老 ) 设置 true 可改为 老 => 新
 }
 
@@ -139,6 +152,7 @@ interface author {
       title: '',
       img: '',
       description: '',
+      tags: [],
       subscribed: false,
       songListInfo: [],
       shareCount: 0,
@@ -146,7 +160,8 @@ interface author {
       commentCount: 0,
       subedIcon: require('../../../public/img/icons/subed.svg'),
       subIcon: require('../../../public/img/icons/sub.svg'),
-      asc: false
+      asc: false,
+      show: false
     })
     const author = reactive<author>({
       avatar: '',
@@ -483,6 +498,37 @@ interface author {
         width: 20px;
       }
     }
+  }
+}
+.wrapper {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 100px 15px;
+  color: #fff;
+  .img {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 10px;
+  }
+  .title {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  .babel {
+    font-size: 13px;
+    margin-bottom: 10px;
+    .babel_item {
+      padding: 3px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      margin-left: 8px;
+    }
+  }
+  p {
+    font-size: 12px;
   }
 }
 </style>

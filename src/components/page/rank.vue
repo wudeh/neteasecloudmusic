@@ -9,8 +9,8 @@
       </div>
     </van-sticky>
     <!-- 官方榜 -->
-    <div class="title">官方榜</div>
-    <div class="official">
+    <div class="title"  v-if="official.length">官方榜</div>
+    <div class="official" v-if="official.length">
       <div class="official_item" @click="router.push({ path: `/songList`, query: {id: it.id }})" v-for="(it, i) in official" :key="i">
         <div class="img_wrapper">
           <van-image radius="8" class="img" :src="it.coverImgUrl" /> 
@@ -35,7 +35,7 @@
       </div>
     </div>
     <!-- 其他榜单 -->
-    <div class="title">其他榜单</div>
+    <div class="title"  v-if="official.length">其他榜单</div>
     <div class="other">
       <div class="other_item" v-for="(it, i) in other" :key="i">
         <div class="img_wrapper">
@@ -73,7 +73,9 @@
       })
       
       onBeforeMount(async () => {
+        store.commit("set_load", true)
         let info = await getRank();
+        store.commit("set_load", false)
         info.list.map((item: any) => {
           if(item.tracks.length) {
             data.official.push(item)
