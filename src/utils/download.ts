@@ -18,9 +18,9 @@ export default function downloadFile(url: string, item: any) {
     let i = url.split(".");
     let last = i[i.length - 1];
     Toast(`${item.name} 开始下载`);
-    console.log("<---正在下载中--->");
-    console.log(`<---下载链接为${handleUrl}--->`);
-    console.log(`<---下载文件名为${item.name}.${last}--->`);
+    // console.log("<---正在下载中--->");
+    // console.log(`<---下载链接为${handleUrl}--->`);
+    // console.log(`<---下载文件名为${item.name}.${last}--->`);
     var xhr = new XMLHttpRequest();
     xhr.open("GET", handleUrl, true);
     xhr.responseType = "blob";
@@ -47,7 +47,7 @@ export default function downloadFile(url: string, item: any) {
         if (event.lengthComputable) {
           let percentComplete = (event.loaded / event.total) * 100;
           // const store = useStore();
-          console.log(`当前下载进度${percentComplete.toFixed(2)}%`);
+          // console.log(`当前下载进度${percentComplete.toFixed(2)}%`);
           store.commit("download_progress", {
             id: item.id,
             name: item.name,

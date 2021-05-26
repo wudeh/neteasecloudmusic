@@ -12,8 +12,8 @@ axios.defaults.baseURL = process.env.NODE_ENV == "development" ? "https://neteas
 
 // 请求拦截
 axios.interceptors.request.use((config) => {
-  console.log("请求拦截");
-  console.log(config);
+  // console.log("请求拦截");
+  // console.log(config);
   // if (!config.url?.startsWith("https")) {
   // 加上时间戳
   const timestamp = new Date().getTime();
@@ -39,15 +39,15 @@ axios.interceptors.request.use((config) => {
 
   return config;
 }, (err) => {
-  console.log(err);
+  // console.log(err);
   return Promise.reject(err)
 });
 
 //  响应拦截
 axios.interceptors.response.use(
   (res) => {
-    console.log("响应拦截");
-    console.log(res);
+    // console.log("响应拦截");
+    // console.log(res);
     if (res.data.code == "301") {
       Toast("登录已过期");
       localStorage.removeItem("cookieMusic");
@@ -58,9 +58,9 @@ axios.interceptors.response.use(
   (error) => {
     // 获取错误状态码
     // const { status } = error.response;
-    console.log("拦截到错误");
+    // console.log("拦截到错误");
     Toast("网络错误，请重试");
-    console.log(error);
+    // console.log(error);
     return Promise.resolve({ msg: `网络错误`, code: 400 });
   }
 );

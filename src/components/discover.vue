@@ -750,112 +750,6 @@ export default defineComponent({
 
       
       
-      // store.commit("set_load", true)
-
-      // info.listLoading = true
-      // let discoverInfo = await getDiscoverInfo(info.cursor);
-      // console.log(discoverInfo);
-      
-      // store.commit("set_load", false)
-      // info.listLoading = false
-      // info.listError = true
-      // return
-      // // 分页数据
-      // info.cursor = discoverInfo.data.cursor;
-      // discoverInfo.data.blocks.map((item: any) => {
-      //   // 轮播图
-      //   if(item.blockCode == "HOMEPAGE_BANNER") {
-      //     info["swiper"] = item.extInfo.banners;
-      //     nextTick(() => {
-      //       topBg.value?.setAttribute(
-      //       "style",
-      //       `background-image:url(${info.swiper[0].pic});background-color:red`
-      //     );
-      //     })
-      //   }
-      //   // 推荐歌单
-      //   if(item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
-      //     console.log("这是推荐歌单");
-      //     info.recommend.arrData = item.creatives;
-      //     info.recommend.titleTex = item.uiElement.subTitle.title;
-      //     info.recommend.button = item.uiElement.button;
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
-      //     console.log("这是较长的推荐区域");
-      //     // 较长的推荐区域
-      //     info.long = item;
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
-      //     console.log("这是精选音乐视频");
-      //     // 精选音乐视频
-      //     info.HOMEPAGE_MUSIC_MLOG = item;
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
-      //     console.log("这是雷达歌单");
-      //     // 雷达歌单
-      //    info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
-      //     console.log("这是音乐日历");
-      //     // 音乐日历
-      //    info.HOMEPAGE_MUSIC_CALENDAR = item;
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST") {
-      //     // 专属场景歌单
-      //    info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST = item;
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG") {
-      //     // 新歌，新碟，数字专辑
-      //    info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri =
-      //       item.creatives;
-      //     info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri.map(
-      //       (item: { creativeType: string }) => {
-      //         // 如果是新歌
-      //         if (item.creativeType == "NEW_SONG_HOMEPAGE") {
-      //           info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].push(item);
-      //         }
-      //         // 新碟
-      //         if (item.creativeType == "NEW_ALBUM_HOMEPAGE") {
-      //           info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[1].push(item);
-      //         }
-      //         // 数字专辑
-      //         if (item.creativeType == "DIGITAL_ALBUM_HOMEPAGE") {
-      //           info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[2].push(item);
-      //         }
-      //       }
-      //     );
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_YUNBEI_NEW_SONG") {
-      //     // 推荐新歌云贝广告
-      //    info.HOMEPAGE_YUNBEI_NEW_SONG = item;
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
-      //     // 播客合辑
-      //    info.HOMEPAGE_VOICELIST_RCMD = item;
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_PODCAST24") {
-      //     // 24小时播客
-      //    info.HOMEPAGE_PODCAST24 = item;
-      //   }
-      //   if(item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
-      //     // 视频合集
-      //    info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = item;
-      //    console.log("这是视频合集");
-         
-      //    console.log(info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST);
-         
-      //   }
-      // })
-      // // 只要有分页数据就继续请求数据
-      // while(info.cursor) {
-       
-      
-      // }
-      // const iconInfo = await getIconInfo();
-      // // 圆形图标
-      // info.icon = iconInfo.data;
-      // let word = await getSearchWord();
-      // info.searchWord = word.data.showKeyword;
     });
 
     const onRefresh = async () => {
@@ -870,31 +764,25 @@ export default defineComponent({
           }
           // 推荐歌单
           if(item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
-            console.log("这是推荐歌单");
             info.recommend.arrData = item.creatives;
             info.recommend.titleTex = item.uiElement.subTitle.title;
             info.recommend.button = item.uiElement.button;
           }
           if(item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
-            console.log("这是较长的推荐区域");
             // 较长的推荐区域
             info.long = item;
           }
           if(item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
-            console.log("这是精选音乐视频");
             // 精选音乐视频
             info.HOMEPAGE_MUSIC_MLOG = item;
             info.HOMEPAGE_MUSIC_MLOG.extInfo.map((i: any) => {
-              console.log('开始处理');
             })
           }
           if(item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
-            console.log("这是雷达歌单");
             // 雷达歌单
           info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
           }
           if(item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
-            console.log("这是音乐日历");
             // 音乐日历
           info.HOMEPAGE_MUSIC_CALENDAR = item;
           }
@@ -945,7 +833,6 @@ export default defineComponent({
     }
 
     const loadMore = async () => {
-      console.log(`重新load`);
       
       info.listLoading = true
       let discoverInfo = await getDiscoverInfo(info.cursor);
@@ -970,28 +857,23 @@ export default defineComponent({
         }
         // 推荐歌单
         if(item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
-          console.log("这是推荐歌单");
           info.recommend.arrData = item.creatives;
           info.recommend.titleTex = item.uiElement.subTitle.title;
           info.recommend.button = item.uiElement.button;
         }
         if(item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
-          console.log("这是较长的推荐区域");
           // 较长的推荐区域
           info.long = item;
         }
         if(item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
-          console.log("这是精选音乐视频");
           // 精选音乐视频
           info.HOMEPAGE_MUSIC_MLOG = item;
         }
         if(item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
-          console.log("这是雷达歌单");
           // 雷达歌单
          info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
         }
         if(item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
-          console.log("这是音乐日历");
           // 音乐日历
          info.HOMEPAGE_MUSIC_CALENDAR = item;
         }
@@ -1035,10 +917,7 @@ export default defineComponent({
         if(item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
           // 视频合集
          info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = item;
-         console.log("这是视频合集");
-         
-         console.log(info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST);
-         
+                  
         }
       })
       const iconInfo = await getIconInfo();
@@ -1073,11 +952,8 @@ export default defineComponent({
 
     // 点击播放歌曲
     async function playMusicSingle(item: any):Promise<void> {
-      console.log(item);
-      console.log(store.state.song_info.id);
       
       if(item.resourceId == store.state.song_info.id) {
-        console.log("是同一首");
         store.commit("play", !store.state.song_info.isPlaying);
       }
       // 先判断和当前的歌曲是不是同一首,如果不是同一首
@@ -1093,7 +969,6 @@ export default defineComponent({
           url: info.data[0].url,
           img: item.uiElement.image.imageUrl
         }
-        console.log(song);
         
         // 设置歌曲信息
         store.commit("setSongInfo",song);
@@ -1155,7 +1030,6 @@ export default defineComponent({
           })
         })
       })
-      console.log(list);
       store.commit(`add_songList`, list)
     }
 

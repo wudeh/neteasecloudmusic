@@ -669,7 +669,6 @@
 
       onBeforeMount(async () => {
         // store.commit("set_load", true)
-        console.log(`onbeforemount`);
         
         data.word = id;
       })
@@ -756,8 +755,6 @@
 
       // 重新搜索
       const onSearch = () => {
-        console.log(`重新搜索`);
-        console.log(data.word);
         data.suggestWord.splice(0)
         
         data.allLoading = false,
@@ -814,8 +811,6 @@
 
 
       const loadMore = async () => {
-        console.log("触发加载更多");
-        console.log(data.word);
         if(data.activeName == 1) {
           data.Loading = true;
           let info = await getsearchResult(data.word,data.activeName,data.songPageNo);
@@ -948,7 +943,6 @@
       }
 
       const changeActive = (i: any) => {
-        console.log(`触发了changeactive`);
         
         tab.value.scrollTo(i);
         if(data.activeName == 1 && data.songs.length) {
@@ -989,20 +983,14 @@
       }
 
       watch(() => data.activeName, (value) => {
-        console.log(`监听到watch改变了`);
         
-        console.log(value);
         changeActive(value)
       })
 
       // 点击播放歌曲
      function playMusicSingle(item: any): void {
-      console.log(item);
-      console.log(item.ar);
-      console.log(store.state.song_info.id);
       
       if(item.id == store.state.song_info.id) {
-        console.log("是同一首");
         store.commit("play", !store.state.song_info.isPlaying);
         return
       }

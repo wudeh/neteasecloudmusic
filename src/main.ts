@@ -21,13 +21,13 @@ const app = createApp(App);
 
 router.beforeEach((to, from, next) => {
   if(to.name == `Home` && from.name ) {
-    console.log(`不能回到Home`);
+    // console.log(`不能回到Home`);
     
     store.commit("close")
     return next(false)
   }
   if(to.name == `Home`) {
-    console.log(`home重定向`);
+    // console.log(`home重定向`);
     
     store.commit("close")
     return next(`/discover`)
@@ -36,7 +36,7 @@ router.beforeEach((to, from, next) => {
     store.commit("close")
     // next()
   }else if(store.state.showPop) {
-    console.log("当前有弹出框禁止后退");
+    // console.log("当前有弹出框禁止后退");
     
     store.commit("close")
     return next(false)

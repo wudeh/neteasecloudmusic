@@ -208,17 +208,17 @@ export default defineComponent({
     watch(
       () => store.state.song_info.isPlaying,
       (value, pre) => {
-        console.log("监听到播放变化");
+        // console.log("监听到播放变化");
         if (value) {
           if (!audio.value.src) {
             audio.value.src = store.state.song_info.url;
           }
-          console.log(store.state.song_info.url);
+          // console.log(store.state.song_info.url);
           audio.value.autoplay = true;
           audio.value.play();
-          console.log("总时长");
-          console.log(audio.value.duration); // 这是总时长
-          console.log(store.state.song_info.duration);
+          // console.log("总时长");
+          // console.log(audio.value.duration); // 这是总时长
+          // console.log(store.state.song_info.duration);
           interval();
         } else {
           audio.value.pause();
@@ -231,7 +231,7 @@ export default defineComponent({
     watch(
       () => store.state.song_info.id,
       async (value, pre) => {
-        console.log("监听到播放歌曲变更");
+        // console.log("监听到播放歌曲变更");
         if(value) {
           audio.value.pause();
           // 请求URL
@@ -277,11 +277,11 @@ export default defineComponent({
           if (from.name == "song") return;
           include.push(to.name);
           transition_name.value = `slide-left`
-          console.log(include);
+          // console.log(include);
         } else {
           include.splice(include.indexOf(from.name), 1);
           transition_name.value = `slide-right`
-          console.log(include);
+          // console.log(include);
         }
       }
     );
@@ -309,7 +309,7 @@ export default defineComponent({
     const lyricRequest = async () => {
       let lyric: { lyric: string; }[]|{ time: string|number; lyric: any; }[] = []
       const data = await getLyric(store.state.song_info.id);
-      console.log(data);
+      // console.log(data);
       // console.log(data.lrc.lyric.split("["));
       if(data.lrc) {
         let i = data.lrc.lyric.split("[");
@@ -331,8 +331,8 @@ export default defineComponent({
         lyric.sort((a: any,b: any) => {
           return a.time - b.time;
         })
-        console.log(lyric);
-        console.log("这是歌词");
+        // console.log(lyric);
+        // console.log("这是歌词");
         // 如果有翻译歌词
         if(data.tlyric.lyric) {
           let i = data.tlyric.lyric.split("[");
@@ -395,22 +395,22 @@ export default defineComponent({
         }
       });
       audio.value.addEventListener("loadstart", () => {
-        console.log("<-- 开始请求数据 -->");
+        // console.log("<-- 开始请求数据 -->");
         // console.log(audio.value.networkState);
 
         // store.commit("play",false);
         // this.SET_PAGE_DATA(['audio', 'isLoading', true])
       });
       audio.value.addEventListener("error", () => {
-        console.log("<-- 请求失败 -->");
-        console.log(audio.value.networkState);
+        // console.log("<-- 请求失败 -->");
+        // console.log(audio.value.networkState);
         store.commit("play", false);
         Toast.fail("数据缓冲失败");
         // this.SET_PAGE_DATA(['audio', 'isLoading', false])
         // if (!window.navigator.onLine) this.$toast('歌曲请求失败，请检查网络')
       });
       audio.value.addEventListener("stalled", () => {
-        console.log("<-- 网络失速 -->");
+        // console.log("<-- 网络失速 -->");
         Toast("当前网络状况较差")
         // store.commit("play",false);
         if (!store.state.song_info.duration) {
@@ -418,7 +418,7 @@ export default defineComponent({
         }
       });
       audio.value.addEventListener("waiting", () => {
-        console.log("<-- 等待数据 ing -->");
+        // console.log("<-- 等待数据 ing -->");
         // store.commit("play",false);
         // this.SET_PAGE_DATA(['audio', 'isLoading', true])
       });
@@ -435,24 +435,24 @@ export default defineComponent({
       //   // this.audio.play()
       // });
       audio.value.addEventListener("play", () => {
-        console.log("<-- 播放 -->");
+        // console.log("<-- 播放 -->");
         console.info(`%c > console 歌词系统工作 ing`, 'color:#db2c1f;background:rgba(0,0,0,0.2);font-size:25px;border-radius:6px')
         // this.SET_PAGE_DATA(['audio', 'isPlaying', true])
         // this.sendCurrentTime('set')
       });
       audio.value.addEventListener("pause", () => {
-        console.log("<-- 暂停 -->");
-        console.log(audio.value.volume);
+        // console.log("<-- 暂停 -->");
+        // console.log(audio.value.volume);
         
         // this.sendCurrentTime('clear')
       });
       audio.value.addEventListener("ended", () => {
-        console.log("<-- 播放结束 -->");
+        // console.log("<-- 播放结束 -->");
         store.commit("play", false);
         store.dispatch("play_next");
       });
       audio.value.addEventListener("ready", () => {
-        console.log("<-- 准备完毕 -->");
+        // console.log("<-- 准备完毕 -->");
       });
 
       lyricRequest();
@@ -463,17 +463,13 @@ export default defineComponent({
     animation.value = "slide-left";
 
     onBeforeUnmount(() => {
-      console.log("onBeforeUnmount");
+      // console.log("onBeforeUnmount");
 
       clearInterval(timerSong.value);
     });
 
     const showPopList = () => {
       store.commit("set_pop_list", true);
-    };
-
-    const closePopList = () => {
-      console.log("3553434344");
     };
     
     return {
@@ -501,7 +497,6 @@ export default defineComponent({
       current_song_time,
       router,
       include,
-      closePopList,
       showPopList,
       // onChange,
     };

@@ -101,7 +101,6 @@ export default defineComponent({
         // eventPassthrough: "vertical",
       });
 
-      // console.log(props.scrollX);
       // data.bs.on("scrollEnd", () => {
 
       // })
@@ -112,7 +111,6 @@ export default defineComponent({
       () => {
         nextTick(() => {
           data.bs.refresh();
-          console.log("数据改变了");
           
         });
       }
@@ -122,7 +120,6 @@ export default defineComponent({
       // 在 DOM 渲染完毕后初始化 better-scroll
       initScroll();
       // data.bs.on("pullingDown",() => {
-      //   console.log("下拉了");
         
       // })
     });
@@ -135,7 +132,6 @@ export default defineComponent({
 
     // onUpdated(() => {
     //   data.bs.refresh();
-    //   console.log("再次计算滚动距离");
     // });
 
     return {

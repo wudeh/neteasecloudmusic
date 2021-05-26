@@ -99,7 +99,6 @@ export default defineComponent({
         eventPassthrough: "vertical",
       });
 
-      console.log(props.scrollX);
       // data.bs.on("scrollEnd", () => {
 
       // })
@@ -119,7 +118,6 @@ export default defineComponent({
       initScroll();
       // window.addEventListener("resize", () => {
       //   data.bs.refresh();
-      //   console.log("window resize");
       // });
     });
 
@@ -131,7 +129,6 @@ export default defineComponent({
 
     onUpdated(() => {
       data.bs.refresh();
-      console.log("再次计算滚动距离");
     });
 
     return {

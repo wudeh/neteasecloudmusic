@@ -138,8 +138,6 @@ export default defineComponent({
     const lyricRequest = async () => {
       // lyric = []
       const data = await getLyric(store.state.song_info.id);
-      console.log(data);
-      // console.log(data.lrc.lyric.split("["));
       if(data.lrc) {
         let i = data.lrc.lyric.split("[");
         i.forEach((item:any,index: number) => {
@@ -160,8 +158,6 @@ export default defineComponent({
         lyric.sort((a: any,b: any) => {
           return a.time - b.time;
         })
-        console.log(lyric);
-        console.log("这是歌词");
         // 如果有翻译歌词
         if(data.tlyric.lyric) {
           let i = data.tlyric.lyric.split("[");
@@ -220,7 +216,6 @@ export default defineComponent({
     })
 
     onMounted(async () => {
-      console.log("mounted");
       // 可能会出现首页已经缓冲好了导致vuex中的缓冲时间不变化，进而导致缓冲进度条监听不执行，所以一进来就设置一下
       linePast.value.style.width = `${store.state.song_info.buffered / store.state.song_info.duration * 100}%`
       
@@ -247,14 +242,9 @@ export default defineComponent({
       lyricScorll.bs.on('scroll', (position: any) => {
         // 用户滑动歌词显示指示线
         showLyricLine.value = true;
-        // console.log(position.x, position.y)
-        // console.log(lyricScorll.bs.maxScrollY);
-        // console.log(lyricRef.value.children[0].offsetHeight);
         let index = Math.abs(position.y) / lyricRef.value.children[0].offsetHeight
-        // console.log(`当前拖动为第${Math.ceil(index)}句歌词`);
         
         current_song_time.value = lyric[Math.ceil(index) - 1 <= 0 ? 0 : Math.ceil(index) - 1].time;
-        // console.log(current_song_time.value);
       })
       lyricScorll.bs.on("scrollEnd", () => {
         // 由于 better-scroll 插件自动滚动也会触发滚动结束事件，所以这里判断一下是不是手动滑动的，手动滑动才设置时间，否则自动滑动也设置的话会造成音乐播放卡顿
@@ -280,8 +270,6 @@ export default defineComponent({
 
     // 歌曲变更重新请求歌词，评论
     watch(() => store.state.song_info.id, (id) => {
-      console.log("歌词页面监听到音乐变更，重新请求歌词");
-      console.log("变更id为" + id);
       
       lyric.splice(0);
       lyricRequest();
@@ -291,10 +279,10 @@ export default defineComponent({
     // 不在歌词页面不让滚动
     watch(() => router.currentRoute.value.name, (value:any) => {
       if(value != "song") {
-        console.log("不能滚动");
+        // console.log("不能滚动");
         scroll.value = false
       }else {
-        console.log("可以滚动");
+        // console.log("可以滚动");
         scroll.value = true;
       }
     })
@@ -351,9 +339,9 @@ export default defineComponent({
 
     // 进度条拖动部分，ev 是事件对象，用来获取点击的位置
     const processControlStart = (ev: any) => {
-      console.log(ev.touches[0].clientX);
+      // console.log(ev.touches[0].clientX);
       // console.log(line.value.offsetWidth);
-      console.log(line.value.offsetLeft);
+      // console.log(line.value.offsetLeft);
       
       
       autoMovePoint.value = false
@@ -362,16 +350,16 @@ export default defineComponent({
       // 算出点击位置距离总进度条左边的距离
       // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
       let slideLength = ev.touches[0].clientX - line.value.offsetLeft
-      console.log(slideLength);
+      // console.log(slideLength);
       
       // 算出点击位置距离总进度条左边距离的百分比
       let slidePercent = slideLength / barOffsetWidth
       // this.process = Math.floor(slidePercent * 100)
       // tempCurrentTime.value = Math.floor(getMusicList().duration / 1000 * slidePercent)
       tempCurrentTime.value = store.state.song_info.duration * slidePercent;
-      console.log("这是tempCurrentTime");
+      // console.log("这是tempCurrentTime");
       
-      console.log(tempCurrentTime.value);
+      // console.log(tempCurrentTime.value);
       
       point.value.style.left = `${slidePercent * 100}%`
     };
@@ -389,7 +377,7 @@ export default defineComponent({
     };
     // 点击结束或者移动结束
     const processControlEnd = (ev:any) => {
-      console.log("移动结束");
+      // console.log("移动结束");
       
       autoMovePoint.value = true;
       // audio.value.currentTime = tempCurrentTime.value;
@@ -409,11 +397,11 @@ export default defineComponent({
       // 算出点击位置距离总进度条左边的距离
       // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
       let slideLength = ev.touches[0].clientX - volume_line.value.offsetLeft
-      console.log(slideLength);
+      // console.log(slideLength);
       
       // 算出点击位置距离总进度条左边距离的百分比
       let slidePercent = slideLength / barOffsetWidth
-      console.log(slidePercent.toFixed(1));
+      // console.log(slidePercent.toFixed(1));
       
       if(slidePercent >= 0 && slidePercent <= 1) {
         store.commit("set_volume",slidePercent.toFixed(1))

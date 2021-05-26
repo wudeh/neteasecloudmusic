@@ -214,7 +214,7 @@ export default createStore<song>({
           ctx.state.song_info.listIndex = index;          
         }
       });
-      console.log("正在检查是否播放下一首");
+      // console.log("正在检查是否播放下一首");
       ctx.state.song_info.isPlaying = false
       ctx.commit(`set_song_time`,0)
       // 如果是列表循环
@@ -235,20 +235,20 @@ export default createStore<song>({
           });
         }else {
           // 播放下一首
-          console.log(`正在播放下一首`);
+          // console.log(`正在播放下一首`);
           
           if(++ctx.state.song_info.listIndex > ctx.state.song_info.list.length -1 ) {
             ctx.state.song_info.listIndex = 0;
           }
         }
       }
-      console.log(`要播放的歌曲索引为${ctx.state.song_info.listIndex}`);
+      // console.log(`要播放的歌曲索引为${ctx.state.song_info.listIndex}`);
       
 
       // 如果是随机播放
       if(ctx.state.song_info.playMode == 2) {
         ctx.state.song_info.listIndex = Math.floor(Math.random() * ctx.state.song_info.list.length);
-        console.log(ctx.state.song_info.listIndex);
+        // console.log(ctx.state.song_info.listIndex);
         
       }
       
@@ -269,7 +269,7 @@ export default createStore<song>({
         ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
         ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
       }else {
-        console.log(`要播放的歌曲名为${ctx.state.song_info.list[ctx.state.song_info.listIndex].name}`);
+        // console.log(`要播放的歌曲名为${ctx.state.song_info.list[ctx.state.song_info.listIndex].name}`);
         
         const info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
         ctx.state.song_info.url = info.data[0].url
@@ -295,7 +295,7 @@ export default createStore<song>({
         ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
         ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
       }else {
-        console.log(`要播放的歌曲名为${ctx.state.song_info.list[ctx.state.song_info.listIndex].name}`);
+        // console.log(`要播放的歌曲名为${ctx.state.song_info.list[ctx.state.song_info.listIndex].name}`);
         
         const info = await getSongUrl(ctx.state.song_info.list[ctx.state.song_info.listIndex].id);
         ctx.state.song_info.url = info.data[0].url
@@ -330,10 +330,10 @@ export default createStore<song>({
       let i = 0;
       ctx.state.song_info.list.forEach((item: any, index: number) => {
         if(item.id == id) {
-          console.log(`要删除的歌曲名为$${item.name}`);
+          // console.log(`要删除的歌曲名为$${item.name}`);
           
           i = index;
-          console.log(i);
+          // console.log(i);
           
         }
       });
@@ -359,7 +359,7 @@ export default createStore<song>({
       }else {
         // 如果删除的是当前播放的歌曲，先播放下一首歌
         if(id == ctx.state.song_info.id) {
-          console.log(`删除当前播放歌曲`);
+          // console.log(`删除当前播放歌曲`);
           i++
           if(i > ctx.state.song_info.list.length - 1 ) i = 0;
           const info = await getSongUrl(ctx.state.song_info.list[i].id);

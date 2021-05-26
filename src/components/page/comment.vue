@@ -293,7 +293,6 @@ export default defineComponent({
         })
       })
       // data.sortType = data.sortTypeList[0].value;
-      console.log(data.sortTypeList);
       
       data.arrloading = false;
       data.pageNo +=1;
@@ -301,10 +300,7 @@ export default defineComponent({
       if(!info.data.hasMore) {
         data.finish = true
       }
-      console.log("这是评论");
-      console.log(info);
 
-      console.log(data.arr);
     });
 
     // 获取楼层评论
@@ -316,7 +312,6 @@ export default defineComponent({
       data.floorFinish = false;
       data.floorPageNo = 1;
       let info = await getFloorComment(id,parentCommentId,type,data.floorPageNo);
-      console.log(data.floorTopComment);
       data.floorArr = info.data.comments;
       data.floorPageNo +=1;
       data.floorPageNo = info.data.time;
@@ -357,7 +352,6 @@ export default defineComponent({
     const change_sortType = async (index: any) => {
       data.sortType = index;
       data.finish = false
-      console.log(data.sortType);
       
       data.pageNo = 1;
       data.arr = [];

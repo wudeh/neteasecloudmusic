@@ -367,7 +367,6 @@
           })
         })
         // data.sortType = data.sortTypeList[0].value;
-        console.log(data.sortTypeList);
         
         
         data.pageNo +=1;
@@ -375,22 +374,13 @@
         if(!info.data.hasMore) {
           data.finish = true
         }
-        console.log("这是评论");
-        console.log(info);
-
-        console.log(data.arr);
-
-
       
       })
 
 
       watch(() => data.vid, (value, pre) => {
-        console.log(data.url);
         
         data.url = ''
-        console.log(value);
-        console.log(pre);
         
         
         init()
@@ -477,7 +467,6 @@
           data.floorError = true;
           return;
         }
-        console.log(data.floorTopComment);
         data.floorArr = info.data.comments;
         data.floorPageNo +=1;
         data.floorPageNo = info.data.time;
@@ -529,7 +518,6 @@
 
       const change_sortType = async (index: any) => {
         data.sortType = index;
-        console.log(data.sortType);
         
         data.pageNo = 1;
         data.arr = [];

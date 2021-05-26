@@ -162,19 +162,17 @@ interface author {
     })
     const id: any=  router.currentRoute.value.query.id;//获取参数
     onBeforeMount(async () => {
-      console.log(router.currentRoute.value);
+      // console.log(router.currentRoute.value);
       store.commit("set_load", true)
       
       // 得到歌单数据
       const songList = await getSongListInfo(id);
-      console.log(songList);
       // 组装歌单数据
       data.title = songList.playlist.name;
       data.id = songList.playlist.id;
       data.img = songList.playlist.coverImgUrl;
       data.description = songList.playlist.description;
       data.subscribed = songList.playlist.subscribed;
-      console.log(data.subscribed);
       
       data.subscribedCount = songList.playlist.subscribedCount;
       data.commentCount = songList.playlist.commentCount;
@@ -190,7 +188,6 @@ interface author {
       });
       // 得到歌单里的全部歌曲信息
       const songListInfo:any = await getSongInfo(allId.join(","));
-      console.log(songListInfo);
 
       data.songListInfo = songListInfo.songs.map((item: any) => {
 
@@ -221,11 +218,8 @@ interface author {
 
     // 点击播放歌曲
      function playMusicSingle(item: any): void {
-      console.log(item);
-      console.log(store.state.song_info.id);
       
       if(item.id == store.state.song_info.id) {
-        console.log("是同一首");
         store.commit("play", !store.state.song_info.isPlaying);
         return
       }
@@ -266,7 +260,6 @@ interface author {
             img: item.img
           })
       })
-      console.log(list);
       store.commit(`add_songList`, list)
     }
 
