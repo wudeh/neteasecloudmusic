@@ -148,7 +148,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch, onBeforeUnmount, reactive, nextTick, onUpdated } from "vue";
+import { defineComponent, ref, onMounted, watch, onBeforeUnmount, reactive, nextTick, onUpdated, onActivated } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useStore } from "vuex";
 import { getTime } from "../utils/num";
@@ -268,9 +268,8 @@ export default defineComponent({
     watch(
       () => router.currentRoute.value,
       (to: any, from: any) => {
-        // console.log("====================");
-        // console.log(from);
-        // console.log(to);
+        
+        // 万一某个页面还没加载完就跳到了别的页面，以防万一关掉载入提示
         store.commit("set_load", false)
 
         if (to.meta.level > from.meta.level) {
@@ -281,7 +280,8 @@ export default defineComponent({
         } else {
           include.splice(include.indexOf(from.name), 1);
           transition_name.value = `slide-right`
-          // console.log(include);
+          
+          
         }
       }
     );
@@ -454,14 +454,23 @@ export default defineComponent({
       audio.value.addEventListener("ready", () => {
         // console.log("<-- 准备完毕 -->");
       });
-
-      lyricRequest();
+      if(store.state.song_info.id) lyricRequest();
+      window.addEventListener(`popstate`, () => {
+        console.log(`后退了`);
+        // 由于 keep-alive 缓存导致 scrollBehavior 滚动失效，但是可以获取滚动高度，所以在路由变化这里判断在路由动画时间过渡过后滚动到之前的位置
+          setTimeout(() => {
+            let top = sessionStorage.getItem(`scrollTop`)
+            console.log(`mounted${top}`);
+            if(top) {
+              window.scrollTo(0, parseInt(top))
+            }
+          }, 520);
+      })
     });
 
     
     const animation = ref("slide");
     animation.value = "slide-left";
-
     onBeforeUnmount(() => {
       // console.log("onBeforeUnmount");
 

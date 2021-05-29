@@ -1051,6 +1051,9 @@ export default defineComponent({
       loadMore,
     };
   },
+  activated: () => {
+        
+  }
 });
 </script>
 

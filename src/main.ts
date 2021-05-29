@@ -20,6 +20,7 @@ import "vant/lib/index.css";
 const app = createApp(App);
 
 router.beforeEach((to, from, next) => {
+
   if(to.name == `Home` && from.name ) {
     // console.log(`不能回到Home`);
     
@@ -43,6 +44,10 @@ router.beforeEach((to, from, next) => {
   }
   
   next()
+})
+
+router.afterEach(() => {
+  
 })
 
 // 注册一个全局自定义指令 用来替换关键搜索词颜色的指令

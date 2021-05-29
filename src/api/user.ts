@@ -27,3 +27,8 @@ export function getUserDetail(uid: any): any {
 export function recentcontact(): any {
   return axios.post("/msg/private");
 }
+
+// 歌手信息
+export function singerInfo(id: number): any {
+  return axios.post(`/artist/detail?id=${id}`);
+}
