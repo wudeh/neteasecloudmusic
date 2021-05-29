@@ -187,8 +187,9 @@ export default defineComponent({
     }
     // 获取评论
     const commentRequest = async () => {
-      const info = await getComment(store.state.song_info.id, 0, 1, 20, 3, '');
-      let total = info.data.totalCount
+      try {
+        const info = await getComment(store.state.song_info.id, 0, 1, 20, 3, '');
+        let total = info.data.totalCount
         if (total >= 100 && total < 1000) {
           commentNum.value = '99+'
         } else if (total >= 1000 && total < 10000) {
@@ -202,6 +203,10 @@ export default defineComponent({
         }else {
           commentNum.value = commentNum.value.toString();
         }
+      } catch (error) {
+        Toast(`获取歌词出错`)
+      }
+      
     }
 
     // 去评论区

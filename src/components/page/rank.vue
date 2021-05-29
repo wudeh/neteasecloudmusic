@@ -37,7 +37,7 @@
     <!-- 其他榜单 -->
     <div class="title"  v-if="official.length">其他榜单</div>
     <div class="other">
-      <div class="other_item" v-for="(it, i) in other" :key="i">
+      <div class="other_item" v-for="(it, i) in other" :key="i" @click="router.push({path:`/songList`, query:{id: it.id}})">
         <div class="img_wrapper">
           <van-image lazy-load radius="8" class="img" :src="it.coverImgUrl" /> 
           <span>{{ it.updateFrequency }}</span>

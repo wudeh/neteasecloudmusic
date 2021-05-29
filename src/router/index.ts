@@ -135,7 +135,7 @@ const router = createRouter({
   routes,
   scrollBehavior (to, from, savedPosition) {
     if (savedPosition) {
-      console.log(savedPosition);
+      // console.log(savedPosition);
       // document.body.scrollTop = savedPosition.top
       sessionStorage.setItem(`scrollTop`,savedPosition.top.toString())
       return savedPosition

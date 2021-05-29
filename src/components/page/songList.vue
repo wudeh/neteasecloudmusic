@@ -312,7 +312,7 @@ interface author {
     }
   }
   .nav {
-    margin-top: 10px;
+    // margin-top: 10px;
     height: 50px;
     margin-bottom: 30px;
     display: flex;

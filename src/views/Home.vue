@@ -460,7 +460,7 @@ export default defineComponent({
         // 由于 keep-alive 缓存导致 scrollBehavior 滚动失效，但是可以获取滚动高度，所以在路由变化这里判断在路由动画时间过渡过后滚动到之前的位置
           setTimeout(() => {
             let top = sessionStorage.getItem(`scrollTop`)
-            console.log(`mounted${top}`);
+            // console.log(`mounted${top}`);
             if(top) {
               window.scrollTo(0, parseInt(top))
             }

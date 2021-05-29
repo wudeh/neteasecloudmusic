@@ -205,9 +205,9 @@
             </div>
           </template>
           <div class="song" v-if="songs">
-            <div class="title">
+            <!-- <div class="title">
               播放全部
-            </div>
+            </div> -->
             <div class="song_item" v-for="(item, index) in songs" :key="index">
               <div class="info">
                 <div class="left" @click="playMusicSingle(item)">
