@@ -3,7 +3,7 @@ import axios from "./axios";
 // 首页数据
 export function getDiscoverInfo(cursor: any): any {
   // return axios.get("/homepage/block/page");
-  return axios.post("/homepage/block/page",{cursor});
+  return axios.post("/homepage/block/page", { cursor });
 }
 
 // 首页圆形图标数据
@@ -30,23 +30,23 @@ export function getSuggest(word: string): any {
 // 搜索
 
 /**
- * 
+ *
  * @param keywords 关键词
  * @param type 搜索种类
  * @param offset 分页
  * @param limit 返回数量
- * @returns 
+ * @returns
  */
-export function getsearchResult(keywords: string,type=1,offset=0,limit=20): any {
+export function getsearchResult(keywords: string, type = 1, offset = 0, limit = 20): any {
   // if(type == 1) {
   //   return axios.post(`/search`,{ keywords, type, offset: offset*limit, limit});
   // }else {
   //   return axios.post(`/search`,{ keywords, type, offset: offset*limit, limit});
   // }
-  if(type == 1) {
-    return axios.get(`/cloudsearch?keywords=${keywords}&type=${type}&offset=${offset*limit}&limit=${limit}`)
-  }else {
-    return axios.get(`/search?keywords=${keywords}&type=${type}&offset=${offset*limit}&limit=${limit}`)
+  if (type == 1) {
+    return axios.get(`/cloudsearch?keywords=${keywords}&type=${type}&offset=${offset * limit}&limit=${limit}`);
+  } else {
+    return axios.get(`/search?keywords=${keywords}&type=${type}&offset=${offset * limit}&limit=${limit}`);
   }
 }
 
