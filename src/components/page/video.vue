@@ -20,7 +20,7 @@
           <div class="vid_detail">
             <div class="title">{{ title }}</div>
             <div class="vid_count">
-              <span class="playTime">{{ numFilter(playTime)}}&nbsp;</span>
+              <span class="playTime">播放量：{{ numFilter(playTime)}}&nbsp;&nbsp;</span>
               <span class="publishTime" v-if="type == 5">{{ sendTimeConversion(publishTime)}}</span>
               <span class="publishTime" v-else>{{ publishTime }}</span>
             </div>
@@ -245,7 +245,7 @@
   import { getComment, getSongInfo, getFloorComment,getPlayListDetail } from "../../api/song";
   import { getUserDetail } from "../../api/user";
   import { Toast } from "vant"
-  import { getVideoDetail, getVideoUrl, getVideoRelated, getMvUrl, getMvDetail } from "../../api/video"
+  import { getVideoDetail, getVideoUrl, getVideoRelated, getMvUrl, getMvDetail, getArtistFans, getArtistDetail } from "../../api/video"
   interface creator {
     vid: string,
     type: number,
@@ -414,10 +414,10 @@
           info = await getMvDetail(data.vid)
           data.url = info.data.url
           data.vid = info.data.id
-          data.followed = info.subed
+          data.followed = info.data.artists[0].followed
           data.nickname = info.data.artistName
           data.userId = info.data.artistId
-          data.avatarUrl = info.data.cover
+          // data.avatarUrl = info.data.cover
           // data.identityIconUrl = info.data.avatarDetail ? info.data.creator.avatarDetail.identityIconUrl : ''
           data.title = info.data.briefDesc
           data.description = info.data.desc
@@ -439,18 +439,27 @@
           if(info.urls[0].needPay) {
             Toast(`当前视频需付费观看`)
           }
+
+          // 获取用户详情，用来获取粉丝量
+          info = await getUserDetail(data.userId)
+          data.fans = info.profile.followeds
         }
+
         if(data.type == 1) {
           info = await getMvUrl(data.vid)
           data.url = info.data.url
+          // 获取歌手信息
+          info = await getArtistDetail(data.userId)
+          data.avatarUrl = info.data.artist.cover;
+          // 获取歌手粉丝量
+          // info = await getArtistFans(data.userId)
         }
         
+        // 获取相关视频
         info = await getVideoRelated(data.vid)
         data.videoRelated = info.data
 
-        // 获取用户详情，用来获取粉丝量
-        info = await getUserDetail(data.userId)
-        data.fans = info.profile.followeds
+        
       }
 
       // 获取楼层评论
@@ -613,6 +622,7 @@
       color: #ccc;
       min-height: 10px;
       transition: all 0.3s;
+      margin-bottom: 8px;
     }
     .des {
       font-size: 12px;

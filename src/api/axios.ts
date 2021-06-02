@@ -46,8 +46,8 @@ axios.interceptors.request.use((config) => {
 //  响应拦截
 axios.interceptors.response.use(
   (res) => {
-    // console.log("响应拦截");
-    // console.log(res);
+    console.log("响应拦截");
+    console.log(res);
     return res.data;
   },
   (error) => {

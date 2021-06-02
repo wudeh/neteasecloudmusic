@@ -2,7 +2,7 @@ import axios from "./axios";
 
 // 手机加密码登录
 export function loginByPhoneAndPassword(): any {
-  return axios.get("/login/cellphone?phone=18250517110&password=wudehua");
+  return axios.get("/login/cellphone?phone=&password=");
 }
 
 // 退出登录

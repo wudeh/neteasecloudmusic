@@ -251,7 +251,9 @@ export default defineComponent({
           audio.value.src = store.state.song_info.url;
           audio.value.play();
           store.commit("play", true);
-          lyricRequest();
+          if(store.state.song_info.id) {
+            lyricRequest();
+          }
         }
       }
     );
@@ -456,7 +458,7 @@ export default defineComponent({
       });
       if(store.state.song_info.id) lyricRequest();
       window.addEventListener(`popstate`, () => {
-        console.log(`后退了`);
+        // console.log(`后退了`);
         // 由于 keep-alive 缓存导致 scrollBehavior 滚动失效，但是可以获取滚动高度，所以在路由变化这里判断在路由动画时间过渡过后滚动到之前的位置
           setTimeout(() => {
             let top = sessionStorage.getItem(`scrollTop`)
