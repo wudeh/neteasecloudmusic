@@ -10,6 +10,7 @@ module.exports = {
       viewportUnit: 'vw', // 指定需要转换成的视窗单位，默认vw
       fontViewportUnit: 'vw', // 指定字体需要转换成的视窗单位，默认vw
       selectorBlackList: [
+        
         '.ignore'
 
         // "step-circle",

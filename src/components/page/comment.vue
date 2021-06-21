@@ -232,7 +232,7 @@ export default defineComponent({
     const router = useRouter();
     const store = useStore();
     const id: any = router.currentRoute.value.query.id; //获取参数
-    const type: any = router.currentRoute.value.query.type; //获取参数
+    let type: any = router.currentRoute.value.query.type; //获取参数
     const data = reactive<info>({
       img: "",
       name: "",
@@ -268,7 +268,9 @@ export default defineComponent({
         data.singer = info.playlist.creator.nickname;
         data.name = info.playlist.name;
       }
-      if(type == 0) {
+      // 等于 0 或者不传默认是歌曲
+      if(type == 0 || type == undefined) {
+        type = 0;
         info = await getSongInfo(id);
         data.img = info.songs[0].al.picUrl;
         data.name = info.songs[0].name;

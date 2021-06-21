@@ -910,7 +910,7 @@ export default defineComponent({
       }
       // 先判断和当前的歌曲是不是同一首,如果不是同一首
       if (item.resourceId != store.state.song_info.id) {
-        store.commit("play", false);
+        // store.commit("play", false);
         // 请求URL
         // const info = await getSongUrl(item.resourceId);
         let song = {
