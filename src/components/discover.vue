@@ -514,7 +514,7 @@ export default defineComponent({
     const decrease = (i: number) => {
       let isDoing = false;
       return () => {
-        let timer: number | undefined;
+        let timer: any;
         if (isDoing) {
           return;
         }

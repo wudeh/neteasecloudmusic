@@ -598,7 +598,7 @@ export default defineComponent({
       data.word = id;
     });
 
-    const suggest = async (i: string) => {
+    const suggest = async () => {
       data.suggestWord = [];
       if (!data.word) return;
       if (data.timer) clearTimeout(data.timer);
