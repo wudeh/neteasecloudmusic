@@ -20,20 +20,22 @@
         <div class="song_author">-{{ store.state.song_info.author }}</div>
       </div>
       <div class="icon" @click.stop="change_play()">
-        <img :src="store.state.song_info.isPlaying ? stopIcon : playIcon" alt="" />
+        <!-- <img :src="store.state.song_info.isPlaying ? stopIcon : playIcon" alt="" /> -->
+        <img v-if="store.state.song_info.isPlaying" src="/img/icons/stop_icon.svg" alt="" />
+        <img v-else src="/img/icons/play_icon.svg" alt="" />
       </div>
-      <img @click.stop="showPopList" src="../../public/img/icons/list_icon.svg" alt="" />
+      <img @click.stop="showPopList" src="/img/icons/list_icon.svg" alt="" />
     </div>
     <van-popup v-model:show="store.state.showList" round @close="store.commit(`close`)" position="bottom" :style="{ height: '50%' }">
       <div class="pop_list">
         <div class="title">当前播放列表({{ store.state.song_info.list.length }})</div>
         <div class="option">
           <div class="circulate"  v-if="store.state.song_info.playMode == 1">
-            <img @click="store.commit(`set_circulate`)" src="../../public/img/icons/circulate_gray.svg" alt="">
+            <img @click="store.commit(`set_circulate`)" src="/img/icons/circulate_gray.svg" alt="">
             <span>列表循环</span>
           </div>
           <div class="circulate"  v-if="store.state.song_info.playMode == 2">
-            <img @click="store.commit(`set_circulate`)" src="../../public/img/icons/circulate_random_gray.svg" alt="">
+            <img @click="store.commit(`set_circulate`)" src="/img/icons/circulate_random_gray.svg" alt="">
             <span>随机播放</span>
           </div>
           <div class="circulate"  v-if="store.state.song_info.playMode == 3">
@@ -95,7 +97,7 @@
           <img src="../../public/img/icons/download_gray.svg" alt="" />
           <span>下载</span>
         </div>
-        <div class="item" @click="router.push({path: `/comment`,query: {id: store.state.song_pop_detail.id}})">
+        <div class="item" @click="goComment">
           <img src="../../public/img/icons/comment.svg" alt="" />
           <span>评论（{{ store.state.song_pop_detail.commentCount }}）</span>
         </div>
@@ -173,10 +175,10 @@ export default defineComponent({
     const line = ref();
     const img = ref();
     const img_pop = ref();
-    const stopIcon = require("../../public/img/icons/stop_icon.svg");
-    const playIcon = require("../../public/img/icons/play_icon.svg");
-    const playWhite = require("../../public/img/icons/play_white.svg");
-    const stopWhite = require("../../public/img/icons/stop_white.svg");
+    // const stopIcon = require("../../public/img/icons/stop_icon.svg");
+    // const playIcon = require("../../public/img/icons/play_icon.svg");
+    // const playWhite = require("../../public/img/icons/play_white.svg");
+    // const stopWhite = require("../../public/img/icons/stop_white.svg");
     let timerSong = ref(); // 定时计算当前播放时间
     let current_song_time = ref("00:00.00");
     // let lyric: Array<{ time: string; lyric: string }> = reactive([]);
@@ -194,6 +196,12 @@ export default defineComponent({
     const goSong = () => {
       router.push({ path: "/song" });
     };
+
+    const goComment = () => {
+      // 跳转评论区前关闭弹出框
+      store.commit('close');
+      router.push({path: `/comment`,query: {id: store.state.song_pop_detail.id}})
+    }
 
     // 定时方法，用来设置歌词滚动和圆点移动
     function interval(): void {
@@ -309,7 +317,8 @@ export default defineComponent({
     })
 
     const lyricRequest = async () => {
-      let lyric: { lyric: string; }[]|{ time: string|number; lyric: any; }[] = []
+      try {
+        let lyric: { lyric: string; }[]|{ time: string|number; lyric: any; }[] = []
       const data = await getLyric(store.state.song_info.id);
       // console.log(data);
       // console.log(data.lrc.lyric.split("["));
@@ -358,6 +367,10 @@ export default defineComponent({
         })
       }
       store.commit(`set_all_lyric`, lyric)
+      } catch (error) {
+        
+      }
+      
     }
 
     onMounted(async () => {
@@ -489,10 +502,10 @@ export default defineComponent({
       audio,
       img,
       change_play,
-      stopIcon,
-      playIcon,
-      playWhite,
-      stopWhite,
+      // stopIcon,
+      // playIcon,
+      // playWhite,
+      // stopWhite,
       store,
       linePast,
       point,
@@ -509,6 +522,7 @@ export default defineComponent({
       router,
       include,
       showPopList,
+      goComment
       // onChange,
     };
   },

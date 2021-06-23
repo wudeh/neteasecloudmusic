@@ -35,7 +35,8 @@
     <!-- 收藏 评论 分享 -->
     <div class="count">
       <div class="sub item">
-        <img :src="subscribed ? subedIcon : subIcon" alt="" />
+        <img v-if="subscribed" src="../../../public/img/icons/subed.svg" alt="" />
+        <img v-else src="../../../public/img/icons/sub.svg" alt="" />
         <span>{{ numFilter(subscribedCount) }}</span>
       </div>
       <div class="line"></div>
@@ -60,7 +61,7 @@
       <div class="play_count" v-if="songListInfo.length">({{ songListInfo.length }})</div>
     </div>
     <!-- 歌曲列表 -->
-    <div class="songList">
+    <div class="songList" :class="{songList_no_bar: !store.state.song_info.id}">
       <div class="song_item" v-for="(item, index) in songListInfo" :key="index">
         <div class="index">
           <img v-if="item.id == store.state.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -111,8 +112,6 @@ interface songList {
   shareCount: number;
   subscribedCount: number;
   commentCount: number;
-  subedIcon: string;
-  subIcon: string;
   show: boolean; // 控制歌单详情遮罩层
   asc: boolean; // 排序方式,默认为 false (新 => 老 ) 设置 true 可改为 老 => 新
 }
@@ -154,8 +153,6 @@ export default defineComponent({
       shareCount: 0,
       subscribedCount: 0,
       commentCount: 0,
-      subedIcon: require("../../../public/img/icons/subed.svg"),
-      subIcon: require("../../../public/img/icons/sub.svg"),
       asc: false,
       show: false,
     });
@@ -491,6 +488,9 @@ export default defineComponent({
       }
     }
   }
+}
+.songList_no_bar {
+  height: 105vw;
 }
 .wrapper {
   height: 100vh;

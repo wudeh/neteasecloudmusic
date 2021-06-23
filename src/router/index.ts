@@ -5,13 +5,13 @@ const routes: Array<RouteRecordRaw> = [
   //   path: "/",
   //   name: "person",
   //   // redirect: `/discover`,
-  //   component: () => import(/* webpackChunkName: "login" */ "@/components/person.vue"),
+  //   component: () => import( "@/components/person.vue"),
   // },
   {
     path: "/",
     name: "Home",
     // redirect: `/discover`,
-    component: () => import(/* webpackChunkName: "login" */ "@/views/Home.vue"),
+    component: () => import( "@/views/Home.vue"),
     meta: {
       keepAlive: true,
       level: 1,
@@ -25,12 +25,12 @@ const routes: Array<RouteRecordRaw> = [
           keepAlive: true,
           level: 8,
         },
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/songList.vue"),
+        component: () => import( "@/components/page/songList.vue"),
       },
       {
         path: "/song",
         name: "song",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/song.vue"),
+        component: () => import( "@/components/page/song.vue"),
         meta: {
           keepAlive: true,
           level: 55,
@@ -43,12 +43,12 @@ const routes: Array<RouteRecordRaw> = [
           keepAlive: true,
           level: 1,
         },
-        component: () => import(/* webpackChunkName: "login" */ "@/components/discover.vue"),
+        component: () => import( "@/components/discover.vue"),
       },
       {
         path: "/searchResult",
         name: "searchResult",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/searchResult.vue"),
+        component: () => import( "@/components/page/searchResult.vue"),
         meta: {
           keepAlive: true,
           level: 3,
@@ -57,7 +57,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/comment",
         name: "comment",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/comment.vue"),
+        component: () => import( "@/components/page/comment.vue"),
         meta: {
           keepAlive: true,
           level: 100,
@@ -66,7 +66,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/search",
         name: "search",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/search.vue"),
+        component: () => import( "@/components/page/search.vue"),
         meta: {
           keepAlive: true,
           level: 2,
@@ -75,7 +75,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/download",
         name: "download",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/download.vue"),
+        component: () => import( "@/components/page/download.vue"),
         meta: {
           keepAlive: true,
           level: 9,
@@ -84,7 +84,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/djProgram",
         name: "djProgram",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/djProgram.vue"),
+        component: () => import( "@/components/page/djProgram.vue"),
         meta: {
           keepAlive: true,
           level: 9,
@@ -93,7 +93,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/album",
         name: "album",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/album.vue"),
+        component: () => import( "@/components/page/album.vue"),
         meta: {
           keepAlive: true,
           level: 9,
@@ -102,7 +102,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/vid",
         name: "vid",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/video.vue"),
+        component: () => import( "@/components/page/video.vue"),
         meta: {
           keepAlive: true,
           level: 9,
@@ -111,7 +111,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/rank",
         name: "rank",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/rank.vue"),
+        component: () => import( "@/components/page/rank.vue"),
         meta: {
           keepAlive: true,
           level: 5,
@@ -120,7 +120,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: "/singer",
         name: "singer",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/singer.vue"),
+        component: () => import( "@/components/page/singer.vue"),
         meta: {
           keepAlive: true,
           level: 6,

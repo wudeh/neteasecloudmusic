@@ -12,7 +12,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="allLoading" v-model:error="allError" :immediate-check="false" :finished="allFinish" error-text="请求失败，点击重新加载" finished-text="" @load="loadMore">
+          <van-list v-model:loading="allLoading" v-model:error="allError" :immediate-check="true" :finished="allFinish" error-text="请求失败，点击重新加载" finished-text="" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -176,7 +176,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="Loading" v-model:error="Error" :immediate-check="false" :finished="song.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="Loading" v-model:error="Error" :immediate-check="true" :finished="song.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -227,7 +227,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="albumLoading" v-model:error="Error" :immediate-check="false" :finished="album.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="albumLoading" v-model:error="Error" :immediate-check="true" :finished="album.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -258,7 +258,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="videoLoading" v-model:error="Error" :immediate-check="false" :finished="video.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="videoLoading" v-model:error="Error" :immediate-check="true" :finished="video.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -290,7 +290,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="artistLoading" v-model:error="Error" :immediate-check="false" :finished="artist.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="artistLoading" v-model:error="Error" :immediate-check="true" :finished="artist.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -324,7 +324,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="playListLoading" v-model:error="Error" :immediate-check="false" :finished="playList.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="playListLoading" v-model:error="Error" :immediate-check="true" :finished="playList.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -355,7 +355,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="userLoading" v-model:error="Error" :immediate-check="false" :finished="user.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="userLoading" v-model:error="Error" :immediate-check="true" :finished="user.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -391,7 +391,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="mvLoading" v-model:error="Error" :immediate-check="false" :finished="MV.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="mvLoading" v-model:error="Error" :immediate-check="true" :finished="MV.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -424,7 +424,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="djRadioLoading" v-model:error="Error" :immediate-check="false" :finished="djRadio.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="djRadioLoading" v-model:error="Error" :immediate-check="true" :finished="djRadio.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />

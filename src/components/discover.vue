@@ -14,7 +14,7 @@
     <van-pull-refresh v-model="loading" @refresh="onRefresh">
       <van-list v-model:loading="listLoading" v-model:error="listError" :immediate-check="true" :finished="listFinish" error-text="请求失败，点击重新加载" finished-text="" @load="loadMore">
         <template v-slot:loading>
-          <div style="display:flex;align-items:center;justify-content:center;">
+          <div style="display: flex; align-items: center; justify-content: center">
             <img width="18" src="../../public/img/icons/loading.svg" alt="" />
             <span>加载中...</span>
           </div>
@@ -368,7 +368,7 @@
               <div class="rec_song">
                 <div class="rec_item" v-for="item in HOMEPAGE_PODCAST24.creatives" :key="item.creativeId" @click="show(item.creativeId)">
                   <van-image class="img" show-loading lazy-load radius="50%" :src="item.uiElement.image.imageUrl" />
-                  <span style="text-align:center">{{ item.uiElement.mainTitle.title }}</span>
+                  <span style="text-align: center">{{ item.uiElement.mainTitle.title }}</span>
                   <!-- <div class="play">
                 <img src="../../public/img/icons/play_white.svg" style="color: #fff" />
               </div> -->
@@ -804,16 +804,16 @@ export default defineComponent({
           resourceId: i.song.id,
           resourceExtInfo: {
             songData: {
-              name: i.song.name
+              name: i.song.name,
             },
-            artists: i.song.ar
+            artists: i.song.ar,
           },
           uiElement: {
             image: {
-              imageUrl: i.song.al.picUrl
-            }
-          }
-        }
+              imageUrl: i.song.al.picUrl,
+            },
+          },
+        };
         playMusicSingle(temp);
       }
     };
@@ -834,7 +834,7 @@ export default defineComponent({
       ...toRefs(info),
       playMusicSingle,
       loadMore,
-      swiper_click
+      swiper_click,
     };
   },
 });
@@ -1100,11 +1100,17 @@ export default defineComponent({
                 color: #ccc;
                 font-size: 10px;
                 white-space: nowrap;
+                text-overflow: ellipsis;
+                overflow: hidden;
               }
             }
             .song_subTitle {
               font-size: 12px;
               color: rgb(182, 182, 182);
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              overflow: hidden;
+              height: 18px;
               .vip {
                 color: red;
                 border: 1px solid red;

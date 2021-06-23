@@ -111,7 +111,7 @@
     <van-list
       v-model:loading="floorLoading"
       v-model:error="floorError"
-      :immediate-check="false"
+      :immediate-check="true"
       :finished="floorFinish"
       error-text="请求失败，点击重新加载"
       finished-text="已经到底啦"

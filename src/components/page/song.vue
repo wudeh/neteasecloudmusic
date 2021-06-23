@@ -76,7 +76,9 @@
           <img @click="store.commit(`set_circulate`)" v-else-if="store.state.song_info.playMode == 2" src="../../../public/img/icons/circulate_random.svg" alt="">
           <img @click="store.commit(`set_circulate`)" v-else-if="store.state.song_info.playMode == 3" src="../../../public/img/icons/circulate_one.svg" alt="">
           <img @click="store.dispatch(`play_next`, -1)" src="../../../public/img/icons/last_song.svg" alt="">
-          <img class="bigPlay" @click.stop="change_play()" :src="store.state.song_info.isPlaying ? stopWhite : playWhite" alt="">
+          <!-- <img class="bigPlay" @click.stop="change_play()" :src="store.state.song_info.isPlaying ? stopWhite : playWhite" alt=""> -->
+          <img class="bigPlay" @click.stop="change_play()" v-if="store.state.song_info.isPlaying" src="../../../public/img/icons/stop_white.svg" alt="">
+          <img class="bigPlay" @click.stop="change_play()" v-else src="../../../public/img/icons/play_white.svg" alt="">
           <img @click="store.dispatch(`play_next`)" src="../../../public/img/icons/last_song.svg" style="transform:rotate(180deg)" alt="">
           <img @click="store.commit(`set_pop_list`, true);" src="../../../public/img/icons/list_white.svg" alt="">
         </div>
@@ -102,8 +104,8 @@ export default defineComponent({
     const router = useRouter();
     const active = ref(0);
     const store = useStore();
-    const playWhite = require('../../../public/img/icons/play_white.svg')
-    const stopWhite = require('../../../public/img/icons/stop_white.svg')
+    // const playWhite = require('../../../public/img/icons/play_white.svg')
+    // const stopWhite = require('../../../public/img/icons/stop_white.svg')
 
     const showLyric = ref(false);  // 控制是否显示全部歌词
     const showLyricLine = ref(false)
@@ -431,8 +433,8 @@ export default defineComponent({
     return {
       goComment,
       back,
-      playWhite,
-      stopWhite,
+      // playWhite,
+      // stopWhite,
       active,
       change_play,
       store,
