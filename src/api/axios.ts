@@ -7,7 +7,7 @@ axios.defaults.baseURL = process.env.NODE_ENV == "development" ? "https://music.
 
 // axios.defaults.headers["X-Requested-With"] = "XMLHttpRequest";
 //  axios.defaults.headers['token'] = localStorage.getItem('token') || ''  http://120.79.155.7/api/   https://music.qier222.com/api/ https://netease-cloud-music-api-jet.vercel.app/
-// axios.defaults.headers.post["Content-Type"] = "application/json";
+// axios.defaults.headers["Content-Type"] = "text/plain";
 // axios.defaults.timeout = 30000
 
 // 请求拦截

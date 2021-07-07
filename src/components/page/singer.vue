@@ -5,14 +5,11 @@
       <div @click="loadMore" class="title">歌手榜单</div>
     </div>
     <van-tabs v-model:active="activeName">
-      <van-tab disabled></van-tab>
-      <van-tab disabled></van-tab>
-      <van-tab disabled></van-tab>
       <van-tab title="华语" name="1">
         <div class="wrapper">
-          <van-list v-model:loading="cn.loading" v-model:error="cn.error" :immediate-check="true" :finished="cn.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="cn.loading" v-model:error="cn.error" :immediate-check="false" :finished="cn.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
-              <div style="display: flex; align-items: center; justify-content: center">
+              <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
@@ -40,9 +37,9 @@
       </van-tab>
       <van-tab title="欧美" name="2">
         <div class="wrapper">
-          <van-list v-model:loading="en.loading" v-model:error="en.error" :immediate-check="true" :finished="en.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="en.loading" v-model:error="en.error" :immediate-check="false" :finished="en.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
-              <div style="display: flex; align-items: center; justify-content: center">
+              <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
@@ -70,9 +67,9 @@
       </van-tab>
       <van-tab title="韩国" name="3">
         <div class="wrapper">
-          <van-list v-model:loading="ko.loading" v-model:error="ko.error" :immediate-check="true" :finished="ko.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="ko.loading" v-model:error="ko.error" :immediate-check="false" :finished="ko.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
-              <div style="display: flex; align-items: center; justify-content: center">
+              <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
@@ -100,9 +97,9 @@
       </van-tab>
       <van-tab title="日本" name="4">
         <div class="wrapper">
-          <van-list v-model:loading="ja.loading" v-model:error="ja.error" :immediate-check="true" :finished="ja.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="ja.loading" v-model:error="ja.error" :immediate-check="false" :finished="ja.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
-              <div style="display: flex; align-items: center; justify-content: center">
+              <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
@@ -128,9 +125,6 @@
           </van-list>
         </div>
       </van-tab>
-      <van-tab disabled></van-tab>
-      <van-tab disabled></van-tab>
-      <van-tab disabled></van-tab>
     </van-tabs>
   </div>
 </template>
@@ -182,7 +176,7 @@ export default defineComponent({
 
     const loadMore = async () => {
       if (data.activeName == 1) {
-        if (data.cn.info.artists.length || data.cn.loading) return;
+        if (data.cn.info.artists.length || data.cn.loading) return 
         data.cn.loading = true;
         let res = await getTopList(data.activeName);
         data.cn.loading = false;
@@ -190,7 +184,7 @@ export default defineComponent({
         data.cn.finish = true;
       }
       if (data.activeName == 2) {
-        if (data.en.info.artists.length || data.en.loading) return;
+        if (data.en.info.artists.length || data.en.loading) return 
         data.en.loading = true;
         let res = await getTopList(data.activeName);
         data.en.loading = false;
@@ -198,7 +192,7 @@ export default defineComponent({
         data.en.finish = true;
       }
       if (data.activeName == 3) {
-        if (data.ko.info.artists.length || data.ko.loading) return;
+        if (data.ko.info.artists.length || data.ko.loading) return 
         data.ko.loading = true;
         let res = await getTopList(data.activeName);
         data.ko.loading = false;
@@ -206,7 +200,7 @@ export default defineComponent({
         data.ko.finish = true;
       }
       if (data.activeName == 4) {
-        if (data.ja.info.artists.length || data.ja.loading) return;
+        if (data.ja.info.artists.length || data.ja.loading) return 
         data.ja.loading = true;
         let res = await getTopList(data.activeName);
         data.ja.loading = false;
@@ -240,7 +234,7 @@ export default defineComponent({
   padding: 8px;
   font-size: 22px;
   img {
-    margin-right: 110px;
+    margin-right: 10px;
     width: 25px;
   }
 }
@@ -308,8 +302,5 @@ export default defineComponent({
       }
     }
   }
-}
-.van-tabs :deep(.van-tabs__line) {
-  transform: translateX(47px);
 }
 </style>

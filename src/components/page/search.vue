@@ -66,7 +66,7 @@
         store.commit("set_load", false)
       })
 
-      const suggest = async () => {
+      const suggest = async (i: string) => {
         data.suggestWord = [];
         if(!data.word) return;
         if(data.timer) clearTimeout(data.timer);
