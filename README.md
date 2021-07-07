@@ -17,8 +17,8 @@
 - 等等（其他功能重复的有点多，将来有机会再开发）
 
 ## 截图
-![image](./screenshot/首页.png) ![image](./screenshot/screenshot/index_2.png) ![image](./screenshot/screenshot/index_3.png) 
-![image](./screenshot/screenshot/index_4.png)  
+![image](./screenshot/首页.png) ![image](./screenshot/index_2.png) ![image](./screenshot/index_3.png) 
+![image](./screenshot/index_4.png)  
 ![image](./screenshot/index_play.png) ![image](./screenshot/index_list.png) 
 ![image](./screenshot/audio.png) 
 ![image](./screenshot/audio_not.png) ![image](./screenshot/comment.png) ![image](./screenshot/comment_floor.png) 
@@ -29,7 +29,7 @@
 ![image](./screenshot/search_list.png) 
 ![image](./screenshot/search_result.png) ![image](./screenshot/search_video.png) ![image](./screenshot/video.png) 
 ![image](./screenshot/singer_rank.png) 
-![image](./screenshot/screenshot/album.png) ![image](./screenshot/screenshot/dj.png) 
+![image](./screenshot/album.png) ![image](./screenshot/dj.png) 
 
 
 ## Project setup
