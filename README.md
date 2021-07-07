@@ -16,6 +16,18 @@
 - 简单的视频播放
 - 等等（其他功能重复的有点多，将来有机会再开发）
 
+## 截图
+![image](./screenshot/首页.png)  ![image](./screenshot/index_play.png) ![image](./screenshot/index_list.png) 
+![image](./screenshot/audio.png) 
+![image](./screenshot/audio_not.png) ![image](./screenshot/comment.png) ![image](./screenshot/comment_floor.png) 
+![image](./screenshot/download.png) 
+![image](./screenshot/info_more.png) ![image](./screenshot/list.png) ![image](./screenshot/list_overlay.png) 
+![image](./screenshot/rank.png) 
+![image](./screenshot/search.png) ![image](./screenshot/search_advice.png) ![image](./screenshot/search_album.png) 
+![image](./screenshot/search_list.png) 
+![image](./screenshot/search_result.png) ![image](./screenshot/search_video.png) ![image](./screenshot/video.png) 
+![image](./screenshot/singer_rank.png) 
+
 
 ## Project setup
 ```
