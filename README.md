@@ -1,7 +1,7 @@
 # 网易云移动端音乐
 
 ## 说明
-- 技术栈：vue3 + vant + better-scroll
+- 技术栈：Vue3 + Vant + better-scroll + Typescript
 - 线上预览：https://neteasecloudmusic.vercel.app
 - 数据来源：https://github.com/Binaryify/NeteaseCloudMusicApi
 - 作为一个开源项目，大概主要亮点就是实现了歌词进度拖动功能吧，虽然在 GitHub 上网易云音乐项目已经被做烂了，不过我翻了半天项目都没找到有比较完整地实现全部音乐播放的项目，选择模仿安卓移动端主要是因为移动端的音乐播放功能要考虑实现的功能更多，所以本项目主要集中于实现音乐播放的相关功能，不会致力于实现全部移动端的网易云音乐功能；各位如果有兴趣的可以考虑自己实现。
