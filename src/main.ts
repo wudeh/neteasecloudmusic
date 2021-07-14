@@ -52,8 +52,17 @@ router.afterEach(() => {
 
 // 注册一个全局自定义指令 用来替换关键搜索词颜色的指令
 app.directive('word',(el,binding) => {
+
+  // 可能有多个关键词，所有转成数组来循环替换
+  let arr = binding.value.replaceAll(' ', '').split('');
+
+  arr.forEach((item: String) => {
+    if(item) {
+      el.innerHTML =  el.innerHTML.replaceAll(item, `<span style='color:rgb(0, 153, 255)'>${item}</span>`)
+    }
+  });
   
-  el.innerHTML =  el.innerHTML.replace(binding.value, `<span style='color:rgb(0, 153, 255)'>${binding.value}</span>`)
+  
 })
 // app.use(Tabbar);
 // app.use(TabbarItem);

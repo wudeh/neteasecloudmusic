@@ -28,7 +28,7 @@
       </div>
     </div>
     <!-- 搜索建议 -->
-    <div class="suggest" v-if="suggestWord.length">
+    <div class="suggest" @click="clearSearchSuggest" v-if="suggestWord.length">
       <div class="item" v-word="word" v-for="(item,index) in suggestWord" :key="index" @click="onSearch(item.keyword)">{{ item.keyword }}</div>
     </div>
   </div>
@@ -72,7 +72,7 @@
         if(data.timer) clearTimeout(data.timer);
         data.timer = setTimeout(async () => {
           let info = await getSuggest(data.word);
-          if(info.result) {
+          if(info.result.allMatch) {
             data.suggestWord = info.result.allMatch
             // info.result.allMatch.forEach((item: any) => {
             //   data.suggestWord.push(item.keyword.replace(data.word,`<span style="color: red">${data.word}</span>`))
@@ -89,9 +89,15 @@
         }
       }
 
+      // 清除搜索建议
+      const clearSearchSuggest = () => {
+        data.suggestWord.splice(0);
+      }
+
       return {
         suggest,
         onSearch,
+        clearSearchSuggest,
         ...toRefs(data)
       }
     },
