@@ -95,7 +95,7 @@
           <img src="../../public/img/icons/download_gray.svg" alt="" />
           <span>下载</span>
         </div>
-        <div class="item" @click="router.push({path: `/comment`,query: {id: store.state.song_pop_detail.id}})">
+        <div class="item" @click="goToComment(store.state.song_pop_detail.id)">
           <img src="../../public/img/icons/comment.svg" alt="" />
           <span>评论（{{ store.state.song_pop_detail.commentCount }}）</span>
         </div>
@@ -482,6 +482,11 @@ export default defineComponent({
     const showPopList = () => {
       store.commit("set_pop_list", true);
     };
+
+    const goToComment = (id: string) => {
+      store.commit("close");
+      router.push({path: `/comment`,query: {id}});
+    }
     
     return {
       animation,
@@ -509,6 +514,7 @@ export default defineComponent({
       router,
       include,
       showPopList,
+      goToComment
       // onChange,
     };
   },
