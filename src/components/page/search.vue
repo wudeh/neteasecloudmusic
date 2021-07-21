@@ -68,7 +68,7 @@
 
       const suggest = async (i: string) => {
         data.suggestWord = [];
-        if(!data.word) return;
+        if(data.word == '') return;
         if(data.timer) clearTimeout(data.timer);
         data.timer = setTimeout(async () => {
           let info = await getSuggest(data.word);

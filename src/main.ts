@@ -54,7 +54,7 @@ router.afterEach(() => {
 app.directive('word',(el,binding) => {
 
   // 可能有多个关键词，所有转成数组来循环替换
-  let arr = binding.value.replaceAll(' ', '').split('');
+  let arr = binding.value.split(' ');
 
   arr.forEach((item: String) => {
     if(item) {
