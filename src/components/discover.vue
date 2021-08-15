@@ -366,7 +366,7 @@
             </div>
             <bsscroll :scrollX="true" :scrollData="HOMEPAGE_PODCAST24.creatives" name="HOMEPAGE_PODCAST24_scroll">
               <div class="rec_song">
-                <div class="rec_item" v-for="item in HOMEPAGE_PODCAST24.creatives" :key="item.creativeId" @click="show(item.creativeId)">
+                <div class="rec_item" v-for="item in HOMEPAGE_PODCAST24.creatives" :key="item.creativeId">
                   <van-image class="img" show-loading lazy-load radius="50%" :src="item.uiElement.image.imageUrl" />
                   <span style="text-align:center">{{ item.uiElement.mainTitle.title }}</span>
                   <!-- <div class="play">
@@ -514,7 +514,7 @@ export default defineComponent({
     const decrease = (i: number) => {
       let isDoing = false;
       return () => {
-        let timer: number | undefined;
+        let timer: any;
         if (isDoing) {
           return;
         }
