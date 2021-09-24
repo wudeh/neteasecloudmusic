@@ -38,7 +38,7 @@
             <div class="icon_top">
               <bsscroll :scrollX="true" :scrollData="icon" name="icon_scroll">
                 <div class="icon_wrapper">
-                  <div class="icon_item" v-for="item in icon" :key="item.id" @click="ballClick(item.name)">
+                  <div class="icon_item" v-for="item in icon" :key="item.id" @click="ballClick()">
                     <div class="img_wrapper">
                       <img :src="item.iconUrl" alt="" />
                     </div>
@@ -52,7 +52,7 @@
           <div class="recommend">
             <div class="rec_title">
               <div class="rec_des">{{ recommend.titleTex }}</div>
-              <div class="rec_more">
+              <div class="rec_more" @click="ballClick()">
                 <span>{{ recommend.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
@@ -127,7 +127,7 @@
               <div class="rec_des">
                 {{ HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle.title }}
               </div>
-              <div class="rec_more">
+              <div class="rec_more" @click="ballClick()">
                 <span>{{ HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
@@ -151,7 +151,7 @@
               <div class="rec_des">
                 {{ HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle.title }}
               </div>
-              <div class="rec_more">
+              <div class="rec_more" @click="ballClick()">
                 <span>{{ HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
@@ -181,7 +181,7 @@
               <div class="rec_des">
                 {{ HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.subTitle.title }}
               </div>
-              <div class="rec_more">
+              <div class="rec_more" @click="ballClick()">
                 <span>{{ HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
@@ -209,7 +209,7 @@
                 <span style="color: #ccc; margin: 0 3px">|</span>
                 <span @click="change_new(2)" :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 2 }">数字专辑</span>
               </div>
-              <div class="rec_more">
+              <div class="rec_more" @click="ballClick()">
                 <img src="../../public/img/icons/videoPlay.svg" alt="" />
                 <span>更多</span>
               </div>
@@ -289,7 +289,7 @@
               <div class="rec_des">
                 {{ HOMEPAGE_VOICELIST_RCMD.uiElement.subTitle.title }}
               </div>
-              <div class="rec_more">
+              <div class="rec_more" @click="ballClick()">
                 <span>{{ HOMEPAGE_VOICELIST_RCMD.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
@@ -308,7 +308,7 @@
             </bsscroll>
           </div>
           <!-- 音乐日历 -->
-          <div class="calendar" v-if="HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle">
+          <div class="calendar" v-if="HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle" @click="ballClick()">
             <div class="rec_title" @click="logoutDD()">
               <div class="rec_des">
                 {{ HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle.title }}
@@ -336,7 +336,7 @@
             </div>
           </div>
           <!-- 精选音乐视频 -->
-          <div class="recommend MUSIC_MLOG" v-if="HOMEPAGE_MUSIC_MLOG.uiElement.subTitle">
+          <div class="recommend MUSIC_MLOG" v-if="HOMEPAGE_MUSIC_MLOG.uiElement.subTitle" @click="ballClick()">
             <div class="rec_title">
               <div class="rec_des">
                 {{ HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title }}
@@ -348,7 +348,7 @@
             </div>
             <bsscroll :scrollX="true" :scrollData="HOMEPAGE_MUSIC_MLOG.extInfo" name="HOMEPAGE_MUSIC_MLOG_scroll">
               <div class="rec_song">
-                <div class="rec_item" v-for="item in HOMEPAGE_MUSIC_MLOG.extInfo" :key="item.creativeId" @click="show(item.creativeId)">
+                <div class="rec_item" v-for="item in HOMEPAGE_MUSIC_MLOG.extInfo" :key="item.creativeId">
                   <van-image class="img" show-loading lazy-load radius="8" :src="item.resource.mlogBaseData.coverUrl" />
                   <span>{{ item.resource.mlogBaseData.text }}</span>
                   <div class="playCount">
@@ -753,9 +753,9 @@ export default defineComponent({
 
     // 点击圆形图标跳转
     const ballClick = (a: string) => {
-      if (a == `排行榜`) {
+      // if (a == `排行榜`) {
         router.push({ path: `/rank` });
-      }
+      // }
     };
 
     const goSearch = () => {

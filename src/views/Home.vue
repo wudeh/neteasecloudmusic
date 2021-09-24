@@ -1,13 +1,13 @@
 <template>
   <div class="home">
     <router-view v-slot="{ Component }">
-      <transition :name="transition_name">
+      <!-- <transition :name="transition_name"> -->
       <keep-alive :include="include">
         
           <component :is="Component" />
         
       </keep-alive>
-      </transition>
+      <!-- </transition> -->
     </router-view>
     <!-- 用来撑开底部的盒子 -->
     <div class="songDiv" v-if="store.state.song_info.id && router.currentRoute.value.name != 'song'"></div>
