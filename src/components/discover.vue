@@ -71,7 +71,7 @@
             </bsscroll>
           </div>
           <!-- 较长的区域 -->
-          <div class="long">
+          <div class="long" v-if="long.uiElement.subTitle">
             <div class="rec_title">
               <div class="rec_des">{{ long.uiElement.subTitle.title }}</div>
               <div class="rec_more" @click="add_song_list">
@@ -120,32 +120,9 @@
               </div>
             </bsscroll>
           </div>
-          <!-- 精选音乐视频 -->
-          <div class="recommend MUSIC_MLOG" v-if="HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title">
-            <div class="rec_title">
-              <div class="rec_des">
-                {{ HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title }}
-              </div>
-              <div class="rec_more">
-                <span>{{ HOMEPAGE_MUSIC_MLOG.uiElement.button.text }}</span>
-                <img src="../../public/img/icons/more.svg" alt="" />
-              </div>
-            </div>
-            <bsscroll :scrollX="true" :scrollData="HOMEPAGE_MUSIC_MLOG.extInfo" name="HOMEPAGE_MUSIC_MLOG_scroll">
-              <div class="rec_song">
-                <div class="rec_item" v-for="item in HOMEPAGE_MUSIC_MLOG.extInfo" :key="item.creativeId" @click="show(item.creativeId)">
-                  <van-image class="img" show-loading lazy-load radius="8" :src="item.resource.mlogBaseData.coverUrl" />
-                  <span>{{ item.resource.mlogBaseData.text }}</span>
-                  <div class="playCount">
-                    <img src="../../public/img/icons/play.svg" alt="" />
-                    <span>{{ numFilter(item.resource.mlogExtVO.playCount) }}</span>
-                  </div>
-                </div>
-              </div>
-            </bsscroll>
-          </div>
+          
           <!-- 雷达歌单 -->
-          <div class="recommend">
+          <div class="recommend" v-if="HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle">
             <div class="rec_title">
               <div class="rec_des">
                 {{ HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle.title }}
@@ -169,7 +146,7 @@
             </bsscroll>
           </div>
           <!-- 视频合辑 -->
-          <div class="video">
+          <div class="video" v-if="HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle">
             <div class="rec_title">
               <div class="rec_des">
                 {{ HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle.title }}
@@ -197,36 +174,9 @@
               </div>
             </bsscroll>
           </div>
-          <!-- 音乐日历 -->
-          <div class="calendar" v-if="HOMEPAGE_MUSIC_CALENDAR">
-            <div class="rec_title" @click="logoutDD()">
-              <div class="rec_des">
-                {{ HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle.title }}
-              </div>
-              <div class="rec_more">
-                <span>{{ HOMEPAGE_MUSIC_CALENDAR.uiElement.button.text }}</span>
-                <img src="../../public/img/icons/more.svg" alt="" />
-              </div>
-            </div>
-            <!-- 今天 -->
-            <div class="item_calendar" v-for="item in HOMEPAGE_MUSIC_CALENDAR.creatives" :key="item.creativeId">
-              <div class="left">
-                <div class="left_top">
-                  <span class="day">{{ item.resources[0].uiElement.labelTexts ? "今天" : "明天" }}</span>
-                  <span class="label" v-if="item.resources[0].uiElement.labelTexts">{{ item.resources[0].uiElement.labelTexts[0] }}</span>
-                  <span class="label_tomrrow" v-else>预告</span>
-                </div>
-                <div class="left_bottom">
-                  {{ item.resources[0].uiElement.mainTitle.title }}
-                </div>
-              </div>
-              <div class="right_img">
-                <img v-lazy="item.resources[0].uiElement.image.imageUrl" alt="" />
-              </div>
-            </div>
-          </div>
+          
           <!-- 专属场景歌单 -->
-          <div class="recommend">
+          <div class="recommend" v-if="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement">
             <div class="rec_title">
               <div class="rec_des">
                 {{ HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.subTitle.title }}
@@ -334,7 +284,7 @@
             </bsscroll>
           </div>
           <!-- 播客合辑 -->
-          <div class="recommend">
+          <div class="recommend" v-if="HOMEPAGE_VOICELIST_RCMD.uiElement">
             <div class="rec_title">
               <div class="rec_des">
                 {{ HOMEPAGE_VOICELIST_RCMD.uiElement.subTitle.title }}
@@ -357,8 +307,60 @@
               </div>
             </bsscroll>
           </div>
+          <!-- 音乐日历 -->
+          <div class="calendar" v-if="HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle">
+            <div class="rec_title" @click="logoutDD()">
+              <div class="rec_des">
+                {{ HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle.title }}
+              </div>
+              <div class="rec_more">
+                <span>{{ HOMEPAGE_MUSIC_CALENDAR.uiElement.button.text }}</span>
+                <img src="../../public/img/icons/more.svg" alt="" />
+              </div>
+            </div>
+            <!-- 今天 -->
+            <div class="item_calendar" v-for="item in HOMEPAGE_MUSIC_CALENDAR.creatives" :key="item.creativeId">
+              <div class="left">
+                <div class="left_top">
+                  <span class="day">{{ item.resources[0].uiElement.labelTexts ? "今天" : "明天" }}</span>
+                  <span class="label" v-if="item.resources[0].uiElement.labelTexts">{{ item.resources[0].uiElement.labelTexts[0] }}</span>
+                  <span class="label_tomrrow" v-else>预告</span>
+                </div>
+                <div class="left_bottom">
+                  {{ item.resources[0].uiElement.mainTitle.title }}
+                </div>
+              </div>
+              <div class="right_img">
+                <img v-lazy="item.resources[0].uiElement.image.imageUrl" alt="" />
+              </div>
+            </div>
+          </div>
+          <!-- 精选音乐视频 -->
+          <div class="recommend MUSIC_MLOG" v-if="HOMEPAGE_MUSIC_MLOG.uiElement.subTitle">
+            <div class="rec_title">
+              <div class="rec_des">
+                {{ HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title }}
+              </div>
+              <div class="rec_more">
+                <span>{{ HOMEPAGE_MUSIC_MLOG.uiElement.button.text }}</span>
+                <img src="../../public/img/icons/more.svg" alt="" />
+              </div>
+            </div>
+            <bsscroll :scrollX="true" :scrollData="HOMEPAGE_MUSIC_MLOG.extInfo" name="HOMEPAGE_MUSIC_MLOG_scroll">
+              <div class="rec_song">
+                <div class="rec_item" v-for="item in HOMEPAGE_MUSIC_MLOG.extInfo" :key="item.creativeId" @click="show(item.creativeId)">
+                  <van-image class="img" show-loading lazy-load radius="8" :src="item.resource.mlogBaseData.coverUrl" />
+                  <span>{{ item.resource.mlogBaseData.text }}</span>
+                  <div class="playCount">
+                    <img src="../../public/img/icons/play.svg" alt="" />
+                    <span>{{ numFilter(item.resource.mlogExtVO.playCount) }}</span>
+                  </div>
+                </div>
+              </div>
+            </bsscroll>
+          </div>
           <!-- 24 小时播客 -->
-          <div class="podcast24">
+          <!-- <div class="podcast24" v-if="HOMEPAGE_PODCAST24.uiElement.subTitle.title">
             <div class="rec_title">
               <div class="rec_des">
                 {{ HOMEPAGE_PODCAST24.uiElement.subTitle.title }}
@@ -369,14 +371,10 @@
                 <div class="rec_item" v-for="item in HOMEPAGE_PODCAST24.creatives" :key="item.creativeId">
                   <van-image class="img" show-loading lazy-load radius="50%" :src="item.uiElement.image.imageUrl" />
                   <span style="text-align:center">{{ item.uiElement.mainTitle.title }}</span>
-                  <!-- <div class="play">
-                <img src="../../public/img/icons/play_white.svg" style="color: #fff" />
-              </div> -->
                 </div>
               </div>
             </bsscroll>
-          </div>
-          <!-- </bsscroll> -->
+          </div> -->
         </div>
       </van-list>
     </van-pull-refresh>
@@ -435,7 +433,7 @@ export default defineComponent({
       // 可刷新的长标题区域
       long: {
         uiElement: {
-          subTitle: {},
+          subTitle: {title: ''},
           button: {},
         },
       },
@@ -444,14 +442,14 @@ export default defineComponent({
         img: [],
         extInfo: [],
         uiElement: {
-          subTitle: {},
+          subTitle: {title: ''},
           button: {},
         },
       },
       // 雷达歌单
       HOMEPAGE_BLOCK_MGC_PLAYLIST: {
         uiElement: {
-          subTitle: {},
+          subTitle: {title: ''},
           button: {},
         },
       },
@@ -459,14 +457,14 @@ export default defineComponent({
       HOMEPAGE_MUSIC_CALENDAR: {
         creatives: [],
         uiElement: {
-          subTitle: {},
+          subTitle: {title: ''},
           button: {},
         },
       },
       // 专属场景歌单
       HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST: {
         uiElement: {
-          subTitle: {},
+          subTitle: {title: ''},
           button: {},
         },
       },
@@ -480,7 +478,7 @@ export default defineComponent({
       // 推荐新歌云贝广告
       HOMEPAGE_YUNBEI_NEW_SONG: {
         uiElement: {
-          subTitle: {},
+          subTitle: {title: ''},
           button: {},
         },
       },
@@ -488,7 +486,7 @@ export default defineComponent({
       HOMEPAGE_VOICELIST_RCMD: {
         creatives: [],
         uiElement: {
-          subTitle: {},
+          subTitle: {title: ''},
           button: {},
         },
       },
@@ -496,7 +494,7 @@ export default defineComponent({
       HOMEPAGE_PODCAST24: {
         creatives: [],
         uiElement: {
-          subTitle: {},
+          subTitle: {title: ''},
           button: {},
         },
       },
@@ -504,7 +502,7 @@ export default defineComponent({
       HOMEPAGE_BLOCK_VIDEO_PLAYLIST: {
         creatives: [],
         uiElement: {
-          subTitle: {},
+          subTitle: {title: ''},
           button: {},
         },
       },
@@ -599,7 +597,7 @@ export default defineComponent({
         }
         if (item.blockCode == "HOMEPAGE_PODCAST24") {
           // 24小时播客
-          info.HOMEPAGE_PODCAST24 = item;
+          info.HOMEPAGE_PODCAST24 = item.creatives[1];
         }
         if (item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
           // 视频合集
