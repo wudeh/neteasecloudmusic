@@ -1,14 +1,22 @@
 <template>
   <div style="width: 100vw">
-    <form action="/">
-      <van-search
-        v-model="word"
-        shape="round"
-        @update:model-value="suggest()"
-        placeholder="请输入搜索关键词"
-        @search="onSearch"
-      />
-    </form>
+    <div class="top_search" style="display: flex;width: 100vw">
+      <div class="back" @click="router.go(-1)" style="display:flex;align-items:center;justify-content:center;width: 10vw;margin-left: 10px">
+        <img @click="router.go(-1)" src="../../../public/img/icons/left_arrow_black.svg" alt="" />
+      </div>
+      <div style="flex: 1">
+        <form action="/">
+          <van-search
+            v-model="word"
+            shape="round"
+            @update:model-value="suggest()"
+            placeholder="请输入搜索关键词"
+            @search="onSearch"
+          />
+        </form>
+      </div>
+    </div>
+    
     <!-- 历史搜索 -->
      <div class="history">
        <div class="title"></div>
@@ -97,6 +105,7 @@
       return {
         suggest,
         onSearch,
+        router,
         clearSearchSuggest,
         ...toRefs(data)
       }

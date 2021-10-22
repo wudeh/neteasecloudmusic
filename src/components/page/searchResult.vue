@@ -1,8 +1,16 @@
 <template>
   <div>
-    <form action="/">
-      <van-search v-model="word" shape="round" @update:model-value="suggest()" placeholder="请输入搜索关键词" @search="onSearch" />
-    </form>
+    <div class="top_search" style="display: flex;width: 100vw">
+      <div class="back" @click="router.go(-1)" style="display:flex;align-items:center;justify-content:center;width: 10vw;margin-left: 10px">
+        <img @click="router.go(-1)" src="../../../public/img/icons/left_arrow_black.svg" alt="" />
+      </div>
+      <div style="flex: 1">
+        <form action="/">
+          <van-search v-model="word" shape="round" @update:model-value="suggest()" placeholder="请输入搜索关键词" @search="onSearch" />
+        </form>
+      </div>
+    </div>
+
     <van-tabs ref="tab" v-model:active="activeName" sticky>
       <van-tab title="综合" name="1018">
         <van-pull-refresh v-model="allRefreshing" @refresh="onRefresh">
@@ -12,7 +20,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="allLoading" v-model:error="allError" :immediate-check="false" :finished="allFinish" error-text="请求失败，点击重新加载" finished-text="" @load="loadMore">
+          <van-list v-model:loading="allLoading" v-model:error="allError" :immediate-check="true" :finished="allFinish" error-text="请求失败，点击重新加载" finished-text="" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -56,7 +64,7 @@
                 <div v-if="song.more" @click="changeActive(`1`)" v-word="word" class="more">{{ song.moreText }}&nbsp;></div>
               </div>
               <!-- 歌手艺人 -->
-              <div class="user" v-if="user">
+              <div class="user" v-if="user" @click="notDone()">
                 <div class="title">艺人</div>
                 <div class="item" v-for="(item, index) in artist.artists" :key="index">
                   <div class="left">
@@ -144,7 +152,7 @@
                 <div v-if="djRadio.more" @click="changeActive(`1009`)" v-word="word" class="more">{{ djRadio.moreText }}&nbsp;></div>
               </div>
               <!-- 用户 -->
-              <div class="user" v-if="user">
+              <div class="user" v-if="user" @click="notDone()">
                 <div class="title">用户</div>
                 <div class="item" v-for="(item, index) in user.users" :key="index">
                   <div class="left">
@@ -176,7 +184,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="Loading" v-model:error="Error" :immediate-check="false" :finished="song.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="Loading" v-model:error="Error" :immediate-check="true" :finished="songFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -227,7 +235,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="albumLoading" v-model:error="Error" :immediate-check="false" :finished="album.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="albumLoading" v-model:error="Error" :immediate-check="true" :finished="albumFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -258,7 +266,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="videoLoading" v-model:error="Error" :immediate-check="false" :finished="video.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="videoLoading" v-model:error="Error" :immediate-check="true" :finished="videoFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -290,14 +298,14 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="artistLoading" v-model:error="Error" :immediate-check="false" :finished="artist.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="artistLoading" v-model:error="Error" :immediate-check="true" :finished="artistFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
             </template>
-            <div class="user">
+            <div class="user" @click="notDone()">
               <div class="item" v-for="(item, index) in artists" :key="index">
                 <div class="left">
                   <van-image class="img" radius="50%" :src="item.img1v1Url" />
@@ -324,7 +332,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="playListLoading" v-model:error="Error" :immediate-check="false" :finished="playList.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="playListLoading" v-model:error="Error" :immediate-check="true" :finished="playListFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -355,14 +363,14 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="userLoading" v-model:error="Error" :immediate-check="false" :finished="user.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="userLoading" v-model:error="Error" :immediate-check="true" :finished="userFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
             </template>
-            <div class="user">
+            <div class="user" @click="notDone()">
               <div class="item" v-for="(item, index) in users" :key="index">
                 <div class="left">
                   <van-image class="img" radius="50%" :src="item.avatarUrl" />
@@ -391,7 +399,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="mvLoading" v-model:error="Error" :immediate-check="false" :finished="MV.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="mvLoading" v-model:error="Error" :immediate-check="true" :finished="mvFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -424,7 +432,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="djRadioLoading" v-model:error="Error" :immediate-check="false" :finished="djRadio.Finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="djRadioLoading" v-model:error="Error" :immediate-check="true" :finished="djRadioFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -461,6 +469,7 @@ import { getSearchHot, getSuggest, getsearchResult } from "../../api/discover";
 import { useStore } from "vuex";
 import { useRouter, useRoute } from "vue-router";
 import { sendTimeConversion, numFilter } from "../../utils/num";
+import { Toast } from "vant";
 
 interface info {
   word: string;
@@ -479,33 +488,41 @@ interface info {
   song: any;
   songs: any;
   songPageNo: number;
+  songFinish: boolean,
   playList: any;
   playLists: any;
   playListPageNo: number;
   playListLoading: boolean;
-  video: any;
+  playListFinish: boolean;
+  video: { videos: []; Finish: boolean };
   videoPageNo: number;
   videos: any;
   videoLoading: boolean;
+  videoFinish: boolean;
   sim_query: any;
   album: any;
   albumPageNo: number;
   albums: any;
   albumLoading: boolean;
+  albumFinish: boolean;
   djRadio: any;
   djRadioPageNo: number;
   djRadios: any;
   djRadioLoading: boolean;
+  djRadioFinish: boolean;
   user: any;
   userPageNo: number;
   users: any;
   userLoading: boolean;
+  userFinish: boolean;
   artist: any;
   artistPageNo: number;
   artists: any;
   artistLoading: boolean;
+  artistFinish: boolean;
   MV: any;
   mvLoading: boolean;
+  mvFinish: boolean;
   mvs: any;
   mvsPageNo: number;
   lyric: any;
@@ -544,37 +561,45 @@ export default defineComponent({
       suggestWord: [],
       suggestWordOrigin: [],
       timer: null,
-      song: { songs: [] },
+      song: { songs: [], Finish: false },
       songs: [],
       songPageNo: 0,
-      playList: { playLists: [] },
+      songFinish: false,
+      playList: { playLists: [], Finish: false },
       playLists: [],
       playListPageNo: 0,
       playListLoading: false,
-      video: { videos: [] },
+      playListFinish: false,
+      video: { videos: [], Finish: false },
       videoPageNo: 0,
       videos: [],
       videoLoading: false,
-      sim_query: { sim_querys: [] },
+      videoFinish: false,
+      sim_query: { sim_querys: [], Finish: false },
       album: { albums: [] },
       albumPageNo: 0,
       albums: [],
       albumLoading: false,
-      djRadio: { djRadios: [] },
+      albumFinish: false,
+      djRadio: { djRadios: [], Finish: false },
       djRadioPageNo: 0,
       djRadios: [],
       djRadioLoading: false,
-      user: { userprofiles: [] },
+      djRadioFinish: false,
+      user: { userprofiles: [], Finish: false },
       userPageNo: 0,
       users: [],
       userLoading: false,
-      artist: { artists: [] },
+      userFinish: false,
+      artist: { artists: [], Finish: false },
       artistPageNo: 0,
       artists: [],
       artistLoading: false,
-      MV: { mvs: [] },
+      artistFinish: false,
+      MV: { mvs: [], Finish: false },
       mvs: [],
       mvLoading: false,
+      mvFinish: false,
       mvsPageNo: 0,
       lyric: {},
       lyrics: [],
@@ -617,27 +642,33 @@ export default defineComponent({
     const onRefresh = () => {
       if (data.activeName == 1 && data.songs.length) {
         data.songs.splice(0);
+        data.songFinish = false;
         (data.songPageNo = 0), (data.Loading = false);
       }
       if (data.activeName == 10 && data.albums.length) {
         data.albums.splice(0);
+        data.albumFinish = false;
         (data.albumPageNo = 0), (data.albumLoading = false);
       }
       if (data.activeName == 100 && data.artists.length) {
         data.artists.splice(0);
+        data.artistFinish = false;
         (data.artistPageNo = 0), (data.artistLoading = false);
       }
       if (data.activeName == 1000 && data.playLists.length) {
         data.playLists.splice(0);
+        data.playListFinish = false;
         (data.playLists = []), (data.playListLoading = false);
       }
       if (data.activeName == 1002 && data.users.length) {
         data.users.splice(0);
+        data.userFinish = false;
         (data.userPageNo = 0), (data.userLoading = false);
       }
       if (data.activeName == 1004 && data.mvs.length) {
         data.mvs.splice(0);
         data.mvLoading = false;
+        data.mvFinish = false;
         data.mvsPageNo = 0;
       }
       // if(data.activeName == 1006 && data.lyric.length) {
@@ -645,17 +676,19 @@ export default defineComponent({
       // }
       if (data.activeName == 1009 && data.djRadios.length) {
         data.djRadios.splice(0);
+        data.djRadioFinish = false;
         (data.djRadioPageNo = 0), (data.djRadioLoading = false);
       }
       if (data.activeName == 1014 && data.videos.length) {
         data.videos.splice(0);
+        data.videoFinish = false;
         (data.videoPageNo = 0), (data.videoLoading = false);
       }
       if (data.activeName == 1018 && data.song.songs.length) {
         data.song = { songs: [] };
         data.playList = { playLists: [] };
         data.sim_query = { sim_querys: [] };
-        data.video = { videos: [] };
+        data.video = { videos: [], Finish: false };
         data.djRadio = { djRadios: [] };
         data.album = { albums: [] };
         data.user = { userprofiles: [] };
@@ -688,34 +721,42 @@ export default defineComponent({
         (data.song = { songs: [] }),
         (data.songs = []),
         (data.songPageNo = 0),
+        data.songFinish = false;
         (data.playList = { playLists: [] }),
         (data.playLists = []),
         (data.playListPageNo = 0),
         (data.playListLoading = false),
-        (data.video = { videos: [] }),
+        (data.playListFinish = false),
+        (data.video = { videos: [], Finish: false }),
         (data.videoPageNo = 0),
         (data.videos = []),
         (data.videoLoading = false),
+        (data.videoFinish = false),
         (data.sim_query = { sim_querys: [] }),
         (data.album = { albums: [] }),
         (data.albumPageNo = 0),
         (data.albums = []),
         (data.albumLoading = false),
+        (data.albumFinish = false),
         (data.djRadio = { djRadios: [] }),
         (data.djRadioPageNo = 0),
         (data.djRadios = []),
         (data.djRadioLoading = false),
+        (data.djRadioFinish = false),
         (data.user = { userprofiles: [] }),
         (data.userPageNo = 0),
         (data.users = []),
         (data.userLoading = false),
+        (data.userFinish = false),
         (data.artist = { artists: [] }),
         (data.artistPageNo = 0),
         (data.artists = []),
         (data.artistLoading = false),
+        (data.artistFinish = false),
         (data.MV = { mvs: [] }),
         (data.mvs = []),
         (data.mvLoading = false),
+        (data.mvFinish = false),
         (data.mvsPageNo = 0),
         // data.lyric =  {},
         // data.lyrics =  [],
@@ -736,6 +777,7 @@ export default defineComponent({
         data.songPageNo += 1;
         if (data.songs.length >= info.result.songCount) {
           data.song.Finish = true;
+          data.songFinish = true;
         }
       }
       if (data.activeName == 10) {
@@ -747,6 +789,7 @@ export default defineComponent({
         data.albumPageNo += 1;
         if (data.albums.length >= info.result.albumCount) {
           data.album.Finish = true;
+          data.albumFinish = true;
         }
       }
       if (data.activeName == 100) {
@@ -758,6 +801,7 @@ export default defineComponent({
         data.artistPageNo += 1;
         if (data.artist.artists.length >= info.result.artistCount) {
           data.artist.Finish = true;
+          data.artistFinish = true;
         }
       }
       if (data.activeName == 1000) {
@@ -769,6 +813,7 @@ export default defineComponent({
         data.playListPageNo += 1;
         if (!info.result.hasMore) {
           data.playList.Finish = true;
+          data.playListFinish = true;
         }
       }
       if (data.activeName == 1002) {
@@ -780,6 +825,7 @@ export default defineComponent({
         data.userLoading = false;
         if (data.users.length >= info.result.userprofileCount) {
           data.user.Finish = true;
+          data.userFinish = true;
         }
       }
       if (data.activeName == 1004) {
@@ -793,19 +839,23 @@ export default defineComponent({
         data.mvsPageNo += 1;
         if (data.mvs.length >= info.result.mvCount) {
           data.MV.Finish = true;
+          data.mvFinish = true;
         }
       }
-      if (data.activeName == 1006) {
-        data.lyricLoading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.lyricPageNo);
-        data.lyrics = data.lyrics.concat(info.result.songs);
-        data.lyricLoading = false;
-        data.lyricPageNo += 1;
-        if (data.lyrics.length >= info.result.songCount) {
-          data.lyric.Finish = true;
-        }
-      }
+      // 歌词暂时不弄
+      // if (data.activeName == 1006) {
+      //   data.lyricLoading = true;
+      //   let info = await getsearchResult(data.word, data.activeName, data.lyricPageNo);
+      //   data.lyrics = data.lyrics.concat(info.result.songs);
+      //   data.lyricLoading = false;
+      //   data.lyricPageNo += 1;
+      //   if (data.lyrics.length >= info.result.songCount) {
+      //     data.lyric.Finish = true;
+      //   }
+      // }
       if (data.activeName == 1009) {
+        console.log("请求电台数据");
+
         data.djRadioLoading = true;
         let info = await getsearchResult(data.word, data.activeName, data.djRadioPageNo);
         data.djRadioRefreshing = false;
@@ -814,14 +864,17 @@ export default defineComponent({
         data.djRadioPageNo += 1;
         if (data.djRadios.length >= info.result.djRadiosCount) {
           data.djRadio.Finish = true;
+          data.djRadioFinish = true;
         }
       }
       if (data.activeName == 1014) {
+        console.log("请求视频数据");
+
         data.videoLoading = true;
         let info = await getsearchResult(data.word, data.activeName, data.videoPageNo);
         data.videoRefreshing = false;
         data.videoLoading = false;
-        if (info.code != 200) {
+        if (info.code != 200 || !info.result) {
           data.Error = true;
           return;
         }
@@ -829,6 +882,7 @@ export default defineComponent({
         data.videoPageNo += 1;
         if (data.videos.length >= info.result.videoCount) {
           data.video.Finish = true;
+          data.videoFinish = true;
         }
       }
       if (data.activeName == 1018) {
@@ -838,7 +892,7 @@ export default defineComponent({
         let info = await getsearchResult(data.word, data.activeName, data.pageNo);
         data.allRefreshing = false;
         data.allLoading = false;
-        if (info.code != 200) {
+        if (info.code != 200 || !info.result) {
           data.allError = true;
           return;
         }
@@ -895,12 +949,12 @@ export default defineComponent({
       loadMore();
     };
 
-    watch(
-      () => data.activeName,
-      (value) => {
-        changeActive(value);
-      }
-    );
+    // watch(
+    //   () => data.activeName,
+    //   (value) => {
+    //     changeActive(value);
+    //   }
+    // );
 
     // 点击播放歌曲
     function playMusicSingle(item: any): void {
@@ -941,6 +995,11 @@ export default defineComponent({
       return `${a.getFullYear()}.${a.getMonth() + 1}.${a.getDate()}`;
     };
 
+    // 提示歌手还没做
+    const notDone = () => {
+      Toast("敬请期待");
+    };
+
     return {
       suggest,
       onSearch,
@@ -955,24 +1014,10 @@ export default defineComponent({
       changeActive,
       loadMore,
       getDate,
+      notDone,
       ...toRefs(data),
     };
   },
-  // activated: () => {
-  //   // console.log(router.cur);
-  //   router.push
-
-  // },
-  // deactivated
-  // directives: {
-  //   // 用来替换关键搜索词颜色的指令
-  //   word(el,binding): void {
-  //     // 参数 el, binding, vnode, oldVnode
-  //     // beforeMount(el,binding) {
-  //      el.innerHTML =  el.innerHTML.replace(binding.value, `<span style='color:rgb(0, 153, 255)'>${binding.value}</span>`)
-  //     // },
-  //   }
-  // },
 });
 </script>
 
@@ -1235,5 +1280,4 @@ export default defineComponent({
     }
   }
 }
-
 </style>
