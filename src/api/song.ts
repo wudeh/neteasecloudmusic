@@ -49,7 +49,11 @@ export function getSongComment(id: string,limit=20,offset?: number,before?: any)
  */
 export function getComment(id: number | string,type: number,pageNo: number,pageSize=20,sortType: number,cursor?: any): any {
   // if(sortType == 3) {
-    return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}&cursor=${cursor}`);
+    if(cursor) {
+      return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}&cursor=${cursor}`);
+    }else {
+      return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}`);
+    }
   // }else {
   //   return axios.get(`/comment/new?id=${id}&type=${type}&pageNo=${pageNo}&pageSize=${pageSize}&sortType=${sortType}`);
   // }
