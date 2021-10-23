@@ -73,7 +73,11 @@ export function getComment(id: number | string,type: number,pageNo: number,pageS
  */
 export function getFloorComment(id: number | string,parentCommentId: number,type: number,time?: any,limit?:number): any {
   // return axios.post("/comment/floor",{id,parentCommentId,type,time,limit});
-  return axios.get(`/comment/floor?parentCommentId=${parentCommentId}&id=${id}&type=${type}&time=${time}`);
+  if(time) {
+    return axios.get(`/comment/floor?parentCommentId=${parentCommentId}&id=${id}&type=${type}&time=${time}`);
+  }else {
+    return axios.get(`/comment/floor?parentCommentId=${parentCommentId}&id=${id}&type=${type}`);
+  }  
 }
 
 /**

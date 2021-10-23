@@ -6,12 +6,12 @@
       </div>
       <div style="flex: 1">
         <form action="/">
-          <van-search v-model="word" shape="round" @update:model-value="suggest()" placeholder="请输入搜索关键词" @search="onSearch" />
+          <van-search v-model="word" @blur="notShowSuggest()" @focus="ShowSuggest()" shape="round" @update:model-value="suggest()" placeholder="请输入搜索关键词" @search="onSearch" />
         </form>
       </div>
     </div>
 
-    <van-tabs ref="tab" v-model:active="activeName" sticky>
+    <van-tabs ref="tab" v-model:active="activeName" sticky swipeable>
       <van-tab title="综合" name="1018">
         <van-pull-refresh v-model="allRefreshing" @refresh="onRefresh">
           <template v-slot:loading>
@@ -457,8 +457,9 @@
       </van-tab>
     </van-tabs>
     <!-- 搜索建议 -->
-    <div class="suggest" v-if="suggestWord.length">
-      <div class="item" v-for="(item, index) in suggestWord" :key="index" v-html="item" @click="suggestClick(index)"></div>
+    <div class="suggest" v-if="suggestWord.length" @click="notShowSuggest">
+      <div class="item" v-for="(item, index) in suggestWord" :key="index" v-word="word" @mousedown.stop="suggestClick(item)">{{ item }}</div>
+      <div style="height: 100%">我是下面的div</div>
     </div>
   </div>
 </template>
@@ -484,11 +485,12 @@ interface info {
   hotWord: Array<any>;
   suggestWordOrigin: Array<any>;
   suggestWord: Array<any>;
+  showSuggest: boolean;
   timer: any;
   song: any;
   songs: any;
   songPageNo: number;
-  songFinish: boolean,
+  songFinish: boolean;
   playList: any;
   playLists: any;
   playListPageNo: number;
@@ -551,7 +553,7 @@ export default defineComponent({
       word: "",
       activeName: 1018,
       pageNo: 0,
-      Loading: true,
+      Loading: false,
       allLoading: false,
       Error: false,
       allError: false,
@@ -560,6 +562,7 @@ export default defineComponent({
       hotWord: [],
       suggestWord: [],
       suggestWordOrigin: [],
+      showSuggest: false, // 是否显示搜索建议
       timer: null,
       song: { songs: [], Finish: false },
       songs: [],
@@ -623,17 +626,19 @@ export default defineComponent({
       data.word = id;
     });
 
+    // 输入搜索词，触发请求搜索建议
     const suggest = async (i: string) => {
       data.suggestWord = [];
       if (!data.word) return;
       if (data.timer) clearTimeout(data.timer);
       data.timer = setTimeout(async () => {
         let info = await getSuggest(data.word);
-        if (info.result) {
+        if (info.result && data.showSuggest) {
           data.suggestWordOrigin = info.result.allMatch;
           info.result.allMatch.forEach((item: any) => {
-            data.suggestWord.push(item.keyword.replace(data.word, `<span style="color: red">${data.word}</span>`));
+            data.suggestWord.push(item.keyword);
           });
+          console.log(data.suggestWord);
         }
       }, 500);
     };
@@ -658,7 +663,7 @@ export default defineComponent({
       if (data.activeName == 1000 && data.playLists.length) {
         data.playLists.splice(0);
         data.playListFinish = false;
-        (data.playLists = []), (data.playListLoading = false);
+        (data.playListPageNo = 0), (data.playListLoading = false);
       }
       if (data.activeName == 1002 && data.users.length) {
         data.users.splice(0);
@@ -699,8 +704,11 @@ export default defineComponent({
       loadMore();
     };
 
-    const suggestClick = (i: number) => {
-      data.word = data.suggestWordOrigin[i].keyword;
+    // 点击搜索建议，重新搜索
+    const suggestClick = (i: string) => {
+      console.log(i);
+
+      data.word = i;
       onSearch();
     };
 
@@ -708,21 +716,8 @@ export default defineComponent({
     const onSearch = () => {
       data.suggestWord.splice(0);
 
-      (data.allLoading = false),
-        (data.allError = false),
-        (data.allFinish = false),
-        (data.pageNo = 0),
-        (data.Loading = true),
-        (data.Error = false),
-        (data.Finish = false),
-        (data.hotWord = []),
-        (data.suggestWord = []),
-        (data.timer = null),
-        (data.song = { songs: [] }),
-        (data.songs = []),
-        (data.songPageNo = 0),
-        data.songFinish = false;
-        (data.playList = { playLists: [] }),
+      (data.allLoading = false), (data.allError = false), (data.allFinish = false), (data.pageNo = 0), (data.Loading = false), (data.Error = false), (data.Finish = false), (data.hotWord = []), (data.suggestWord = []), (data.timer = null), (data.song = { songs: [] }), (data.songs = []), (data.songPageNo = 0), (data.songFinish = false);
+      (data.playList = { playLists: [] }),
         (data.playLists = []),
         (data.playListPageNo = 0),
         (data.playListLoading = false),
@@ -764,7 +759,7 @@ export default defineComponent({
         // data.lyricLoading = false
         (data.activeName = 1018);
       // changeActive(data.activeName);
-      // loadMore
+      loadMore();
     };
 
     const loadMore = async () => {
@@ -776,7 +771,7 @@ export default defineComponent({
         data.Loading = false;
         data.songPageNo += 1;
         if (data.songs.length >= info.result.songCount) {
-          data.song.Finish = true;
+          // data.song.Finish = true;
           data.songFinish = true;
         }
       }
@@ -788,7 +783,7 @@ export default defineComponent({
         data.albumLoading = false;
         data.albumPageNo += 1;
         if (data.albums.length >= info.result.albumCount) {
-          data.album.Finish = true;
+          // data.album.Finish = true;
           data.albumFinish = true;
         }
       }
@@ -800,7 +795,7 @@ export default defineComponent({
         data.artistLoading = false;
         data.artistPageNo += 1;
         if (data.artist.artists.length >= info.result.artistCount) {
-          data.artist.Finish = true;
+          // data.artist.Finish = true;
           data.artistFinish = true;
         }
       }
@@ -812,7 +807,7 @@ export default defineComponent({
         data.playListLoading = false;
         data.playListPageNo += 1;
         if (!info.result.hasMore) {
-          data.playList.Finish = true;
+          // data.playList.Finish = true;
           data.playListFinish = true;
         }
       }
@@ -824,7 +819,7 @@ export default defineComponent({
         data.userPageNo += 1;
         data.userLoading = false;
         if (data.users.length >= info.result.userprofileCount) {
-          data.user.Finish = true;
+          // data.user.Finish = true;
           data.userFinish = true;
         }
       }
@@ -838,7 +833,7 @@ export default defineComponent({
         data.mvLoading = false;
         data.mvsPageNo += 1;
         if (data.mvs.length >= info.result.mvCount) {
-          data.MV.Finish = true;
+          // data.MV.Finish = true;
           data.mvFinish = true;
         }
       }
@@ -863,7 +858,7 @@ export default defineComponent({
         data.djRadioLoading = false;
         data.djRadioPageNo += 1;
         if (data.djRadios.length >= info.result.djRadiosCount) {
-          data.djRadio.Finish = true;
+          // data.djRadio.Finish = true;
           data.djRadioFinish = true;
         }
       }
@@ -881,7 +876,7 @@ export default defineComponent({
         data.videos = data.videos.concat(info.result.videos);
         data.videoPageNo += 1;
         if (data.videos.length >= info.result.videoCount) {
-          data.video.Finish = true;
+          // data.video.Finish = true;
           data.videoFinish = true;
         }
       }
@@ -911,50 +906,53 @@ export default defineComponent({
       data.pageNo += 1;
     };
 
+    // 综合 tab 页里面点击跳转的方法
     const changeActive = (i: any) => {
       tab.value.scrollTo(i);
-      if (data.activeName == 1 && data.songs.length) {
-        return;
-      }
-      if (data.activeName == 10 && data.albums.length) {
-        return;
-      }
-      if (data.activeName == 100 && data.artists.length) {
-        return;
-      }
-      if (data.activeName == 1000 && data.playLists.length) {
-        return;
-      }
-      if (data.activeName == 1002 && data.users.length) {
-        return;
-      }
-      if (data.activeName == 1004 && data.mvs.length) {
-        return;
-      }
-      if (data.activeName == 1006 && data.lyric.length) {
-        return;
-      }
-      if (data.activeName == 1009 && data.djRadios.length) {
-        return;
-      }
-      if (data.activeName == 1014 && data.videos.length) {
-        return;
-      }
-      if (data.activeName == 1018 && data.song.songs.length) {
-        return;
-      }
-      data.pageNo += 1;
+      // if (data.activeName == 1 && data.songs.length) {
+      //   return;
+      // }
+      // if (data.activeName == 10 && data.albums.length) {
+      //   return;
+      // }
+      // if (data.activeName == 100 && data.artists.length) {
+      //   return;
+      // }
+      // if (data.activeName == 1000 && data.playLists.length) {
+      //   return;
+      // }
+      // if (data.activeName == 1002 && data.users.length) {
+      //   return;
+      // }
+      // if (data.activeName == 1004 && data.mvs.length) {
+      //   return;
+      // }
+      // if (data.activeName == 1006 && data.lyric.length) {
+      //   return;
+      // }
+      // if (data.activeName == 1009 && data.djRadios.length) {
+      //   return;
+      // }
+      // if (data.activeName == 1014 && data.videos.length) {
+      //   return;
+      // }
+      // if (data.activeName == 1018 && data.song.songs.length) {
+      //   return;
+      // }
+      // data.pageNo += 1;
 
-      data.activeName = i;
-      loadMore();
+      // data.activeName = i;
+      // loadMore();
     };
 
-    // watch(
-    //   () => data.activeName,
-    //   (value) => {
-    //     changeActive(value);
-    //   }
-    // );
+    // 手动滑动需要监听
+    watch(
+      () => data.activeName,
+      (value) => {
+        console.log(value);
+        
+      }
+    );
 
     // 点击播放歌曲
     function playMusicSingle(item: any): void {
@@ -982,6 +980,19 @@ export default defineComponent({
         store.commit("play", true);
       }
     }
+
+    // 输入框失去焦点就不显示搜索建议
+    const notShowSuggest = (): void => {
+      console.log("触发了不显示");
+
+      data.showSuggest = false;
+      data.suggestWord.splice(0);
+    };
+
+    // 输入框获得焦点允许显示搜索建议
+    const ShowSuggest = (): void => {
+      data.showSuggest = true;
+    };
 
     // 计算视频时长
     const timeFilter = (i: number) => {
@@ -1015,6 +1026,8 @@ export default defineComponent({
       loadMore,
       getDate,
       notDone,
+      notShowSuggest,
+      ShowSuggest,
       ...toRefs(data),
     };
   },
@@ -1070,6 +1083,7 @@ export default defineComponent({
     padding-bottom: 8px;
     background-color: #fff;
     border-bottom: 1px solid #ccc;
+    z-index: 111;
   }
 }
 .wrapper {

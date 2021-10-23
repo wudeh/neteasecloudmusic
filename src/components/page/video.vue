@@ -73,7 +73,7 @@
               <div class="comment_choose">
                 <div class="title">评论区</div>
                 <div class="choose" v-show="!arrloading">
-                  <span :class="{ choosed: sortType == 1 }" @click="change_sortType(1)">推荐</span>
+                  <span :class="{ choosed: sortType == 99 }" @click="change_sortType(99)">推荐</span>
                   <span :class="{ choosed: sortType == 2 }" @click="change_sortType(2)">最热</span>
                   <span :class="{ choosed: sortType == 3 }" @click="change_sortType(3)">最新</span>
                   <!-- <van-dropdown-menu >
@@ -132,7 +132,7 @@
 
     <!-- 楼层弹出评论 -->
     <van-popup v-model:show="store.state.showFloor" closeable round @close="store.commit(`close`)" :close-on-popstate="true" close-icon-position="top-left" position="bottom" :style="{ height: '80%' }">
-      <van-list v-model:loading="floorLoading" v-model:error="floorError" :immediate-check="false" :finished="floorFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoadFloor">
+      <van-list v-model:loading="floorLoading" v-model:error="floorError" :immediate-check="true" :finished="floorFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoadFloor">
         <template v-slot:loading>
           <div style="display:flex;align-items:center;justify-content:center;">
             <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -260,6 +260,7 @@ interface creator {
   requestLoading: boolean; // 请求是否完成
   error: boolean;
   finish: boolean; // 是否没有更多数据了
+  haveFirstFloorPop: boolean
 }
 export default defineComponent({
   name: "vid",
@@ -292,7 +293,7 @@ export default defineComponent({
       commentTotal: 0,
       pageNo: 1,
       floorPageNo: 1,
-      sortType: 1,
+      sortType: 99, // 99: 推荐排序，2：热度排序，3：时间最新排序
       sortTypeName: "",
       sortTypeList: [],
       cursor: "",
@@ -308,6 +309,7 @@ export default defineComponent({
       requestLoading: false,
       error: false,
       finish: false,
+      haveFirstFloorPop: false // 是否已经弹出过楼层了，已经弹出过楼层就需要自己请求楼层的第一次评论
     });
 
     onBeforeMount(async () => {
@@ -428,30 +430,40 @@ export default defineComponent({
 
     // 获取楼层评论
     const floorRequest = async (topComment: any, parentCommentId: number) => {
+      console.log('弹出楼层');
+      
       data.floorTopComment = topComment;
       data.floorLoading = true;
       store.commit("set_floor_comment", true);
       data.floorArr = [];
       data.floorFinish = false;
-      data.floorPageNo = 1;
-      let info = await getFloorComment(vid, parentCommentId, data.type, data.floorPageNo);
-      data.floorLoading = false;
-      if (info.code == 400) {
-        data.floorError = true;
-        return;
+      data.floorPageNo = 0;
+      // 如果设置了:immediate-check="true"，第一次弹出楼层，组件会自己检查发一次请求；所以如果不是第一次的话，再弹出楼层评论就需要自己发第一次请求了
+      if(data.haveFirstFloorPop) {
+        let info = await getFloorComment(vid, parentCommentId, data.type, data.floorPageNo);
+        data.floorLoading = false;
+        if (info.code == 400) {
+          data.floorError = true;
+          return;
+        }
+        data.floorArr = info.data.comments;
+        if(data.floorArr.length) {
+          data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
+        }
+        
+        if (!info.data.hasMore) {
+          data.floorFinish = true;
+        }
       }
-      data.floorArr = info.data.comments;
-      data.floorPageNo += 1;
-      data.floorPageNo = info.data.time;
-      if (!info.data.hasMore) {
-        data.floorFinish = true;
-      }
+      
     };
 
     // 加载更多楼层评论
     const onLoadFloor = async () => {
       data.floorError = false;
       data.floorLoading = true;
+      // 触发了加载更多楼层评论方法说明已经弹出过一次楼层了
+      if(!data.haveFirstFloorPop) data.haveFirstFloorPop = true;
       let info = await getFloorComment(vid, data.floorTopComment.commentId, data.type, data.floorPageNo);
       data.floorLoading = false;
       if (info.code == 400) {
@@ -459,9 +471,10 @@ export default defineComponent({
         return;
       }
       data.floorArr = data.floorArr.concat(info.data.comments);
-      data.floorPageNo += 1;
       data.floorLoading = false;
-      data.floorPageNo = info.data.time;
+      if(data.floorArr.length) {
+          data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
+        }
       if (!info.data.hasMore) {
         data.floorFinish = true;
       }
@@ -483,16 +496,17 @@ export default defineComponent({
       data.arr = data.arr.concat(info.data.comments);
       data.arrloading = false;
       data.pageNo += 1;
-      if (!info.data.hasMore) {
+      if (!info.data.hasMore || data.arr.length >= info.data.totalCount) {
         data.finish = true;
       }
     };
 
     const change_sortType = async (index: any) => {
       data.sortType = index;
-
+      data.finish = false;
       data.pageNo = 1;
       data.arr = [];
+      data.cursor = '';
       onLoad();
     };
 

@@ -198,6 +198,7 @@ interface info {
   requestLoading: boolean; // 请求是否完成
   error: boolean;
   finish: boolean; // 是否没有更多数据了
+  haveFirstFloorPop: boolean
 }
 export default defineComponent({
   name: "comment",
@@ -213,7 +214,7 @@ export default defineComponent({
       singerInfo: [],
       commentTotal: 0,
       pageNo: 1,
-      floorPageNo: 1,
+      floorPageNo: 0,
       sortType: 2,
       sortTypeName: "",
       sortTypeList: [],
@@ -230,6 +231,7 @@ export default defineComponent({
       requestLoading: false,
       error: false,
       finish: false,
+      haveFirstFloorPop: false
     });
     onBeforeMount(async () => {
       // 获取音乐图片，标题，歌手
@@ -284,25 +286,35 @@ export default defineComponent({
       store.commit("set_floor_comment", true);
       data.floorArr = [];
       data.floorFinish = false;
-      data.floorPageNo = 1;
-      let info = await getFloorComment(id, parentCommentId, type, data.floorPageNo);
-      data.floorArr = info.data.comments;
-      data.floorPageNo += 1;
-      data.floorPageNo = info.data.time;
-      if (!info.data.hasMore) {
-        data.floorFinish = true;
+      data.floorPageNo = 0;
+      if(data.haveFirstFloorPop) {
+        let info = await getFloorComment(id, parentCommentId, type, data.floorPageNo);
+        data.floorArr = info.data.comments;
+        data.floorPageNo += 1;
+        if(data.floorArr.length) {
+          data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
+        }
+        if (!info.data.hasMore) {
+          data.floorFinish = true;
+        }
+        data.floorLoading = false;
       }
-      data.floorLoading = false;
+      
     };
 
     // 加载更多楼层评论
     const onLoadFloor = async () => {
       data.floorLoading = true;
-      let info = await getFloorComment(id, data.floorTopComment.commentId, 0, data.floorPageNo);
+      // 触发了加载更多楼层评论方法说明已经弹出过一次楼层了
+      if(!data.haveFirstFloorPop) data.haveFirstFloorPop = true;
+      let info = await getFloorComment(id, data.floorTopComment.commentId, type, data.floorPageNo);
       data.floorArr = data.floorArr.concat(info.data.comments);
       data.floorPageNo += 1;
       data.floorLoading = false;
-      data.floorPageNo = info.data.time;
+      // data.floorPageNo = info.data.time;
+      if(data.floorArr.length) {
+          data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
+        }
       if (!info.data.hasMore) {
         data.floorFinish = true;
       }
