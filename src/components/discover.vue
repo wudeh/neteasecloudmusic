@@ -1,9 +1,20 @@
 <template>
   <div>
+    <!-- 侧边栏 -->
+    <van-popup v-model:show="show" position="left" :style="{ width: '80%', height: '100%' }" >
+      <div class="avatar" style="background-color: red; display: flex;padding-left: 30px;flex-direction: column">
+        <img src="../../public/img/icons/avatar.png" width="150">
+        <span style="color: #fff;padding-bottom: 20px;padding-top: 20px;font-size: 16px">1650024814@qq.com</span>
+      </div>
+      <div @click="goToGithub" style="padding: 10px;padding-left:30px;display:flex;justify-content:space-between;color:red">
+        <span>查看本应用数据来源</span>
+        <span>></span>
+      </div>
+    </van-popup>
     <!-- 导航栏 -->
     <div :class="{ nav: true, red: scrollY >= 50 }" @click="goSearch()">
-      <div class="pop">
-        <van-icon name="chat-o" badge="" />
+      <div class="pop" @click.stop="showLeftPop">
+        <van-icon name="wap-nav" badge="" />
       </div>
       <div class="search">
         <van-icon name="search" />
@@ -413,6 +424,7 @@ export default defineComponent({
     const active = ref<number>(0);
     const topBg = ref<HTMLElement>();
     const store = useStore();
+    let show = ref<boolean>(false);
     const info = reactive<any>({
       loading: false,
       listLoading: false,
@@ -816,10 +828,23 @@ export default defineComponent({
       }
     };
 
+    // 弹出侧边栏
+    const showLeftPop = ():void => {
+      show.value = !show.value;
+    }
+
+    // 跳转GitHub文档
+    const goToGithub = ():void => {
+      window.location.href = 'https://github.com/Binaryify/NeteaseCloudMusicApi';
+    }
+
     return {
       active,
       ballClick,
+      goToGithub,
       router,
+      show,
+      showLeftPop,
       new_three,
       goSearch,
       onRefresh,
