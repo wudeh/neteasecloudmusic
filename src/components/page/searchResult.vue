@@ -218,7 +218,7 @@
                       <span v-for="(it, i) in item.originSongSimpleData.artists" :key="i"><i v-if="i > 0">/</i>{{ it.name }}</span>
                     </div>
                   </div>
-                  <div class="rignt" @click="store.dispatch(`set_pop_detail`, item)">
+                  <div class="rignt" @click="popMoreInfo(item, 0)">
                     <img src="../../../public/img/icons/more_gray.svg" alt="" />
                   </div>
                 </div>
@@ -290,40 +290,6 @@
           </van-list>
         </van-pull-refresh>
       </van-tab>
-      <van-tab title="歌手" name="100">
-        <van-pull-refresh v-model="artistRefreshing" @refresh="onRefresh">
-          <template v-slot:loading>
-            <div style="display:flex;align-items:center;justify-content:center;">
-              <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
-              <span>加载中...</span>
-            </div>
-          </template>
-          <van-list v-model:loading="artistLoading" v-model:error="Error" :immediate-check="true" :finished="artistFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
-            <template v-slot:loading>
-              <div style="display:flex;align-items:center;justify-content:center;">
-                <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
-                <span>加载中...</span>
-              </div>
-            </template>
-            <div class="user" @click="notDone()">
-              <div class="item" v-for="(item, index) in artists" :key="index">
-                <div class="left">
-                  <van-image class="img" radius="50%" :src="item.img1v1Url" />
-                  <img v-if="item.picUrl" src="https://p5.music.126.net/obj/wo3DlcOGw6DClTvDisK1/4874132307/4499/f228/d867/da64b9725e125943ad4e14e4c72d0884.png" alt="" />
-                </div>
-                <div class="info">
-                  <div class="name" v-word="word">
-                    {{ item.name }}
-                  </div>
-                  <span>{{ item.description }}</span>
-                </div>
-                <span class="follow" v-if="!item.followed">+&nbsp;关注</span>
-                <span class="followed" v-else>已关注</span>
-              </div>
-            </div>
-          </van-list>
-        </van-pull-refresh>
-      </van-tab>
       <van-tab title="歌单" name="1000">
         <van-pull-refresh v-model="playListRefreshing" @refresh="onRefresh">
           <template v-slot:loading>
@@ -355,42 +321,7 @@
           </van-list>
         </van-pull-refresh>
       </van-tab>
-      <van-tab title="用户" name="1002">
-        <van-pull-refresh v-model="userRefreshing" @refresh="onRefresh">
-          <template v-slot:loading>
-            <div style="display:flex;align-items:center;justify-content:center;">
-              <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
-              <span>加载中...</span>
-            </div>
-          </template>
-          <van-list v-model:loading="userLoading" v-model:error="Error" :immediate-check="true" :finished="userFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
-            <template v-slot:loading>
-              <div style="display:flex;align-items:center;justify-content:center;">
-                <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
-                <span>加载中...</span>
-              </div>
-            </template>
-            <div class="user" @click="notDone()">
-              <div class="item" v-for="(item, index) in users" :key="index">
-                <div class="left">
-                  <van-image class="img" radius="50%" :src="item.avatarUrl" />
-                  <img v-if="item.avatarDetail" :src="item.avatarDetail.identityIconUrl" alt="" />
-                </div>
-                <div class="info">
-                  <div class="name" v-word="word">
-                    {{ item.nickname }}
-                    <img v-if="item.gender == 1" src="../../../public/img/icons/gender_boy.svg" alt="" />
-                    <img v-else src="../../../public/img/icons/gender_girl.svg" alt="" />
-                  </div>
-                  <span>{{ item.description }}</span>
-                </div>
-                <span class="follow" v-if="!item.followed">+&nbsp;关注</span>
-                <span class="followed" v-else>已关注</span>
-              </div>
-            </div>
-          </van-list>
-        </van-pull-refresh>
-      </van-tab>
+      
       <van-tab title="MV" name="1004">
         <van-pull-refresh v-model="MVRefreshing" @refresh="onRefresh">
           <template v-slot:loading>
@@ -455,11 +386,80 @@
           </van-list>
         </van-pull-refresh>
       </van-tab>
+      <van-tab title="歌手" name="100">
+        <van-pull-refresh v-model="artistRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
+              <span>加载中...</span>
+            </div>
+          </template>
+          <van-list v-model:loading="artistLoading" v-model:error="Error" :immediate-check="true" :finished="artistFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+            <template v-slot:loading>
+              <div style="display:flex;align-items:center;justify-content:center;">
+                <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
+                <span>加载中...</span>
+              </div>
+            </template>
+            <div class="user" @click="notDone()">
+              <div class="item" v-for="(item, index) in artists" :key="index">
+                <div class="left">
+                  <van-image class="img" radius="50%" :src="item.img1v1Url" />
+                  <img v-if="item.picUrl" src="https://p5.music.126.net/obj/wo3DlcOGw6DClTvDisK1/4874132307/4499/f228/d867/da64b9725e125943ad4e14e4c72d0884.png" alt="" />
+                </div>
+                <div class="info">
+                  <div class="name" v-word="word">
+                    {{ item.name }}
+                  </div>
+                  <span>{{ item.description }}</span>
+                </div>
+                <span class="follow" v-if="!item.followed">+&nbsp;关注</span>
+                <span class="followed" v-else>已关注</span>
+              </div>
+            </div>
+          </van-list>
+        </van-pull-refresh>
+      </van-tab>
+      <van-tab title="用户" name="1002">
+        <van-pull-refresh v-model="userRefreshing" @refresh="onRefresh">
+          <template v-slot:loading>
+            <div style="display:flex;align-items:center;justify-content:center;">
+              <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
+              <span>加载中...</span>
+            </div>
+          </template>
+          <van-list v-model:loading="userLoading" v-model:error="Error" :immediate-check="true" :finished="userFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+            <template v-slot:loading>
+              <div style="display:flex;align-items:center;justify-content:center;">
+                <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
+                <span>加载中...</span>
+              </div>
+            </template>
+            <div class="user" @click="notDone()">
+              <div class="item" v-for="(item, index) in users" :key="index">
+                <div class="left">
+                  <van-image class="img" radius="50%" :src="item.avatarUrl" />
+                  <img v-if="item.avatarDetail" :src="item.avatarDetail.identityIconUrl" alt="" />
+                </div>
+                <div class="info">
+                  <div class="name" v-word="word">
+                    {{ item.nickname }}
+                    <img v-if="item.gender == 1" src="../../../public/img/icons/gender_boy.svg" alt="" />
+                    <img v-else src="../../../public/img/icons/gender_girl.svg" alt="" />
+                  </div>
+                  <span>{{ item.description }}</span>
+                </div>
+                <span class="follow" v-if="!item.followed">+&nbsp;关注</span>
+                <span class="followed" v-else>已关注</span>
+              </div>
+            </div>
+          </van-list>
+        </van-pull-refresh>
+      </van-tab>
     </van-tabs>
     <!-- 搜索建议 -->
     <div class="suggest" v-if="suggestWord.length" @click="notShowSuggest">
       <div class="item" v-for="(item, index) in suggestWord" :key="index" v-word="word" @mousedown.stop="suggestClick(item)">{{ item }}</div>
-      <div style="height: 100%">我是下面的div</div>
     </div>
   </div>
 </template>
@@ -1011,9 +1011,16 @@ export default defineComponent({
       Toast("敬请期待");
     };
 
+    // 弹出更多信息
+    const popMoreInfo = (item: any, type: number):void => {
+      item.type = type;
+      store.dispatch(`set_pop_detail`, item)
+    }
+
     return {
       suggest,
       onSearch,
+      popMoreInfo,
       tab,
       suggestClick,
       onRefresh,

@@ -174,6 +174,7 @@ import { getComment, getSongInfo, getFloorComment, getPlayListDetail } from "../
 import { useRouter } from "vue-router";
 import { sendTimeConversion, numFilter } from "../../utils/num";
 import { useStore } from "vuex";
+import { Toast } from 'vant';
 interface info {
   img: string;
   name: string;
@@ -258,6 +259,9 @@ export default defineComponent({
           }
         });
       }
+
+      // 电台评论由于未知原因暂时无法获取
+      if(type === 4) Toast('电台评论暂时无法获取')
 
       info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
       data.commentTotal = info.data.totalCount;

@@ -159,7 +159,29 @@ export default createStore<song>({
     },
     // 添加到下一首播放
     add_song(state, song) {
-      state.song_info.list.splice(state.song_info.listIndex, 0, song);
+      console.log(song);
+      console.log(state.song_info.list);
+      let isInList: boolean = false;
+      state.song_info.list.forEach((item) => {
+        console.log(item.id);
+        
+        if(item.id == song.id) {
+          Toast(`已在播放列表`)
+          isInList = true;
+        }
+      })
+      if(isInList) return;
+      state.song_info.list.splice(state.song_info.listIndex + 1, 0, song);
+      Toast(`已添加到播放列表`)
+      // 添加完列表只有一首就要直接播放了
+      if(state.song_info.list.length === 1) {
+        
+        state.song_info.listIndex = 0;
+        state.song_info.id = state.song_info.list[state.song_info.listIndex].id;        
+        state.song_info.name = state.song_info.list[state.song_info.listIndex].name;
+        state.song_info.author = state.song_info.list[state.song_info.listIndex].author;
+        state.song_info.img = state.song_info.list[state.song_info.listIndex].img;
+      }
     },
     // 展示当前播放列表
     set_pop_list(state, i) {
@@ -307,17 +329,29 @@ export default createStore<song>({
       }
     },
     // 设置歌曲弹出框详情
-    async set_pop_detail(ctx, item) {
+    async set_pop_detail(ctx: any, item:any) {
       ctx.state.showDetail = true;
       ctx.state.showPop = true;
 
       if(ctx.state.song_pop_detail.id != item.id) {
-        ctx.state.song_pop_detail = Object.assign({}, item);
+        // 如果是电台
+        if(item.type === 4) {
+          // ctx.state.song_pop_detail = Object.assign({}, item);
+          ctx.state.song_pop_detail.author = item.author;
+          ctx.state.song_pop_detail.img = item.img;
+          ctx.state.song_pop_detail.id = item.id;
+          ctx.state.song_pop_detail.name = item.name;
+          ctx.state.song_pop_detail.al = {name: '无'};
+        }else {
+          // 要么是歌曲，type === 0
+          ctx.state.song_pop_detail = Object.assign({}, item);
         ctx.state.song_pop_detail.author = item.ar.map((i:any) => i.name).join("/")
         ctx.state.song_pop_detail.img = item.al.picUrl
+        }
+        
       
         // 获取一下评论数量
-        let info = await getComment(item.id,0,1,20,3);
+        let info = await getComment(item.id,item.type,1,20,3);
         ctx.state.song_pop_detail.commentCount = info.data.totalCount
         // 获取URL，以供下载
         info = await getSongUrl(item.id);

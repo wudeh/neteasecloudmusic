@@ -84,7 +84,7 @@
           </div>
         </div>
         <div class="more">
-          <img @click="store.dispatch(`set_pop_detail`, item)" src="../../../public/img/icons/songInfo.svg" alt="" />
+          <img @click="popMoreInfo(item, 0)" src="../../../public/img/icons/songInfo.svg" alt="" />
         </div>
       </div>
     </div>
@@ -247,7 +247,7 @@ export default defineComponent({
           id: item.id,
           name: item.name,
           author: item.ar.map((i: any) => i.name).join("/"),
-          type: 4,
+          type: 0,
           // url: info.data[0].url,
           img: item.al.picUrl,
         };
@@ -278,9 +278,16 @@ export default defineComponent({
       store.commit(`add_songList`, list);
     };
 
+    // 弹出更多信息
+    const popMoreInfo = (item: any, type: number):void => {
+      item.type = type;
+      store.dispatch(`set_pop_detail`, item)
+    }
+
     return {
       ...toRefs(data),
       author,
+      popMoreInfo,
       store,
       add_song_list,
       router,

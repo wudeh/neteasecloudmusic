@@ -40,7 +40,7 @@
         <span>{{ numFilter(subscribedCount) }}</span>
       </div>
       <div class="line"></div>
-      <div class="comment item">
+      <div class="comment item" @click="router.push({ path: `/comment`, query: { id, type: 4 } })">
         <img src="../../../public/img/icons/comment.svg" alt="" />
         <span>{{ numFilter(commentCount) }}</span>
       </div>
@@ -73,7 +73,7 @@
           </div>
           <div class="info_bottom">播放量：{{ item.playCount }}&nbsp; 时长：{{ item.duration }}&nbsp; by：{{ item.author }}</div>
         </div>
-        <div class="more">
+        <div class="more" @click="popMoreInfo(item, 4)">
           <img src="../../../public/img/icons/songInfo.svg" alt="" />
         </div>
       </div>
@@ -252,8 +252,16 @@ export default defineComponent({
       store.commit(`add_songList`, list);
     };
 
+    // 弹出更多信息
+    const popMoreInfo = (item: any, type: number):void => {
+      item.type = type;      
+      store.dispatch(`set_pop_detail`, item)
+    }
+
     return {
       ...toRefs(data),
+      id,
+      popMoreInfo,
       author,
       router,
       store,

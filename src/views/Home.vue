@@ -232,6 +232,7 @@ export default defineComponent({
       () => store.state.song_info.id,
       async (value, pre) => {
         // console.log("监听到播放歌曲变更");
+        // id 变了，而且必须有 id 才认为需要播放新的歌曲
         if(value) {
           audio.value.pause();
           // 请求URL
@@ -243,7 +244,7 @@ export default defineComponent({
               forbidClick: true,
 
             })
-            const info = await getSongUrl(store.state.song_info.id);
+            const info = await getSongUrl(store.state.song_info.id, store.state.song_info.type);
             Toast.clear()
             store.commit("set_song_url",info.data[0].url);
           // }
@@ -617,7 +618,7 @@ export default defineComponent({
   }
 }
 .fixed_out {
-  bottom: -50px;
+  bottom: -100px;
 }
 .load {
   padding: 8px 0;
