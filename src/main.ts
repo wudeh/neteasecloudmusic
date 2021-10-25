@@ -20,6 +20,11 @@ import "vant/lib/index.css";
 const app = createApp(App);
 
 router.beforeEach((to, from, next) => {
+  // 防止从 URL 直接输入链接到歌词滚动页面的情况
+  if(to.name === `song` && store.state.song_info.id === ``) {
+    Toast(`你可真是个小基佬`)
+    return next(`/gay`)
+  }
 
   if(to.name == `Home` && from.name ) {
     // console.log(`不能回到Home`);

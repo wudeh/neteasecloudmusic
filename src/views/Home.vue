@@ -24,6 +24,7 @@
       </div>
       <img @click.stop="showPopList" src="../../public/img/icons/list_icon.svg" alt="" />
     </div>
+    <!-- 从底部弹出的播放列表 -->
     <van-popup v-model:show="store.state.showList" round @close="store.commit(`close`)" position="bottom" :style="{ height: '50%' }">
       <div class="pop_list">
         <div class="title">当前播放列表({{ store.state.song_info.list.length }})</div>
@@ -375,6 +376,18 @@ export default defineComponent({
             url: store.state.song_info.url,
           });
         }
+      }
+
+      // 如果本地有上一次的播放数据还有加入播放列表
+      if(localStorage.getItem("songId")){
+        store.commit("add_local_info",{
+          id: localStorage.getItem("songId") || '',
+          name: localStorage.getItem("songName") || '',
+          author: localStorage.getItem("songAuthor") || '',
+          img: localStorage.getItem("songImg") || '',
+          url: '',
+          type: localStorage.getItem("songType") || `0`,
+        })
       }
 
       audio.value.preload = `auto`

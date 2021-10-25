@@ -7,10 +7,12 @@
     </div>
     <video class="vid" webkit-playsinline playsinline x5-playsinline :src="url" controls></video>
     <div class="info">
-      <van-tabs v-model:active="activeName" sticky>
+      <van-tabs v-model:active="activeName" sticky swipeable>
         <van-tab title="简介" name="1">
           <div class="author">
-            <van-image radius="50%" class="img" :src="avatarUrl" />
+            <div class="img">
+              <van-image radius="50%" class="img" :src="avatarUrl" />
+            </div>
             <div class="detail">
               <span class="name">{{ nickname }}</span>
               <span class="fan" v-if="type == 5">{{ numFilter(fans) }}粉丝</span>
@@ -562,6 +564,7 @@ export default defineComponent({
     .img {
       float: left;
       width: 40px;
+      height: 40px;
       margin-right: 8px;
     }
     .detail {
@@ -580,11 +583,11 @@ export default defineComponent({
     .look {
       float: right;
       height: 20px;
-      padding: 2px;
+      padding: 2px 4px;
       font-size: 14px;
-      border-radius: 8px;
-      color: orange;
-      border: 1px solid orange;
+      border-radius: 20px;
+      color: #fff;
+      background-color: red;
       white-space: nowrap;
     }
   }

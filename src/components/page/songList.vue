@@ -83,7 +83,9 @@
             {{ item.des }}
           </div>
         </div>
+        
         <div class="more">
+          <van-icon v-if="item.mv != 0" name="play-circle-o" @click="goMv(item.mv)" />
           <img @click="popMoreInfo(item, 0)" src="../../../public/img/icons/songInfo.svg" alt="" />
         </div>
       </div>
@@ -217,6 +219,7 @@ export default defineComponent({
           des: item.al.name,
           ar: item.ar,
           al: item.al,
+          mv: item.mv
           // sq: item.maxbr >= 999000,
           // vip: item.fee == 1,
           // dujia: item.flag == 1092
@@ -284,12 +287,18 @@ export default defineComponent({
       store.dispatch(`set_pop_detail`, item)
     }
 
+    // 点击跳转 mv
+    const goMv = (mvId: number): void => {
+      router.push({ name: "vid", query : { vid: mvId }})
+    }
+
     return {
       ...toRefs(data),
       author,
       popMoreInfo,
       store,
       add_song_list,
+      goMv,
       router,
       playMusicSingle,
     };
@@ -485,7 +494,7 @@ export default defineComponent({
       display: flex;
       flex-direction: column;
       height: 100%;
-      width: 300px;
+      width: 275px;
       justify-content: space-between;
       .info_top {
         // color: #fff;
@@ -531,8 +540,17 @@ export default defineComponent({
         }
       }
     }
+    .van-icon {
+      margin-right: 10px;
+    }
     .more {
+      width: 50px;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
       img {
+        float: right;
         width: 20px;
       }
     }

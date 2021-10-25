@@ -11,7 +11,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "Home",
     // redirect: `/discover`,
-    component: () => import(/* webpackChunkName: "login" */ "@/views/Home.vue"),
+    component: () => import(/* webpackChunkName: "home" */ "@/views/Home.vue"),
     meta: {
       keepAlive: true,
       level: 1,
@@ -128,6 +128,15 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
+  {
+    path: "/404",
+    name: "404",
+    component: () => import(/* webpackChunkName: "404" */ "@/components/page/404.vue"),
+  },
+  {
+    path: '/:pathMatch(.*)',
+    redirect: '/404'
+  }
 ];
 
 const router = createRouter({

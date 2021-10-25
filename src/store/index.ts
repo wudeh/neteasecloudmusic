@@ -183,6 +183,10 @@ export default createStore<song>({
         state.song_info.img = state.song_info.list[state.song_info.listIndex].img;
       }
     },
+    // 第一次进来如果本地有上一次播放的信息就加入 list 列表
+    add_local_info(state, info) {
+      state.song_info.list.push(info);
+    },
     // 展示当前播放列表
     set_pop_list(state, i) {
       state.showList = i;
@@ -434,6 +438,7 @@ export default createStore<song>({
       localStorage.removeItem("songImg");
       localStorage.removeItem("songType");
       ctx.commit(`close`)
+      // 如果在歌词滚动页面删除全部列表歌曲需要后退
       if(router.currentRoute.value.name == 'song') router.go(-1)
     }
   },
