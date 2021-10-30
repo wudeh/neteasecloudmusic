@@ -4,7 +4,7 @@
       <div class="img_blur">
         <img :src="img" alt="" />
       </div>
-      <div class="nav">
+      <div class="navSongList">
         <div class="left_arrow" @click="router.go(-1)">
           <img src="../../../public/img/icons/left_arrow.svg" alt="" />
         </div>
@@ -323,7 +323,7 @@ export default defineComponent({
       height: 100vh;
     }
   }
-  .nav {
+  .navSongList {
     // margin-top: 10px;
     height: 50px;
     margin-bottom: 30px;
