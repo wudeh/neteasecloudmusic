@@ -62,7 +62,7 @@
       <div class="play_count">({{ songListInfo.length }})</div>
     </div>
     <!-- 歌曲列表 -->
-    <div class="songList" :class="{songList_no_bar: !store.state.song_info.id}">
+    <div class="songList" :class="{ songList_no_bar: !store.state.song_info.id }">
       <div class="song_item" v-for="(item, index) in songListInfo" :key="index">
         <div class="index">
           <img v-if="item.id == store.state.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -83,7 +83,7 @@
             {{ item.des }}
           </div>
         </div>
-        
+
         <div class="more">
           <!-- 歌曲可能有相关 mv -->
           <van-icon v-if="item.mv != 0" name="play-circle-o" @click="goMv(item.mv)" />
@@ -221,7 +221,7 @@ export default defineComponent({
           des: item.al.name,
           ar: item.ar,
           al: item.al,
-          mv: item.mv
+          mv: item.mv,
           // sq: item.maxbr >= 999000,
           // vip: item.fee == 1,
           // dujia: item.flag == 1092
@@ -281,15 +281,15 @@ export default defineComponent({
     };
 
     // 弹出更多信息
-    const popMoreInfo = (item: any, type: number):void => {
+    const popMoreInfo = (item: any, type: number): void => {
       item.type = type;
-      store.dispatch(`set_pop_detail`, item)
-    }
+      store.dispatch(`set_pop_detail`, item);
+    };
 
     // 点击跳转 mv
     const goMv = (mvId: number): void => {
-      router.push({ name: "vid", query : { vid: mvId }})
-    }
+      router.push({ name: "vid", query: { vid: mvId } });
+    };
 
     return {
       ...toRefs(data),
@@ -308,7 +308,6 @@ export default defineComponent({
 <style lang="less" scoped>
 .top {
   padding: 0 8px;
-  height: 200px;
   position: relative;
   .img_blur {
     position: fixed;
@@ -326,7 +325,7 @@ export default defineComponent({
   .navSongList {
     // margin-top: 10px;
     height: 50px;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
     z-index: 1;
@@ -350,6 +349,7 @@ export default defineComponent({
   .info {
     display: flex;
     z-index: 1;
+    margin-bottom: 5px;
     .avatar {
       margin-right: 8px;
       .img {
@@ -474,7 +474,7 @@ export default defineComponent({
   }
 }
 .songList {
-  height: 90vw;
+  height: 353px;
   overflow: scroll;
   .song_item {
     display: flex;
@@ -556,7 +556,7 @@ export default defineComponent({
   }
 }
 .songList_no_bar {
-  height: 105vw;
+  height: 402px;
 }
 .wrapper {
   height: 100vh;

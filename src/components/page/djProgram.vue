@@ -272,7 +272,6 @@ export default defineComponent({
 <style lang="less" scoped>
 .top {
   padding: 0 8px;
-  height: 200px;
   position: relative;
   .img_blur {
     position: fixed;
@@ -290,7 +289,7 @@ export default defineComponent({
   .navSongList {
     // margin-top: 10px;
     height: 50px;
-    margin-bottom: 30px;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
     z-index: 1;
@@ -314,6 +313,7 @@ export default defineComponent({
   .info {
     display: flex;
     z-index: 1;
+    margin-bottom: 5px;
     .avatar {
       margin-right: 8px;
       .img {
@@ -438,7 +438,7 @@ export default defineComponent({
   }
 }
 .songList {
-  height: 90vw;
+  height: 353px;
   overflow: scroll;
   .song_item {
     display: flex;
@@ -495,7 +495,7 @@ export default defineComponent({
   }
 }
 .songList_no_bar {
-  height: 105vw;
+  height: 402px;
 }
 .wrapper {
   height: 100vh;
