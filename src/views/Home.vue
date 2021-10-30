@@ -110,7 +110,7 @@
         </div>
         <div class="item">
           <img src="../../public/img/icons/album.svg" alt="" />
-          <span>专辑：{{ store.state.song_pop_detail.al.name }}</span>
+          <span>专辑：{{ store.state.song_pop_detail.al }}</span>
         </div>
         <div class="item">
           <img src="../../public/img/icons/cloud.svg" alt="" />

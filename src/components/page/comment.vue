@@ -261,7 +261,7 @@ export default defineComponent({
       }
 
       // 电台评论由于未知原因暂时无法获取
-      if(type === 4) Toast('电台评论暂时无法获取')
+      if(type == 4) Toast('电台评论暂时无法获取')
 
       info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
       data.commentTotal = info.data.totalCount;
@@ -282,6 +282,10 @@ export default defineComponent({
         data.finish = true;
       }
     });
+
+    onMounted(() => {
+      
+    })
 
     // 获取楼层评论
     const floorRequest = async (topComment: any, parentCommentId: number) => {

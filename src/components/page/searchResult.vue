@@ -1024,7 +1024,7 @@ export default defineComponent({
           name: item.name,
           type: 0,
           author: item.ar.map((i: any) => i.name).join("/"),
-          // url: info.data[0].url,
+          al: item.al.name,
           img: item.al.picUrl,
         };
         // 设置歌曲信息

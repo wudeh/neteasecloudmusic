@@ -253,7 +253,7 @@ export default defineComponent({
           name: item.name,
           author: item.ar.map((i: any) => i.name).join("/"),
           type: 0,
-          // url: info.data[0].url,
+          al: item.al.name,
           img: item.al.picUrl,
         };
         // 设置歌曲信息

@@ -10,6 +10,7 @@ interface song {
     img: string;
     url: string;
     type: number | string;
+    al: string,
     isPlaying: boolean;
     lyric: string;
     lyricAll: any[];
@@ -55,6 +56,7 @@ export default createStore<song>({
       img: localStorage.getItem("songImg") || '',
       url: '',
       type: localStorage.getItem("songType") || `0`,
+      al: localStorage.getItem("songAl") || '', // 专辑
       isPlaying: false,
       lyric: ``, // 当前歌词
       lyricAll: [], // 全部歌词
@@ -108,6 +110,7 @@ export default createStore<song>({
       state.song_info.author = song.author;
       state.song_info.img = song.img;
       state.song_info.type = song.type;
+      state.song_info.al = song.al;
 
       // state.song_info.url = song.url;
       localStorage.setItem("songId", state.song_info.id);
@@ -323,6 +326,7 @@ export default createStore<song>({
         ctx.state.song_info.name = ctx.state.song_info.list[ctx.state.song_info.listIndex].name;
         ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
         ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
+        ctx.state.song_info.type = ctx.state.song_info.list[ctx.state.song_info.listIndex].type;
       } else {
         // console.log(`要播放的歌曲名为${ctx.state.song_info.list[ctx.state.song_info.listIndex].name}`);
 
@@ -333,12 +337,13 @@ export default createStore<song>({
         ctx.state.song_info.name = ctx.state.song_info.list[ctx.state.song_info.listIndex].name;
         ctx.state.song_info.author = ctx.state.song_info.list[ctx.state.song_info.listIndex].author;
         ctx.state.song_info.img = ctx.state.song_info.list[ctx.state.song_info.listIndex].img;
+        ctx.state.song_info.type = ctx.state.song_info.list[ctx.state.song_info.listIndex].type;
       }
     },
     // 设置歌曲弹出框详情
     async set_pop_detail(ctx: any, item: any) {
       ctx.state.showDetail = true;
-      ctx.state.showPop = true;
+      // ctx.state.showPop = true;
 
       if (ctx.state.song_pop_detail.id != item.id) {
         // 如果是电台
@@ -348,12 +353,20 @@ export default createStore<song>({
           ctx.state.song_pop_detail.img = item.img;
           ctx.state.song_pop_detail.id = item.id;
           ctx.state.song_pop_detail.name = item.name;
-          ctx.state.song_pop_detail.al = { name: "无" };
+          ctx.state.song_pop_detail.al = "无";
         } else {
           // 要么是歌曲，type === 0
           ctx.state.song_pop_detail = Object.assign({}, item);
-          ctx.state.song_pop_detail.author = item.ar.map((i: any) => i.name).join("/");
-          ctx.state.song_pop_detail.img = item.al.picUrl;
+          
+          // 如果是歌词页面点击的话，直接拿当前播放的信息
+          if(item.isSongClik){
+            ctx.state.song_pop_detail.author = item.author;
+            ctx.state.song_pop_detail.img = item.img;
+          }else {
+            ctx.state.song_pop_detail.author = item.ar.map((i: any) => i.name).join("/");
+            ctx.state.song_pop_detail.img = item.al.picUrl;
+            ctx.state.song_pop_detail.al = item.al.name;
+          }
         }
 
         ctx.state.song_pop_detail.type = item.type;

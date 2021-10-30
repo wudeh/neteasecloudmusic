@@ -26,6 +26,12 @@ router.beforeEach((to, from, next) => {
     return next(`/gay`)
   }
 
+  // 播放列表没有歌，输入URL跳转歌词页面会被拦截到错误页面
+  if(store.state.song_info.list.length == 0 && to.name == `song`) {
+    Toast(`你可真是个小基佬`)
+    return next(`/gay`)
+  }
+
 
   if(to.name == `Home` && from.name ) {
     // console.log(`不能回到Home`);

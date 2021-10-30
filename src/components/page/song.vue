@@ -58,7 +58,7 @@
           <img src="../../../public/img/icons/comment_num.svg" alt="" />
           <div class="comment_num">{{ commentNum }}</div>
         </div>
-        <img src="../../../public/img/icons/songInfo.svg" alt="" />
+        <img src="../../../public/img/icons/songInfo.svg" @click="popMoreInfo" alt="" />
       </div>
       <!-- 进度条 -->
       <div class="progress">
@@ -442,6 +442,21 @@ export default defineComponent({
       }
     };
 
+    // 弹出更多信息
+    const popMoreInfo = (): void => {
+      let item = {
+        id: store.state.song_info.id,
+        name: store.state.song_info.name,
+        author: store.state.song_info.author,
+        img: store.state.song_info.img,
+        type: store.state.song_info.type,
+        isSongClik: true,
+        al: store.state.song_info.al,
+      }
+      
+      store.dispatch(`set_pop_detail`, item);
+    };
+
     return {
       goComment,
       back,
@@ -470,6 +485,7 @@ export default defineComponent({
       volume_line,
       volume_point,
       volume_linePast,
+      popMoreInfo
     };
   },
 });

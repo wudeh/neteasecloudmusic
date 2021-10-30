@@ -224,6 +224,7 @@ export default defineComponent({
           author: item.author,
           url: item.url,
           img: item.img,
+          al: item.al.name,
         };
         // 设置歌曲信息
         store.commit("setSongInfo", song);
