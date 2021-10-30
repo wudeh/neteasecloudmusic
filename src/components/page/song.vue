@@ -102,6 +102,14 @@ export default defineComponent({
     const router = useRouter();
     const active = ref(0);
     const store = useStore();
+
+
+    // 防止从 URL 直接输入链接到歌词滚动页面的情况
+    if(store.state.song_info.id === ``) {
+      Toast(`你可真是个小基佬`)
+      router.push({name: "404"})
+    }
+
     const playWhite = require("../../../public/img/icons/play_white.svg");
     const stopWhite = require("../../../public/img/icons/stop_white.svg");
 
@@ -631,7 +639,7 @@ export default defineComponent({
     }
     .lyric_line_time {
       position: absolute;
-      left: 90%;
+      left: 91%;
       top: 47%;
       font-size: 12px;
       color: #fff;

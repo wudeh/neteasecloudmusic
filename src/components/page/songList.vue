@@ -85,7 +85,9 @@
         </div>
         
         <div class="more">
+          <!-- 歌曲可能有相关 mv -->
           <van-icon v-if="item.mv != 0" name="play-circle-o" @click="goMv(item.mv)" />
+          <!-- 点击弹出歌曲底部弹框信息 -->
           <img @click="popMoreInfo(item, 0)" src="../../../public/img/icons/songInfo.svg" alt="" />
         </div>
       </div>
@@ -256,9 +258,6 @@ export default defineComponent({
         };
         // 设置歌曲信息
         store.commit("setSongInfo", song);
-        // store.commit("add_songList",song)
-        // 再播放
-        store.commit("play", true);
       }
     }
 

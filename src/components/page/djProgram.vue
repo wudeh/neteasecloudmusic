@@ -227,9 +227,6 @@ export default defineComponent({
         };
         // 设置歌曲信息
         store.commit("setSongInfo", song);
-        // store.commit("add_songList",song)
-        // 再播放
-        store.commit("play", true);
       }
     }
 

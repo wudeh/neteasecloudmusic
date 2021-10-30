@@ -380,14 +380,7 @@ export default defineComponent({
 
       // 如果本地有上一次的播放数据还有加入播放列表
       if(localStorage.getItem("songId")){
-        store.commit("add_local_info",{
-          id: localStorage.getItem("songId") || '',
-          name: localStorage.getItem("songName") || '',
-          author: localStorage.getItem("songAuthor") || '',
-          img: localStorage.getItem("songImg") || '',
-          url: '',
-          type: localStorage.getItem("songType") || `0`,
-        })
+        Toast('发现上次播放数据，加入播放列表')
       }
 
       audio.value.preload = `auto`
@@ -427,7 +420,7 @@ export default defineComponent({
       });
       audio.value.addEventListener("stalled", () => {
         // console.log("<-- 网络失速 -->");
-        Toast("当前网络状况较差")
+        if(store.state.song_info.isPlaying) Toast(`当前网络较差`)
         // store.commit("play",false);
         if (!store.state.song_info.duration) {
           store.commit("set_song_allTime", 0);

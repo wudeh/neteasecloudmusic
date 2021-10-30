@@ -83,13 +83,16 @@
           </div>
         </div>
         <div class="more">
-          <img @click="store.dispatch(`set_pop_detail`, item)" src="../../../public/img/icons/songInfo.svg" alt="" />
+          <!-- 歌曲可能有相关 mv -->
+          <van-icon v-if="item.mv != 0" name="play-circle-o" @click="goMv(item.mv)" />
+          <img @click="popMoreInfo(item, 0)" src="../../../public/img/icons/songInfo.svg" alt="" />
         </div>
       </div>
     </div>
     <van-overlay :show="show" @click="show = false">
       <div class="wrapper" @click="show = false">
-        <van-image radius="8" class="img" :src="img" />
+        <!-- <van-image radius="8" :src="img" /> -->
+        <img class="img" :src="img" alt="">
         <span class="title">{{ title }}</span>
         <div class="babel" v-if="tags.length">
           <span>标签：</span>
@@ -177,7 +180,7 @@ export default defineComponent({
     const id: any = router.currentRoute.value.query.id; //获取参数
     onBeforeMount(async () => {
       store.commit("set_load", true);
-
+      Toast("专辑部分歌曲可能无法播放")
       // 得到专辑数据
       const songList = await getAlbumDetail(id);
       // 组装歌单数据
@@ -212,6 +215,7 @@ export default defineComponent({
           sq: item.privilege.maxbr >= 999000,
           vip: item.privilege.fee == 1,
           dujia: item.privilege.flag == 1092,
+          mv: item.mv
         };
       });
 
@@ -245,9 +249,6 @@ export default defineComponent({
         };
         // 设置歌曲信息
         store.commit("setSongInfo", song);
-        // store.commit("add_songList",song)
-        // 再播放
-        store.commit("play", true);
       }
     }
 
@@ -270,12 +271,25 @@ export default defineComponent({
       store.commit(`add_songList`, list);
     };
 
+    // 弹出更多信息
+    const popMoreInfo = (item: any, type: number):void => {
+      item.type = type;
+      store.dispatch(`set_pop_detail`, item)
+    }
+
+    // 点击跳转 mv
+    const goMv = (mvId: number): void => {      
+      router.push({ name: "vid", query : { vid: mvId }})
+    }
+
     return {
       ...toRefs(data),
       author,
       store,
+      popMoreInfo,
       router,
       playMusicSingle,
+      goMv,
       add_song_list,
     };
   },
@@ -516,8 +530,17 @@ export default defineComponent({
         }
       }
     }
+    .van-icon {
+      margin-right: 10px;
+    }
     .more {
+      width: 50px;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
       img {
+        float: right;
         width: 20px;
       }
     }
@@ -528,6 +551,8 @@ export default defineComponent({
 }
 .wrapper {
   height: 100vh;
+  width: 100vw;
+  overflow: scroll;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -538,6 +563,7 @@ export default defineComponent({
     width: 200px;
     height: 200px;
     margin-bottom: 10px;
+    border-radius: 8px;
   }
   .title {
     font-size: 18px;

@@ -126,6 +126,15 @@ const routes: Array<RouteRecordRaw> = [
           level: 6,
         },
       },
+      {
+        path: "/singerDetail",
+        name: "singerDetail",
+        component: () => import(/* webpackChunkName: "login" */ "@/components/page/singer_detail.vue"),
+        meta: {
+          keepAlive: true,
+          level: 10,
+        },
+      },
     ],
   },
   {

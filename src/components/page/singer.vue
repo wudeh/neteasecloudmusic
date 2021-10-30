@@ -1,15 +1,19 @@
 <template>
   <div>
-    <div class="nav">
-      <img @click="router.go(-1)" src="../../../public/img/icons/left_arrow_black.svg" alt="" />
-      <div @click="loadMore" class="title">歌手榜单</div>
+    <div class="top_search" style="display: flex;width: 100vw;height:50px;align-items:center">
+      <div class="back" @click="router.go(-1)" style="display:flex;align-items:center;justify-content:center;width: 10vw;margin-left: 10px">
+        <img @click="router.go(-1)" src="../../../public/img/icons/left_arrow_black.svg" alt="" />
+      </div>
+      <div style="margin-left: 104px;font-size:18px;text-align:center">
+        歌手榜单
+      </div>
     </div>
-    <van-tabs v-model:active="activeName">
+    <van-tabs v-model:active="activeName" sticky>
+      <!-- <van-tab disabled></van-tab>
       <van-tab disabled></van-tab>
-      <van-tab disabled></van-tab>
-      <van-tab disabled></van-tab>
+      <van-tab disabled></van-tab> -->
       <van-tab title="华语" name="1">
-        <div class="wrapper">
+        <!-- <div class="wrapper"> -->
           <van-list v-model:loading="cn.loading" v-model:error="cn.error" :immediate-check="true" :finished="cn.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display: flex; align-items: center; justify-content: center">
@@ -19,7 +23,7 @@
             </template>
             <div class="time" v-if="cn.info.updateTime">更新时间：{{ new Date(cn.info.updateTime).getMonth() + 1 }}月{{ new Date(cn.info.updateTime).getDate() }}日</div>
             <div class="info">
-              <div class="item" v-for="(it, i) in cn.info.artists" :key="it.id">
+              <div class="item" v-for="(it, i) in cn.info.artists" :key="it.id"  @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
                 <div class="index">
                   <span :class="{ num: true, red: i < 3 }">{{ i + 1 }}</span>
                   <span v-if="it.rank == i">-</span>
@@ -36,10 +40,10 @@
               </div>
             </div>
           </van-list>
-        </div>
+        <!-- </div> -->
       </van-tab>
       <van-tab title="欧美" name="2">
-        <div class="wrapper">
+        <!-- <div class="wrapper"> -->
           <van-list v-model:loading="en.loading" v-model:error="en.error" :immediate-check="true" :finished="en.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display: flex; align-items: center; justify-content: center">
@@ -49,7 +53,7 @@
             </template>
             <div class="time" v-if="en.info.updateTime">更新时间：{{ new Date(en.info.updateTime).getMonth() + 1 }}月{{ new Date(en.info.updateTime).getDate() }}日</div>
             <div class="info">
-              <div class="item" v-for="(it, i) in en.info.artists" :key="it.id">
+              <div class="item" v-for="(it, i) in en.info.artists" :key="it.id" @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
                 <div class="index">
                   <span :class="{ num: true, red: i < 3 }">{{ i + 1 }}</span>
                   <span v-if="it.rank == i">-</span>
@@ -66,10 +70,10 @@
               </div>
             </div>
           </van-list>
-        </div>
+        <!-- </div> -->
       </van-tab>
       <van-tab title="韩国" name="3">
-        <div class="wrapper">
+        <!-- <div class="wrapper"> -->
           <van-list v-model:loading="ko.loading" v-model:error="ko.error" :immediate-check="true" :finished="ko.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display: flex; align-items: center; justify-content: center">
@@ -79,7 +83,7 @@
             </template>
             <div class="time" v-if="ko.info.updateTime">更新时间：{{ new Date(ko.info.updateTime).getMonth() + 1 }}月{{ new Date(ko.info.updateTime).getDate() }}日</div>
             <div class="info">
-              <div class="item" v-for="(it, i) in ko.info.artists" :key="it.id">
+              <div class="item" v-for="(it, i) in ko.info.artists" :key="it.id" @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
                 <div class="index">
                   <span :class="{ num: true, red: i < 3 }">{{ i + 1 }}</span>
                   <span v-if="it.rank == i">-</span>
@@ -96,10 +100,10 @@
               </div>
             </div>
           </van-list>
-        </div>
+        <!-- </div> -->
       </van-tab>
       <van-tab title="日本" name="4">
-        <div class="wrapper">
+        <!-- <div class="wrapper"> -->
           <van-list v-model:loading="ja.loading" v-model:error="ja.error" :immediate-check="true" :finished="ja.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display: flex; align-items: center; justify-content: center">
@@ -109,7 +113,7 @@
             </template>
             <div class="time" v-if="ja.info.updateTime">更新时间：{{ new Date(ja.info.updateTime).getMonth() + 1 }}月{{ new Date(ja.info.updateTime).getDate() }}日</div>
             <div class="info">
-              <div class="item" v-for="(it, i) in ja.info.artists" :key="it.id">
+              <div class="item" v-for="(it, i) in ja.info.artists" :key="it.id" @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
                 <div class="index">
                   <span :class="{ num: true, red: i < 3 }">{{ i + 1 }}</span>
                   <span v-if="it.rank == i">-</span>
@@ -126,11 +130,11 @@
               </div>
             </div>
           </van-list>
-        </div>
+        <!-- </div> -->
       </van-tab>
+      <!-- <van-tab disabled></van-tab>
       <van-tab disabled></van-tab>
-      <van-tab disabled></van-tab>
-      <van-tab disabled></van-tab>
+      <van-tab disabled></van-tab> -->
     </van-tabs>
   </div>
 </template>
@@ -180,6 +184,7 @@ export default defineComponent({
       },
     });
 
+    // dfsdfdf
     const loadMore = async () => {
       if (data.activeName == 1) {
         if (data.cn.info.artists.length || data.cn.loading) return;
@@ -244,10 +249,10 @@ export default defineComponent({
     width: 25px;
   }
 }
-.wrapper {
-  height: 573px;
-  overflow: scroll;
-}
+// .wrapper {
+//   height: 573px;
+//   overflow: scroll;
+// }
 .time {
   font-size: 18px;
   padding: 8px;

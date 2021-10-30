@@ -1,5 +1,5 @@
 import axios from "./axios";
-
+import { singerDetail }  from "../components/interface/interface"
 // 获取歌单数据
 export function getSongListInfo(id:string): any {
   return axios.post("/playlist/detail",{id});
@@ -113,4 +113,9 @@ export function getAlbumDetail(id: number): any {
 // 歌手排行榜
 export function getTopList(type: number): any {
   return axios.get(`/toplist/artist?type=${type}`);
+}
+
+// 歌手详情
+export function getSingerDetail(id: string): Promise<singerDetail> {
+  return axios.get(`/artist/detail?id=${id}`);
 }

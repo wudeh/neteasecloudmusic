@@ -401,13 +401,13 @@
                 <span>加载中...</span>
               </div>
             </template>
-            <div class="user" @click="notDone()">
+            <div class="user">
               <div class="item" v-for="(item, index) in artists" :key="index">
                 <div class="left">
                   <van-image class="img" radius="50%" :src="item.img1v1Url" />
                   <img v-if="item.picUrl" src="https://p5.music.126.net/obj/wo3DlcOGw6DClTvDisK1/4874132307/4499/f228/d867/da64b9725e125943ad4e14e4c72d0884.png" alt="" />
                 </div>
-                <div class="info">
+                <div class="info" @click="goSingerDetail(item.id)">
                   <div class="name" v-word="word">
                     {{ item.name }}
                   </div>
@@ -975,9 +975,6 @@ export default defineComponent({
         };
         // 设置歌曲信息
         store.commit("setSongInfo", song);
-        // store.commit("add_songList",song)
-        // 再播放
-        store.commit("play", true);
       }
     }
 
@@ -1017,6 +1014,11 @@ export default defineComponent({
       store.dispatch(`set_pop_detail`, item)
     }
 
+    // 跳转歌手详情
+    const goSingerDetail = (id: string):void => {
+      router.push({name:"singerDetail", query: {id}})
+    }
+
     return {
       suggest,
       onSearch,
@@ -1035,6 +1037,7 @@ export default defineComponent({
       notDone,
       notShowSuggest,
       ShowSuggest,
+      goSingerDetail,
       ...toRefs(data),
     };
   },
@@ -1287,7 +1290,6 @@ export default defineComponent({
     .followed {
       color: #ccc;
       padding: 5px;
-      border: 1px solid #ccc;
       font-size: 12px;
       line-height: 12px;
       border-radius: 20px;
@@ -1295,9 +1297,9 @@ export default defineComponent({
       text-align: center;
     }
     .follow {
+      background-color: red;
       .followed;
-      color: orange;
-      border-color: orange;
+      color: #fff;
     }
   }
 }
