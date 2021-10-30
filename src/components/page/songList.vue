@@ -92,7 +92,7 @@
         </div>
       </div>
     </div>
-    <van-overlay :show="show" @click="show = false">
+    <van-overlay :show="show" @click="show = false" :lock-scroll="false">
       <div class="wrapper" @click="show = false">
         <van-image radius="8" class="img" :src="img" />
         <span class="title">{{ title }}</span>
