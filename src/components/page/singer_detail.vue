@@ -7,7 +7,7 @@
   <div class="Bg" v-if="name">
     <van-image class="img" width="375" height="280" :src="backgroundUrl" />
     <div class="avatar_info">
-      <van-image class="img topMove" :src="avatarUrl" />
+      <van-image class="img topMove" width="70" height="70" radius="70" :src="avatarUrl" />
       <div class="name topMove">{{ name }}</div>
       <div class="icondes topMove">{{imageDesc}}</div>
     </div>
@@ -16,7 +16,7 @@
       <div class="title">艺人百科</div>
       <div class="icondes">艺人名：{{ name }}</div>
       <div class="icondes" v-if="transNames">译名：{{ transNames }}</div>
-      <div class="icondes">身份：{{ secondaryExpertIdentiy }}</div>
+      <div class="icondes">身份：{{ imageDesc }}</div>
       <div class="icondes">性别：{{ gender == 2 ? "女" : "男" }}</div>
       <div class="icondes" v-if="birthday">生日：{{ birthday }}</div>
       <div class="icondes" v-if="signature">个人简介：{{ signature }}</div>
@@ -97,6 +97,7 @@ export default defineComponent ({
       } catch (error) {
         Toast("获取歌手详情失败");
         data.error = true;
+        store.commit("set_load", false)
       }
     }
     
@@ -138,17 +139,16 @@ export default defineComponent ({
       background-color: #fff;
       border-radius: 20px;
       position: relative;
-      top: -10px;
+      top: -25px;
       display: flex;
       flex-direction: column;
       align-items: center;
       .topMove {
         position: relative;
-        top: -10px;
+        top: -25px;
       }
       img {
         position: relative;
-        top: -25px;
         width: 70px;
         height: 70px;
         border-radius: 70px;

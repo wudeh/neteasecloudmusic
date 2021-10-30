@@ -56,7 +56,7 @@
                         <span v-for="(it, i) in item.originSongSimpleData.artists" :key="i"><i v-if="i > 0">/</i>{{ it.name }}</span>
                       </div>
                     </div>
-                    <div class="rignt" @click="store.dispatch(`set_pop_detail`, item)">
+                    <div class="rignt" @click="popMoreInfo(item, 0)">
                       <img src="../../../public/img/icons/more_gray.svg" alt="" />
                     </div>
                   </div>
@@ -117,7 +117,7 @@
               <!-- 相关搜索 -->
               <div class="searchSimilar" v-if="sim_query">
                 <div class="title">相关搜索</div>
-                <div class="item" v-for="(item, index) in sim_query.sim_querys" :key="index">{{ item.keyword }}</div>
+                <div class="item" v-for="(item, index) in sim_query.sim_querys" :key="index" @click="suggestClick(item.keyword)">{{ item.keyword }}</div>
               </div>
               <!-- 专辑 -->
               <div class="playList" v-if="album">
@@ -184,7 +184,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="Loading" v-model:error="Error" :immediate-check="true" :finished="songFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="Loading" v-model:error="songError" :immediate-check="true" :finished="songFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -235,7 +235,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="albumLoading" v-model:error="Error" :immediate-check="true" :finished="albumFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="albumLoading" v-model:error="albumError" :immediate-check="true" :finished="albumFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -266,7 +266,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="videoLoading" v-model:error="Error" :immediate-check="true" :finished="videoFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="videoLoading" v-model:error="videoError" :immediate-check="true" :finished="videoFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -298,7 +298,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="playListLoading" v-model:error="Error" :immediate-check="true" :finished="playListFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="playListLoading" v-model:error="playListError" :immediate-check="true" :finished="playListFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -330,7 +330,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="mvLoading" v-model:error="Error" :immediate-check="true" :finished="mvFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="mvLoading" v-model:error="mvError" :immediate-check="true" :finished="mvFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -363,7 +363,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="djRadioLoading" v-model:error="Error" :immediate-check="true" :finished="djRadioFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="djRadioLoading" v-model:error="djRadioError" :immediate-check="true" :finished="djRadioFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -394,7 +394,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="artistLoading" v-model:error="Error" :immediate-check="true" :finished="artistFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="artistLoading" v-model:error="artistError" :immediate-check="true" :finished="artistFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -428,7 +428,7 @@
               <span>加载中...</span>
             </div>
           </template>
-          <van-list v-model:loading="userLoading" v-model:error="Error" :immediate-check="true" :finished="userFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="userLoading" v-model:error="userError" :immediate-check="true" :finished="userFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display:flex;align-items:center;justify-content:center;">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
@@ -491,40 +491,48 @@ interface info {
   songs: any;
   songPageNo: number;
   songFinish: boolean;
+  songError: boolean;
   playList: any;
   playLists: any;
   playListPageNo: number;
   playListLoading: boolean;
   playListFinish: boolean;
+  playListError: boolean;
   video: { videos: []; Finish: boolean };
   videoPageNo: number;
   videos: any;
   videoLoading: boolean;
   videoFinish: boolean;
+  videoError: boolean;
   sim_query: any;
   album: any;
   albumPageNo: number;
   albums: any;
   albumLoading: boolean;
   albumFinish: boolean;
+  albumError: boolean;
   djRadio: any;
   djRadioPageNo: number;
   djRadios: any;
   djRadioLoading: boolean;
   djRadioFinish: boolean;
+  djRadioError: boolean;
   user: any;
   userPageNo: number;
   users: any;
   userLoading: boolean;
   userFinish: boolean;
+  userError: boolean;
   artist: any;
   artistPageNo: number;
   artists: any;
   artistLoading: boolean;
   artistFinish: boolean;
+  artistError: boolean;
   MV: any;
   mvLoading: boolean;
   mvFinish: boolean;
+  mvError: boolean;
   mvs: any;
   mvsPageNo: number;
   lyric: any;
@@ -568,41 +576,49 @@ export default defineComponent({
       songs: [],
       songPageNo: 0,
       songFinish: false,
+      songError: false,
       playList: { playLists: [], Finish: false },
       playLists: [],
       playListPageNo: 0,
       playListLoading: false,
       playListFinish: false,
+      playListError: false,
       video: { videos: [], Finish: false },
       videoPageNo: 0,
       videos: [],
       videoLoading: false,
       videoFinish: false,
+      videoError: false,
       sim_query: { sim_querys: [], Finish: false },
       album: { albums: [] },
       albumPageNo: 0,
       albums: [],
       albumLoading: false,
       albumFinish: false,
+      albumError: false,
       djRadio: { djRadios: [], Finish: false },
       djRadioPageNo: 0,
       djRadios: [],
       djRadioLoading: false,
       djRadioFinish: false,
+      djRadioError: false,
       user: { userprofiles: [], Finish: false },
       userPageNo: 0,
       users: [],
       userLoading: false,
       userFinish: false,
+      userError: false,
       artist: { artists: [], Finish: false },
       artistPageNo: 0,
       artists: [],
       artistLoading: false,
       artistFinish: false,
+      artistError: false,
       MV: { mvs: [], Finish: false },
       mvs: [],
       mvLoading: false,
       mvFinish: false,
+      mvError: false,
       mvsPageNo: 0,
       lyric: {},
       lyrics: [],
@@ -704,10 +720,9 @@ export default defineComponent({
       loadMore();
     };
 
-    // 点击搜索建议，重新搜索
+    // 点击搜索建议，点击相关搜索词，重新搜索
     const suggestClick = (i: string) => {
-      console.log(i);
-
+      router.replace({path: "/searchResult", query: {word: i}})
       data.word = i;
       onSearch();
     };
@@ -764,77 +779,107 @@ export default defineComponent({
 
     const loadMore = async () => {
       if (data.activeName == 1) {
-        data.Loading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.songPageNo);
-        data.songRefreshing = false;
-        data.songs = data.songs.concat(info.result.songs);
-        data.Loading = false;
-        data.songPageNo += 1;
-        if (data.songs.length >= info.result.songCount) {
-          // data.song.Finish = true;
-          data.songFinish = true;
+        try {
+          data.Loading = true;
+          let info = await getsearchResult(data.word, data.activeName, data.songPageNo);
+          data.songRefreshing = false;
+          data.songs = data.songs.concat(info.result.songs);
+          data.Loading = false;
+          data.songPageNo += 1;
+          if (data.songs.length >= info.result.songCount) {
+            // data.song.Finish = true;
+            data.songFinish = true;
+          }
+        } catch (error) {
+          data.Loading = false;
+          data.songError = true;
         }
       }
       if (data.activeName == 10) {
-        data.albumLoading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.albumPageNo);
-        data.albumRefreshing = false;
-        data.albums = data.albums.concat(info.result.albums);
-        data.albumLoading = false;
-        data.albumPageNo += 1;
-        if (data.albums.length >= info.result.albumCount) {
-          // data.album.Finish = true;
-          data.albumFinish = true;
+        try {
+          data.albumLoading = true;
+          let info = await getsearchResult(data.word, data.activeName, data.albumPageNo);
+          data.albumRefreshing = false;
+          data.albums = data.albums.concat(info.result.albums);
+          data.albumLoading = false;
+          data.albumPageNo += 1;
+          if (data.albums.length >= info.result.albumCount) {
+            // data.album.Finish = true;
+            data.albumFinish = true;
+          }
+        } catch (error) {
+          data.albumLoading = false;
+          data.albumError = true;
         }
       }
       if (data.activeName == 100) {
-        data.artistLoading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.artistPageNo);
-        data.artistRefreshing = false;
-        data.artists = data.artists.concat(info.result.artists);
-        data.artistLoading = false;
-        data.artistPageNo += 1;
-        if (data.artist.artists.length >= info.result.artistCount) {
-          // data.artist.Finish = true;
-          data.artistFinish = true;
+        try {
+          data.artistLoading = true;
+          let info = await getsearchResult(data.word, data.activeName, data.artistPageNo);
+          data.artistRefreshing = false;
+          data.artists = data.artists.concat(info.result.artists);
+          data.artistLoading = false;
+          data.artistPageNo += 1;
+          if (data.artist.artists.length >= info.result.artistCount) {
+            // data.artist.Finish = true;
+            data.artistFinish = true;
+          }
+        } catch (error) {
+          data.artistLoading = false;
+          data.artistError = true;
         }
       }
       if (data.activeName == 1000) {
-        data.playListLoading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.playListPageNo);
-        data.playListRefreshing = false;
-        data.playLists = data.playLists.concat(info.result.playlists);
-        data.playListLoading = false;
-        data.playListPageNo += 1;
-        if (!info.result.hasMore) {
-          // data.playList.Finish = true;
-          data.playListFinish = true;
+        try {
+          data.playListLoading = true;
+          let info = await getsearchResult(data.word, data.activeName, data.playListPageNo);
+          data.playListRefreshing = false;
+          data.playLists = data.playLists.concat(info.result.playlists);
+          data.playListLoading = false;
+          data.playListPageNo += 1;
+          if (!info.result.hasMore) {
+            // data.playList.Finish = true;
+            data.playListFinish = true;
+          }
+        } catch (error) {
+          data.playListLoading = false;
+          data.playListError = true;
         }
       }
       if (data.activeName == 1002) {
-        data.userLoading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.userPageNo);
-        data.userRefreshing = false;
-        data.users = data.users.concat(info.result.userprofiles);
-        data.userPageNo += 1;
-        data.userLoading = false;
-        if (data.users.length >= info.result.userprofileCount) {
-          // data.user.Finish = true;
-          data.userFinish = true;
+        try {
+          data.userLoading = true;
+          let info = await getsearchResult(data.word, data.activeName, data.userPageNo);
+          data.userRefreshing = false;
+          data.users = data.users.concat(info.result.userprofiles);
+          data.userLoading = false;
+          data.userPageNo += 1;
+          if (data.users.length >= info.result.userprofileCount) {
+            // data.user.Finish = true;
+            data.userFinish = true;
+          }
+        } catch (error) {
+          data.userLoading = false;
+          data.userError = true;
         }
       }
       if (data.activeName == 1004) {
-        data.mvLoading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.mvsPageNo);
-        data.MVRefreshing = false;
-        if (info.result.mvs) {
-          data.mvs = data.mvs.concat(info.result.mvs);
-        }
-        data.mvLoading = false;
-        data.mvsPageNo += 1;
-        if (data.mvs.length >= info.result.mvCount) {
-          // data.MV.Finish = true;
-          data.mvFinish = true;
+        try {
+          data.mvLoading = true;
+          let info = await getsearchResult(data.word, data.activeName, data.mvsPageNo);
+          data.MVRefreshing = false;
+          if (info.result.mvs) {
+            data.mvs = data.mvs.concat(info.result.mvs);
+          }
+          data.mvLoading = false;
+          data.mvsPageNo += 1;
+          if (data.mvs.length >= info.result.mvCount) {
+            // data.MV.Finish = true;
+            data.mvFinish = true;
+          }
+        } catch (error) {
+          data.mvLoading = false;
+          data.mvError = true;
         }
       }
       // 歌词暂时不弄
@@ -849,58 +894,67 @@ export default defineComponent({
       //   }
       // }
       if (data.activeName == 1009) {
-        console.log("请求电台数据");
 
-        data.djRadioLoading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.djRadioPageNo);
-        data.djRadioRefreshing = false;
-        data.djRadios = data.djRadios.concat(info.result.djRadios);
-        data.djRadioLoading = false;
-        data.djRadioPageNo += 1;
-        if (data.djRadios.length >= info.result.djRadiosCount) {
-          // data.djRadio.Finish = true;
-          data.djRadioFinish = true;
+        try {
+          data.djRadioLoading = true;
+          let info = await getsearchResult(data.word, data.activeName, data.djRadioPageNo);
+          data.djRadioRefreshing = false;
+          data.djRadios = data.djRadios.concat(info.result.djRadios);
+          data.djRadioLoading = false;
+          data.djRadioPageNo += 1;
+          if (data.djRadios.length >= info.result.djRadiosCount) {
+            // data.djRadio.Finish = true;
+            data.djRadioFinish = true;
+          }
+        } catch (error) {
+          data.djRadioError = true;
+          data.djRadioLoading = false;
         }
       }
       if (data.activeName == 1014) {
-        console.log("请求视频数据");
-
-        data.videoLoading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.videoPageNo);
-        data.videoRefreshing = false;
-        data.videoLoading = false;
-        if (info.code != 200 || !info.result) {
-          data.Error = true;
-          return;
-        }
-        data.videos = data.videos.concat(info.result.videos);
-        data.videoPageNo += 1;
-        if (data.videos.length >= info.result.videoCount) {
-          // data.video.Finish = true;
-          data.videoFinish = true;
-        }
+          try {
+            data.videoLoading = true;
+            let info = await getsearchResult(data.word, data.activeName, data.videoPageNo);
+            data.videoRefreshing = false;
+            data.videoLoading = false;
+            if (info.code != 200 || !info.result) {
+              data.Error = true;
+              return;
+            }
+            data.videos = data.videos.concat(info.result.videos);
+            data.videoPageNo += 1;
+            if (data.videos.length >= info.result.videoCount) {
+              data.videoFinish = true;
+            }
+          } catch (error) {
+            data.videoLoading = false;
+            data.videoError = true;
+          }
       }
       if (data.activeName == 1018) {
-        // store.commit("set_load", true)
-        data.allFinish = false;
-        data.allLoading = true;
-        let info = await getsearchResult(data.word, data.activeName, data.pageNo);
-        data.allRefreshing = false;
-        data.allLoading = false;
-        if (info.code != 200 || !info.result) {
+        try {
+          data.allFinish = false;
+          data.allLoading = true;
+          let info = await getsearchResult(data.word, data.activeName, data.pageNo);
+          data.allRefreshing = false;
+          data.allLoading = false;
+          if (info.code != 200 || !info.result) {
+            data.allError = true;
+            return;
+          }
+          data.allFinish = true;
+          data.song = info.result.song;
+          data.playList = info.result.playList;
+          data.video = info.result.video;
+          data.sim_query = info.result.sim_query;
+          data.album = info.result.album;
+          data.djRadio = info.result.djRadio;
+          data.user = info.result.user;
+          data.artist = info.result.artist;
+        } catch (error) {
           data.allError = true;
-          return;
+          data.allLoading = false;
         }
-        data.allFinish = true;
-        data.song = info.result.song;
-        data.playList = info.result.playList;
-        data.video = info.result.video;
-        data.sim_query = info.result.sim_query;
-        data.album = info.result.album;
-        data.djRadio = info.result.djRadio;
-        data.user = info.result.user;
-        data.artist = info.result.artist;
-        // store.commit("set_load", false)
       }
 
       data.pageNo += 1;
@@ -946,13 +1000,13 @@ export default defineComponent({
     };
 
     // 手动滑动需要监听
-    watch(
-      () => data.activeName,
-      (value) => {
-        console.log(value);
+    // watch(
+    //   () => data.activeName,
+    //   (value) => {
+    //     console.log(value);
         
-      }
-    );
+    //   }
+    // );
 
     // 点击播放歌曲
     function playMusicSingle(item: any): void {

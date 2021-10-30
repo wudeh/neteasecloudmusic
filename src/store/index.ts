@@ -358,13 +358,22 @@ export default createStore<song>({
 
         ctx.state.song_pop_detail.type = item.type;
 
-        // 获取一下评论数量
-        let info = await getComment(item.id, item.type, 1, 20, 3);
-        ctx.state.song_pop_detail.commentCount = info.data.totalCount;
-        // 获取URL，以供下载
-        info = await getSongUrl(item.id);
-        Toast(`已获取到下载链接，可以下载了`);
-        ctx.state.song_pop_detail.url = info.data[0].url;
+        try {
+          // 获取一下评论数量
+          let info = await getComment(item.id, item.type, 1, 20, 3);
+          ctx.state.song_pop_detail.commentCount = info.data.totalCount;
+        } catch (error) {
+          Toast(`评论获取失败`)
+        }
+        
+        try {
+          // 获取URL，以供下载
+          let info = await getSongUrl(item.id);
+          Toast(`已获取到下载链接，可以下载了`);
+          ctx.state.song_pop_detail.url = info.data[0].url;
+        } catch (error) {
+          Toast(`下载链接获取失败`)
+        }
       }
     },
     // 删除一首列表歌曲
