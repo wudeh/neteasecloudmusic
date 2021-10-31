@@ -741,7 +741,7 @@ export default defineComponent({
           author: item.resourceExtInfo.artists.map((i: any) => i.name).join("/"),
           url: info.data[0].url,
           img: item.uiElement.image.imageUrl,
-          al: item.al.name
+          al: item.resourceExtInfo.songData.album.name
         };
 
         // 设置歌曲信息
