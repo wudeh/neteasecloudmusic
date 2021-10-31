@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="{first_div: true, first_div_song_height: store.state.song_info.id}">
     <div class="top">
       <div class="img_blur">
         <img :src="img" alt="" />
@@ -297,6 +297,14 @@ export default defineComponent({
 </script>
 
 <style lang="less" scoped>
+.first_div {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.first_div_song_height {
+  height: 617px;
+}
 .top {
   padding: 0 8px;
   position: relative;
@@ -465,7 +473,7 @@ export default defineComponent({
   }
 }
 .songList {
-  height: 353px;
+  // height: 353px;
   overflow: scroll;
   .song_item {
     display: flex;
@@ -547,7 +555,7 @@ export default defineComponent({
   }
 }
 .songList_no_bar {
-  height: 402px;
+  // height: 402px;
 }
 .wrapper {
   height: 100vh;

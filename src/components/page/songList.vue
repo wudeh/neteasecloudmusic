@@ -1,18 +1,20 @@
 <template>
-  <div>
+  <div :class="{first_div: true, first_div_song_height: store.state.song_info.id}">
     <div class="top">
       <div class="img_blur">
         <img :src="img" alt="" />
       </div>
-      <div class="navSongList">
-        <div class="left_arrow" @click="router.go(-1)">
-          <img src="../../../public/img/icons/left_arrow.svg" alt="" />
+      <!-- <van-sticky> -->
+        <div class="navSongList">
+          <div class="left_arrow" @click="router.go(-1)">
+            <img src="../../../public/img/icons/left_arrow.svg" alt="" />
+          </div>
+          <div class="title">歌单</div>
+          <div class="search">
+            <img src="../../../public/img/icons/search.svg" alt="" />
+          </div>
         </div>
-        <div class="title">歌单</div>
-        <div class="search">
-          <img src="../../../public/img/icons/search.svg" alt="" />
-        </div>
-      </div>
+      <!-- </van-sticky> -->
       <div class="info">
         <div class="avatar">
           <van-image radius="8" class="img" :src="img" />
@@ -52,15 +54,17 @@
       </div>
     </div>
     <!-- 全部播放 -->
-    <div class="playAll">
-      <div class="icon">
-        <img @click="add_song_list" src="../../../public/img/icons/playAll.svg" alt="" />
+    <!-- <van-sticky offset-top="50"> -->
+      <div class="playAll">
+        <div class="icon">
+          <img @click="add_song_list" src="../../../public/img/icons/playAll.svg" alt="" />
+        </div>
+        <div class="text">
+          <div class="play_all_title">播放全部</div>
+        </div>
+        <div class="play_count">({{ songListInfo.length }})</div>
       </div>
-      <div class="text">
-        <div class="play_all_title">播放全部</div>
-      </div>
-      <div class="play_count">({{ songListInfo.length }})</div>
-    </div>
+    <!-- </van-sticky> -->
     <!-- 歌曲列表 -->
     <div class="songList" :class="{ songList_no_bar: !store.state.song_info.id }">
       <div class="song_item" v-for="(item, index) in songListInfo" :key="index">
@@ -306,6 +310,14 @@ export default defineComponent({
 </script>
 
 <style lang="less" scoped>
+.first_div {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.first_div_song_height {
+  height: 617px;
+}
 .top {
   padding: 0 8px;
   position: relative;
@@ -474,7 +486,8 @@ export default defineComponent({
   }
 }
 .songList {
-  height: 353px;
+  // height: 353px;
+  flex: 1;
   overflow: scroll;
   .song_item {
     display: flex;
@@ -556,7 +569,7 @@ export default defineComponent({
   }
 }
 .songList_no_bar {
-  height: 402px;
+  // height: 402px;
 }
 .wrapper {
   height: 100vh;

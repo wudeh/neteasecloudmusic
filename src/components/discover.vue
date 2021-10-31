@@ -754,7 +754,18 @@ export default defineComponent({
 
     // 点击新歌 新碟 新专辑
     const new_three = (item: any) => {
-      if (item.resourceType == `song`) {
+      if (item.resourceType == `song`) {        
+        // let i: any = {
+        //   id: item.resourceId,
+        //   type: 0,
+        //   name: item!.resourceExtInfo!.songData.name,
+        //   author: item.resourceExtInfo.artists.map((i: any) => i.name).join("/"),
+        //   url: '',
+        //   img: item.uiElement.image.imageUrl,
+        //   al: item.resourceExtInfo.songData.album.name
+        // }
+        item.al = {name: ''}
+        item.al.name = item.resourceExtInfo.songData.album.name
         playMusicSingle(item);
       } else {
         router.push({ path: `/album`, query: { id: item.resourceId } });

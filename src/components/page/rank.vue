@@ -1,7 +1,7 @@
 <template>
   <div>
     <van-sticky>
-      <div class="nav">
+      <div class="navSongList">
         <div class="back" @click="router.go(-1)">
           <img src="../../../public/img/icons/left_arrow_black.svg" alt="">
         </div>
@@ -96,7 +96,7 @@
 </script>
 
 <style lang="less" scoped>
-.nav {
+.navSongList {
   display: flex;
   align-items: center;
   background-color: #fff;
