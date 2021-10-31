@@ -316,7 +316,7 @@ export default defineComponent({
   flex-direction: column;
 }
 .first_div_song_height {
-  height: 617px;
+  height: calc(100vh - 50px);
 }
 .top {
   padding: 0 8px;

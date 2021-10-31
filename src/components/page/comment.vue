@@ -10,7 +10,7 @@
 
       <!-- 导航 -->
       <van-sticky>
-        <div class="nav">
+        <div class="navSongList">
           <div class="back" @click="router.go(-1)">
             <img src="../../../public/img/icons/left_arrow_black.svg" alt="" />
           </div>
@@ -371,7 +371,7 @@ export default defineComponent({
 .van-skeleton {
   background-color: #fff;
 }
-.nav {
+.navSongList {
   height: 50px;
   display: flex;
   padding: 8px;
