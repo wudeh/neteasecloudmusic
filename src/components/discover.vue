@@ -539,6 +539,7 @@ export default defineComponent({
 
     // 数据请求
     onMounted(async () => {
+      
       window.addEventListener("scroll", () => {
         decrease(window.scrollY)();
       });
@@ -785,13 +786,6 @@ export default defineComponent({
     const goSearch = () => {
       router.push({ path: "/search", query: {} });
     };
-
-    // 退出登录
-    function logoutDD(): void {
-      localStorage.removeItem("cookieMusic");
-      localStorage.removeItem("tokenMusic");
-      logout();
-    }
 
     function recentcontactDD(): void {
       recentcontact();

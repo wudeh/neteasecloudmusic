@@ -174,7 +174,7 @@ import { getComment, getSongInfo, getFloorComment, getPlayListDetail } from "../
 import { useRouter } from "vue-router";
 import { sendTimeConversion, numFilter } from "../../utils/num";
 import { useStore } from "vuex";
-import { Toast } from 'vant';
+import { Toast } from "vant";
 interface info {
   img: string;
   name: string;
@@ -199,7 +199,7 @@ interface info {
   requestLoading: boolean; // 请求是否完成
   error: boolean;
   finish: boolean; // 是否没有更多数据了
-  haveFirstFloorPop: boolean
+  haveFirstFloorPop: boolean;
 }
 export default defineComponent({
   name: "comment",
@@ -232,7 +232,7 @@ export default defineComponent({
       requestLoading: false,
       error: false,
       finish: false,
-      haveFirstFloorPop: false
+      haveFirstFloorPop: false,
     });
     onBeforeMount(async () => {
       // 获取音乐图片，标题，歌手
@@ -261,7 +261,7 @@ export default defineComponent({
       }
 
       // 电台评论由于未知原因暂时无法获取
-      if(type == 4) Toast('电台评论暂时无法获取')
+      if (type == 4) Toast("电台评论暂时无法获取");
 
       info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
       data.commentTotal = info.data.totalCount;
@@ -283,9 +283,7 @@ export default defineComponent({
       }
     });
 
-    onMounted(() => {
-      
-    })
+    onMounted(() => {});
 
     // 获取楼层评论
     const floorRequest = async (topComment: any, parentCommentId: number) => {
@@ -295,11 +293,11 @@ export default defineComponent({
       data.floorArr = [];
       data.floorFinish = false;
       data.floorPageNo = 0;
-      if(data.haveFirstFloorPop) {
+      if (data.haveFirstFloorPop) {
         let info = await getFloorComment(id, parentCommentId, type, data.floorPageNo);
         data.floorArr = info.data.comments;
         data.floorPageNo += 1;
-        if(data.floorArr.length) {
+        if (data.floorArr.length) {
           data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
         }
         if (!info.data.hasMore) {
@@ -307,22 +305,21 @@ export default defineComponent({
         }
         data.floorLoading = false;
       }
-      
     };
 
     // 加载更多楼层评论
     const onLoadFloor = async () => {
       data.floorLoading = true;
       // 触发了加载更多楼层评论方法说明已经弹出过一次楼层了
-      if(!data.haveFirstFloorPop) data.haveFirstFloorPop = true;
+      if (!data.haveFirstFloorPop) data.haveFirstFloorPop = true;
       let info = await getFloorComment(id, data.floorTopComment.commentId, type, data.floorPageNo);
       data.floorArr = data.floorArr.concat(info.data.comments);
       data.floorPageNo += 1;
       data.floorLoading = false;
       // data.floorPageNo = info.data.time;
-      if(data.floorArr.length) {
-          data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
-        }
+      if (data.floorArr.length) {
+        data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
+      }
       if (!info.data.hasMore) {
         data.floorFinish = true;
       }
@@ -332,6 +329,11 @@ export default defineComponent({
     const onLoad = async () => {
       data.requestLoading = true;
       let info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor);
+      if (info.code != 200) {
+        data.error = true;
+        data.requestLoading = false;
+        return;
+      }
       data.requestLoading = false;
       data.commentTotal = info.data.totalCount;
       data.cursor = info.data.cursor;
@@ -349,6 +351,7 @@ export default defineComponent({
       data.cursor = "";
       data.pageNo = 1;
       data.arr = [];
+      data.error = false;
       onLoad();
     };
 
