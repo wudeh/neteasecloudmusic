@@ -189,12 +189,12 @@ export default defineComponent({
     onBeforeMount(async () => {
       // console.log(router.currentRoute.value);
       store.commit("set_load", true);
-
+      data.id = id;
       // 得到歌单数据
       const songList = await getSongListInfo(id);
       // 组装歌单数据
       data.title = songList.playlist.name;
-      data.id = songList.playlist.id;
+      
       data.img = songList.playlist.coverImgUrl;
       data.description = songList.playlist.description;
       data.tags = songList.playlist.tags;

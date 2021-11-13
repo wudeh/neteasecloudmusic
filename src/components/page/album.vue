@@ -181,11 +181,12 @@ export default defineComponent({
     onBeforeMount(async () => {
       store.commit("set_load", true);
       Toast("专辑部分歌曲可能无法播放")
+      data.id = id;
       // 得到专辑数据
       const songList = await getAlbumDetail(id);
       // 组装歌单数据
       data.title = songList.album.name;
-      data.id = songList.album.id;
+      
       data.img = songList.album.picUrl;
       data.description = songList.album.description;
       data.tags = songList.album.tags;
