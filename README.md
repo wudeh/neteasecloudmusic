@@ -5,6 +5,7 @@
 - 技术栈：Vue3 + Vant + Typescript
 - 线上预览：https://neteasecloudmusic.vercel.app
 - 数据来源：https://github.com/Binaryify/NeteaseCloudMusicApi
+- Flutter 版：https://github.com/wudeh/flutter_music_code
 - 对您有一丁点帮助的话给个 star 吧 【哭唧唧】
 
 ## 主要完成功能
