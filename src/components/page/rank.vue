@@ -44,6 +44,13 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: "rank"
+}
+</script>
+
+
 <script lang="ts" setup>
 import { defineComponent, onBeforeMount, reactive, toRefs } from "vue";
 import songStore from "../../store";

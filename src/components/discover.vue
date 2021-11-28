@@ -391,8 +391,12 @@
     </van-pull-refresh>
   </div>
 </template>
-
-<script name="discover" lang="ts" setup>
+<script lang="ts">
+export default {
+  name: "discover"
+}
+</script>
+<script lang="ts" setup>
 import { defineComponent, ref, reactive, onMounted, toRefs, onBeforeMount, watch, nextTick } from "vue";
 import { getDiscoverInfo, getIconInfo, getSearchWord } from "../api/discover";
 import { getSongUrl } from "../api/song";

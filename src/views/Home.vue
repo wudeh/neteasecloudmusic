@@ -146,7 +146,11 @@
     </van-tabbar> -->
   </div>
 </template>
-
+<script lang="ts">
+export default {
+  name: "home"
+}
+</script>
 <script lang="ts" setup>
 import { defineComponent, ref, onMounted, watch, onBeforeUnmount, reactive, nextTick, onUpdated, onActivated } from "vue";
 import { useRouter, useRoute } from "vue-router";
@@ -275,7 +279,7 @@ watch(
       if (from.name == "song") return;
       include.push(to.name);
       transition_name.value = `slide-left`;
-      console.log(include);
+      // console.log(include);
     } else {
       include.splice(include.indexOf(from.name), 1);
       transition_name.value = `slide-right`;

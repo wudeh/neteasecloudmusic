@@ -167,7 +167,11 @@
     </van-popup>
   </div>
 </template>
-
+<script lang="ts">
+export default {
+  name: "comment"
+}
+</script>
 <script lang="ts" setup>
 import { defineComponent, onMounted, reactive, onBeforeMount, toRefs } from "vue";
 import { getComment, getSongInfo, getFloorComment, getPlayListDetail } from "../../api/song";

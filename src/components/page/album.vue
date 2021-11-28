@@ -103,7 +103,11 @@
     </van-overlay>
   </div>
 </template>
-
+<script lang="ts">
+export default {
+  name: "album"
+}
+</script>
 <script lang="ts" setup>
 import { defineComponent, ref, toRefs, onBeforeMount, reactive } from "vue";
 import { useRouter } from "vue-router";

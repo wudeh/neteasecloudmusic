@@ -139,6 +139,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: "singer"
+}
+</script>
+
 <script name="singer" lang="ts" setup>
 import { defineComponent, onBeforeMount, reactive, toRefs, watch } from "vue";
 import { getTopList } from "../../api/song";

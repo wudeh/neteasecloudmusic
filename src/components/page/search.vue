@@ -36,6 +36,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: "search"
+}
+</script>
+
 <script lang="ts" setup>
 import { defineComponent, onBeforeMount, reactive, toRefs } from "vue";
 import { getSearchHot, getSuggest } from "../../api/discover";

@@ -85,6 +85,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: "song"
+}
+</script>
+
 <script lang="ts" setup>
 import { defineComponent, ref, onBeforeMount, onMounted, watch, onBeforeUnmount, reactive, nextTick } from "vue";
 import { useRouter } from "vue-router";

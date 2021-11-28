@@ -1,4 +1,4 @@
-# 网易云移动端音乐
+# 网易云仿移动端音乐
 
 ## 说明
 
@@ -8,7 +8,7 @@
 - Flutter 版：https://github.com/wudeh/flutter_music_code
 - 对您有一丁点帮助的话给个 star 吧 【哭唧唧】
 
-- 2021-11-28：从 webpack 迁移到 vite，状态管理换成 pinia，使用 setup 语法糖导致动态缓存组件功能失效；原 webpack 版本保存在 cli-version 分支
+- 2021-11-28：从 webpack 迁移到 vite，状态管理换成 pinia，使用 setup 语法糖
 
 ## 主要完成功能
 

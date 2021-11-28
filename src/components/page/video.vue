@@ -213,6 +213,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: "vid"
+}
+</script>
+
 <script lang="ts" setup>
 import { defineComponent, onBeforeMount, reactive, toRefs, watch } from "vue";
 import songStore from "../../store";

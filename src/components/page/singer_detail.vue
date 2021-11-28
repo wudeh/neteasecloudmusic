@@ -30,6 +30,12 @@
   <div class="loadAgain" v-if="data.error" @click="getInfo">请求出错，点击重试</div>
 </template>
 
+<script lang="ts">
+export default {
+  name: "singerDetail"
+}
+</script>
+
 <script lang="ts" setup>
 import { defineComponent, ref, toRefs, onBeforeMount, reactive } from "vue";
 import { useRouter } from "vue-router";
