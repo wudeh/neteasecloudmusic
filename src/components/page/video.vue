@@ -5,49 +5,49 @@
         <img src="../../../public/img/icons/left_arrow.svg" @click="router.go(-1)" />
       </div>
     </div>
-    <video class="vid" webkit-playsinline playsinline x5-playsinline :src="url" controls></video>
+    <video class="vid" webkit-playsinline playsinline x5-playsinline :src="data.url" controls></video>
     <div class="info">
-      <van-tabs v-model:active="activeName" sticky swipeable>
+      <van-tabs v-model:active="data.activeName" sticky swipeable>
         <van-tab title="简介" name="1">
           <div class="author">
             <div class="img">
-              <van-image radius="50%" class="img" :src="avatarUrl" />
+              <van-image radius="50%" class="img" :src="data.avatarUrl" />
             </div>
             <div class="detail">
-              <span class="name">{{ nickname }}</span>
-              <span class="fan" v-if="type == 5">{{ numFilter(fans) }}粉丝</span>
+              <span class="name">{{ data.nickname }}</span>
+              <span class="fan" v-if="data.type == 5">{{ numFilter(data.fans) }}粉丝</span>
             </div>
             <div class="look">+ 关注</div>
           </div>
           <div class="vid_detail">
-            <div class="title">{{ title }}</div>
+            <div class="title">{{ data.title }}</div>
             <div class="vid_count">
-              <span class="playTime">播放量：{{ numFilter(playTime) }}&nbsp;&nbsp;</span>
-              <span class="publishTime" v-if="type == 5">{{ sendTimeConversion(publishTime) }}</span>
-              <span class="publishTime" v-else>{{ publishTime }}</span>
+              <span class="playTime">播放量：{{ numFilter(data.playTime) }}&nbsp;&nbsp;</span>
+              <span class="publishTime" v-if="data.type == 5">{{ sendTimeConversion(data.publishTime) }}</span>
+              <span class="publishTime" v-else>{{ data.publishTime }}</span>
             </div>
             <div class="des">
-              {{ description }}
+              {{ data.description }}
             </div>
             <div class="count">
-              <div class="count_item" v-if="praisedCount != 0">
+              <div class="count_item" v-if="data.praisedCount != 0">
                 <img src="../../../public/img/icons/like_gray.svg" alt="" />
-                <span>{{ praisedCount }}</span>
+                <span>{{ data.praisedCount }}</span>
               </div>
               <div class="count_item">
                 <img src="../../../public/img/icons/sub.svg" alt="" />
-                <span>{{ subscribeCount }}</span>
+                <span>{{ data.subscribeCount }}</span>
               </div>
               <div class="count_item">
                 <img src="../../../public/img/icons/share.svg" alt="" />
-                <span>{{ shareCount }}</span>
+                <span>{{ data.shareCount }}</span>
               </div>
             </div>
             <div class="tag">
-              <div class="item_tag" v-for="(it, i) in videoGroup" :key="i">{{ it.name }}</div>
+              <div class="item_tag" v-for="(it, i) in data.videoGroup" :key="i">{{ it.name }}</div>
             </div>
             <div class="related">
-              <div class="item" v-for="(item, index) in videoRelated" :key="index" @click="vid = item.vid">
+              <div class="item" v-for="(item, index) in data.videoRelated" :key="index" @click="vid = item.vid">
                 <div class="left">
                   <van-image class="img" radius="8" :src="item.coverUrl" />
                   <img src="../../../public/img/icons/play_white.svg" alt="" />
@@ -62,10 +62,10 @@
             </div>
           </div>
         </van-tab>
-        <van-tab :title="`评论` + commentCount" name="2">
-          <van-list v-model:loading="requestLoading" v-model:error="error" :finished="finish" :immediate-check="false" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoad">
+        <van-tab :title="`评论` + data.commentCount" name="2">
+          <van-list v-model:loading="data.requestLoading" v-model:error="data.error" :finished="data.finish" :immediate-check="false" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoad">
             <template v-slot:loading>
-              <div style="display:flex;align-items:center;justify-content:center;">
+              <div style="display: flex; align-items: center; justify-content: center">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
@@ -74,10 +74,10 @@
             <van-sticky :offset-top="50">
               <div class="comment_choose">
                 <div class="title">评论区</div>
-                <div class="choose" v-show="!arrloading">
-                  <span :class="{ choosed: sortType == 99 }" @click="change_sortType(99)">推荐</span>
-                  <span :class="{ choosed: sortType == 2 }" @click="change_sortType(2)">最热</span>
-                  <span :class="{ choosed: sortType == 3 }" @click="change_sortType(3)">最新</span>
+                <div class="choose" v-show="!data.arrloading">
+                  <span :class="{ choosed: data.sortType == 99 }" @click="change_sortType(99)">推荐</span>
+                  <span :class="{ choosed: data.sortType == 2 }" @click="change_sortType(2)">最热</span>
+                  <span :class="{ choosed: data.sortType == 3 }" @click="change_sortType(3)">最新</span>
                   <!-- <van-dropdown-menu >
                     <van-dropdown-item @change="change_sortType()" v-model="sortType" :options="sortTypeList" />
                   </van-dropdown-menu> -->
@@ -85,9 +85,9 @@
               </div>
             </van-sticky>
             <!-- 评论区 -->
-            <van-skeleton title avatar :row="3" :loading="arrloading">
+            <van-skeleton title avatar :row="3" :loading="data.arrloading">
               <div class="comment_area">
-                <div class="comment_item" v-for="item in arr" :key="item.commentId">
+                <div class="comment_item" v-for="item in data.arr" :key="item.commentId">
                   <div class="avatar">
                     <van-image round width="30" height="30" :src="item.user.avatarUrl" />
                   </div>
@@ -96,7 +96,7 @@
                       <div class="top_left">
                         <div class="name">
                           {{ item.user.nickname }} &nbsp;
-                          <span v-if="item.user.vipRights" style="display:flex;align-items: center">
+                          <span v-if="item.user.vipRights" style="display: flex; align-items: center">
                             <img src="../../../public/img/icons/1.png" alt="" />
                             <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
                             <span v-if="item.user.vipRights.redVipLevel == 5" class="level">·伍</span>
@@ -124,50 +124,50 @@
                 </div>
               </div>
             </van-skeleton>
-            <van-skeleton title avatar :row="3" :loading="arrloading" />
-            <van-skeleton title avatar :row="3" :loading="arrloading" />
-            <van-skeleton title avatar :row="3" :loading="arrloading" />
+            <van-skeleton title avatar :row="3" :loading="data.arrloading" />
+            <van-skeleton title avatar :row="3" :loading="data.arrloading" />
+            <van-skeleton title avatar :row="3" :loading="data.arrloading" />
           </van-list>
         </van-tab>
       </van-tabs>
     </div>
 
     <!-- 楼层弹出评论 -->
-    <van-popup v-model:show="store.state.showFloor" closeable round @close="store.commit(`close`)" :close-on-popstate="true" close-icon-position="top-left" position="bottom" :style="{ height: '80%' }">
-      <van-list v-model:loading="floorLoading" v-model:error="floorError" :immediate-check="true" :finished="floorFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoadFloor">
+    <van-popup v-model:show="store.showFloor" closeable round @close="store.close()" :close-on-popstate="true" close-icon-position="top-left" position="bottom" :style="{ height: '80%' }">
+      <van-list v-model:loading="data.floorLoading" v-model:error="data.floorError" :immediate-check="true" :finished="data.floorFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoadFloor">
         <template v-slot:loading>
-          <div style="display:flex;align-items:center;justify-content:center;">
+          <div style="display: flex; align-items: center; justify-content: center">
             <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
             <span>加载中...</span>
           </div>
         </template>
         <div class="floor">
-          <div class="reply_count">回复({{ floorArr.length }})</div>
+          <div class="reply_count">回复({{ data.floorArr.length }})</div>
           <div class="comment_item floor_top">
             <div class="avatar">
-              <van-image round width="30" height="30" :src="floorTopComment.user.avatarUrl" />
+              <van-image round width="30" height="30" :src="data.floorTopComment.user.avatarUrl" />
             </div>
             <div class="info">
               <div class="top">
                 <div class="top_left">
-                  <div class="name">{{ floorTopComment.user.nickname }}</div>
+                  <div class="name">{{ data.floorTopComment.user.nickname }}</div>
                   <div class="time">
-                    <span class="time">{{ sendTimeConversion(floorTopComment.time) }}</span>
+                    <span class="time">{{ sendTimeConversion(data.floorTopComment.time) }}</span>
                     <!-- <span v-if="item.tag.datas" style="margin: 0 2px">-</span> -->
                     <!-- <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span> -->
                   </div>
                 </div>
                 <div class="like_count">
-                  <span class="count">{{ numFilter(floorTopComment.likedCount) }}</span>
-                  <img v-if="floorTopComment.liked" src="../../../public/img/icons/liked.svg" alt="" />
+                  <span class="count">{{ numFilter(data.floorTopComment.likedCount) }}</span>
+                  <img v-if="data.floorTopComment.liked" src="../../../public/img/icons/liked.svg" alt="" />
                   <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
                 </div>
               </div>
-              <div class="text">{{ floorTopComment.content }}</div>
+              <div class="text">{{ data.floorTopComment.content }}</div>
             </div>
           </div>
           <div class="all_reply">全部回复</div>
-          <div class="comment_item" v-for="item in floorArr" :key="item.commentId">
+          <div class="comment_item" v-for="item in data.floorArr" :key="item.commentId">
             <div class="avatar">
               <van-image round width="30" height="30" :src="item.user.avatarUrl" />
             </div>
@@ -176,7 +176,7 @@
                 <div class="top_left">
                   <div class="name">
                     {{ item.user.nickname }} &nbsp;
-                    <span v-if="item.user.vipRights" style="display:flex;align-items: center">
+                    <span v-if="item.user.vipRights" style="display: flex; align-items: center">
                       <img src="../../../public/img/icons/1.png" alt="" />
                       <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
                       <span v-if="item.user.vipRights.redVipLevel == 5" class="level">·伍</span>
@@ -199,7 +199,8 @@
                 </div>
               </div>
               <div class="text">{{ item.content }}</div>
-              <div class="beReplied_item" v-if="item.beReplied[0].beRepliedCommentId != floorTopComment.commentId">
+              <!-- 回复的是楼主就不显示了，回复其他人才显示 -->
+              <div class="beReplied_item" v-if="item.beReplied.length && item.beReplied[0].beRepliedCommentId != data.floorTopComment.commentId">
                 <span class="beReplied_name">@{{ item.beReplied[0].user.nickname }}：</span>
                 <span class="beReplied_content" v-if="item.beReplied[0].content">{{ item.beReplied[0].content }}</span>
                 <span class="beReplied_content" v-else>该评论已删除</span>
@@ -212,9 +213,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { defineComponent, onBeforeMount, reactive, toRefs, watch } from "vue";
-import { useStore } from "vuex";
+import songStore from "../../store";
 import { useRouter } from "vue-router";
 import { numFilter, sendTimeConversion, timeFilter, getDate } from "../../utils/num";
 import { getComment, getSongInfo, getFloorComment, getPlayListDetail } from "../../api/song";
@@ -262,271 +263,272 @@ interface creator {
   requestLoading: boolean; // 请求是否完成
   error: boolean;
   finish: boolean; // 是否没有更多数据了
-  haveFirstFloorPop: boolean
+  haveFirstFloorPop: boolean;
 }
-export default defineComponent({
-  name: "vid",
-  setup: () => {
-    const store = useStore();
-    const router = useRouter();
-    const vid: any = router.currentRoute.value.query.vid; //获取参数
-    const data = reactive<creator>({
-      vid: "",
-      type: 5,
-      activeName: "1",
-      url: "",
-      followed: false,
-      userId: 0,
-      fans: 0,
-      nickname: "",
-      avatarUrl: "",
-      identityIconUrl: "",
-      title: "",
-      description: "",
-      durationms: 0,
-      playTime: 0,
-      praisedCount: 0,
-      commentCount: 0,
-      shareCount: 0,
-      subscribeCount: 0,
-      publishTime: 0,
-      videoGroup: [],
-      videoRelated: [],
-      commentTotal: 0,
-      pageNo: 1,
-      floorPageNo: 1,
-      sortType: 99, // 99: 推荐排序，2：热度排序，3：时间最新排序
-      sortTypeName: "",
-      sortTypeList: [],
-      cursor: "",
-      arr: [],
-      floorArr: [],
-      floorTopComment: { user: { avatarUrl: "" } },
-      floorLoading: false,
-      floorError: false,
-      floorFinish: false,
-      showFloor: false,
-      imgloading: true,
-      arrloading: true,
-      requestLoading: false,
-      error: false,
-      finish: false,
-      haveFirstFloorPop: false // 是否已经弹出过楼层了，已经弹出过楼层就需要自己请求楼层的第一次评论
-    });
 
-    onBeforeMount(async () => {
-      if (Number.isNaN(Number(vid))) {
-        data.type = 5;
-      } else {
-        data.type = 1;
-      }
-      data.vid = vid;
-
-      // init()
-
-      data.arrloading = true;
-      // 开始获取评论
-      let info = await getComment(vid, data.type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
-      data.arrloading = false;
-      if (info.code == 400) {
-        data.error = true;
-        return;
-      }
-      data.commentCount = info.data.totalCount;
-      data.arr = info.data.comments;
-      if (info.data.cursor) data.cursor = info.data.cursor;
-      info.data.sortTypeList.forEach((item: any, index: number) => {
-        data.sortTypeList.push({
-          text: item.sortTypeName,
-          value: item.sortType,
-        });
-      });
-      // data.sortType = data.sortTypeList[0].value;
-
-      data.pageNo += 1;
-
-      if (!info.data.hasMore) {
-        data.finish = true;
-      }
-    });
-
-    watch(
-      () => data.vid,
-      (value, pre) => {
-        data.url = "";
-
-        init();
-      }
-    );
-
-    const init = async () => {
-      data.videoGroup.splice(0);
-      let info;
-
-      if (data.type == 5) {
-        info = await getVideoDetail(data.vid);
-        data.vid = info.data.vid;
-        data.followed = info.data.creator.followed;
-        data.nickname = info.data.creator.nickname;
-        data.userId = info.data.creator.userId;
-        data.avatarUrl = info.data.creator.avatarUrl;
-        data.identityIconUrl = info.data.creator.avatarDetail ? info.data.creator.avatarDetail.identityIconUrl : "";
-        data.title = info.data.title;
-        data.description = info.data.description;
-        data.durationms = info.data.durationms;
-        data.playTime = info.data.playTime;
-        data.praisedCount = info.data.praisedCount;
-        // data.commentCount = info.data.commentCount
-        data.shareCount = info.data.shareCount;
-        data.subscribeCount = info.data.subscribeCount;
-        data.publishTime = info.data.publishTime;
-        data.videoGroup = info.data.videoGroup;
-      }
-      if (data.type == 1) {
-        info = await getMvDetail(data.vid);
-        data.url = info.data.url;
-        data.vid = info.data.id;
-        data.followed = info.data.artists[0].followed;
-        data.nickname = info.data.artistName;
-        data.userId = info.data.artistId;
-        // data.avatarUrl = info.data.cover
-        // data.identityIconUrl = info.data.avatarDetail ? info.data.creator.avatarDetail.identityIconUrl : ''
-        data.title = info.data.briefDesc;
-        data.description = info.data.desc;
-        data.durationms = info.data.duration;
-        data.playTime = info.data.playCount;
-        data.praisedCount = info.data.praisedCount || 0;
-        data.commentCount = info.data.commentCount;
-        data.shareCount = info.data.shareCount;
-        data.subscribeCount = info.data.subCount;
-        data.publishTime = info.data.publishTime;
-        data.videoGroup = info.data.videoGroup;
-      }
-
-      if (data.type == 5) {
-        info = await getVideoUrl(data.vid);
-        data.url = info.urls[0].url;
-        if (info.urls[0].needPay) {
-          Toast(`当前视频需付费观看`);
-        }
-
-        // 获取用户详情，用来获取粉丝量
-        info = await getUserDetail(data.userId);
-        data.fans = info.profile.followeds;
-      }
-
-      if (data.type == 1) {
-        info = await getMvUrl(data.vid);
-        data.url = info.data.url;
-        // 获取歌手信息
-        info = await getArtistDetail(data.userId);
-        data.avatarUrl = info.data.artist.cover;
-        // 获取歌手粉丝量
-        // info = await getArtistFans(data.userId)
-      }
-
-      // 获取相关视频
-      info = await getVideoRelated(data.vid);
-      data.videoRelated = info.data;
-    };
-
-    // 获取楼层评论
-    const floorRequest = async (topComment: any, parentCommentId: number) => {
-      console.log('弹出楼层');
-      
-      data.floorTopComment = topComment;
-      data.floorLoading = true;
-      store.commit("set_floor_comment", true);
-      data.floorArr = [];
-      data.floorFinish = false;
-      data.floorPageNo = 0;
-      // 如果设置了:immediate-check="true"，第一次弹出楼层，组件会自己检查发一次请求；所以如果不是第一次的话，再弹出楼层评论就需要自己发第一次请求了
-      if(data.haveFirstFloorPop) {
-        let info = await getFloorComment(vid, parentCommentId, data.type, data.floorPageNo);
-        data.floorLoading = false;
-        if (info.code == 400) {
-          data.floorError = true;
-          return;
-        }
-        data.floorArr = info.data.comments;
-        if(data.floorArr.length) {
-          data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
-        }
-        
-        if (!info.data.hasMore) {
-          data.floorFinish = true;
-        }
-      }
-      
-    };
-
-    // 加载更多楼层评论
-    const onLoadFloor = async () => {
-      data.floorError = false;
-      data.floorLoading = true;
-      // 触发了加载更多楼层评论方法说明已经弹出过一次楼层了
-      if(!data.haveFirstFloorPop) data.haveFirstFloorPop = true;
-      let info = await getFloorComment(vid, data.floorTopComment.commentId, data.type, data.floorPageNo);
-      data.floorLoading = false;
-      if (info.code == 400) {
-        data.floorError = true;
-        return;
-      }
-      data.floorArr = data.floorArr.concat(info.data.comments);
-      data.floorLoading = false;
-      if(data.floorArr.length) {
-          data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
-        }
-      if (!info.data.hasMore) {
-        data.floorFinish = true;
-      }
-    };
-
-    // 加载更多评论
-    const onLoad = async () => {
-      data.error = false;
-      data.requestLoading = true;
-      let info = await getComment(vid, data.type, data.pageNo, 20, data.sortType, data.cursor);
-      data.arrloading = false;
-      data.requestLoading = false;
-      if (info.code == 400) {
-        data.error = true;
-        return;
-      }
-      data.commentCount = info.data.totalCount;
-      data.cursor = info.data.cursor;
-      data.arr = data.arr.concat(info.data.comments);
-      data.arrloading = false;
-      data.pageNo += 1;
-      if (!info.data.hasMore || data.arr.length >= info.data.totalCount) {
-        data.finish = true;
-      }
-    };
-
-    const change_sortType = async (index: any) => {
-      data.sortType = index;
-      data.finish = false;
-      data.pageNo = 1;
-      data.arr = [];
-      data.cursor = '';
-      onLoad();
-    };
-
-    return {
-      store,
-      router,
-      numFilter,
-      timeFilter,
-      getDate,
-      change_sortType,
-      floorRequest,
-      onLoad,
-      onLoadFloor,
-      sendTimeConversion,
-      ...toRefs(data),
-    };
-  },
+const store = songStore();
+const router = useRouter();
+const vid: any = router.currentRoute.value.query.vid; //获取参数
+const data = reactive<creator>({
+  vid: "",
+  type: 5,
+  activeName: "1",
+  url: "",
+  followed: false,
+  userId: 0,
+  fans: 0,
+  nickname: "",
+  avatarUrl: "",
+  identityIconUrl: "",
+  title: "",
+  description: "",
+  durationms: 0,
+  playTime: 0,
+  praisedCount: 0,
+  commentCount: 0,
+  shareCount: 0,
+  subscribeCount: 0,
+  publishTime: 0,
+  videoGroup: [],
+  videoRelated: [],
+  commentTotal: 0,
+  pageNo: 1,
+  floorPageNo: 1,
+  sortType: 99, // 99: 推荐排序，2：热度排序，3：时间最新排序
+  sortTypeName: "",
+  sortTypeList: [],
+  cursor: "",
+  arr: [],
+  floorArr: [],
+  floorTopComment: { user: { avatarUrl: "" } },
+  floorLoading: false,
+  floorError: false,
+  floorFinish: false,
+  showFloor: false,
+  imgloading: true,
+  arrloading: true,
+  requestLoading: false,
+  error: false,
+  finish: false,
+  haveFirstFloorPop: false, // 是否已经弹出过楼层了，已经弹出过楼层就需要自己请求楼层的第一次评论
 });
+
+onBeforeMount(async () => {
+  if (Number.isNaN(Number(vid))) {
+    data.type = 5;
+  } else {
+    data.type = 1;
+  }
+  data.vid = vid;
+
+  // init()
+
+  data.arrloading = true;
+  // 开始获取评论
+  let info = await getComment(vid, data.type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
+  data.arrloading = false;
+  if (info.code == 400) {
+    data.error = true;
+    return;
+  }
+  data.commentCount = info.data.totalCount;
+  data.arr = info.data.comments;
+  if (info.data.cursor) data.cursor = info.data.cursor;
+  info.data.sortTypeList.forEach((item: any, index: number) => {
+    data.sortTypeList.push({
+      text: item.sortTypeName,
+      value: item.sortType,
+    });
+  });
+  // data.sortType = data.sortTypeList[0].value;
+
+  data.pageNo += 1;
+
+  if (!info.data.hasMore) {
+    data.finish = true;
+  }
+});
+
+watch(
+  () => data.vid,
+  (value, pre) => {
+    data.url = "";
+
+    init();
+  }
+);
+
+const init = async () => {
+  data.videoGroup.splice(0);
+  let info;
+
+  if (data.type == 5) {
+    info = await getVideoDetail(data.vid);
+    data.vid = info.data.vid;
+    data.followed = info.data.creator.followed;
+    data.nickname = info.data.creator.nickname;
+    data.userId = info.data.creator.userId;
+    data.avatarUrl = info.data.creator.avatarUrl;
+    data.identityIconUrl = info.data.creator.avatarDetail ? info.data.creator.avatarDetail.identityIconUrl : "";
+    data.title = info.data.title;
+    data.description = info.data.description;
+    data.durationms = info.data.durationms;
+    data.playTime = info.data.playTime;
+    data.praisedCount = info.data.praisedCount;
+    // data.commentCount = info.data.commentCount
+    data.shareCount = info.data.shareCount;
+    data.subscribeCount = info.data.subscribeCount;
+    data.publishTime = info.data.publishTime;
+    data.videoGroup = info.data.videoGroup;
+  }
+  if (data.type == 1) {
+    info = await getMvDetail(data.vid);
+    data.url = info.data.url;
+    data.vid = info.data.id;
+    data.followed = info.data.artists[0].followed;
+    data.nickname = info.data.artistName;
+    data.userId = info.data.artistId;
+    // data.avatarUrl = info.data.cover
+    // data.identityIconUrl = info.data.avatarDetail ? info.data.creator.avatarDetail.identityIconUrl : ''
+    data.title = info.data.briefDesc;
+    data.description = info.data.desc;
+    data.durationms = info.data.duration;
+    data.playTime = info.data.playCount;
+    data.praisedCount = info.data.praisedCount || 0;
+    data.commentCount = info.data.commentCount;
+    data.shareCount = info.data.shareCount;
+    data.subscribeCount = info.data.subCount;
+    data.publishTime = info.data.publishTime;
+    data.videoGroup = info.data.videoGroup;
+  }
+
+  if (data.type == 5) {
+    info = await getVideoUrl(data.vid);
+    data.url = info.urls[0].url;
+    if (info.urls[0].needPay) {
+      Toast(`当前视频需付费观看`);
+    }
+
+    // 获取用户详情，用来获取粉丝量
+    info = await getUserDetail(data.userId);
+    data.fans = info.profile.followeds;
+  }
+
+  if (data.type == 1) {
+    info = await getMvUrl(data.vid);
+    data.url = info.data.url;
+    // 获取歌手信息
+    info = await getArtistDetail(data.userId);
+    data.avatarUrl = info.data.artist.cover;
+    // 获取歌手粉丝量
+    // info = await getArtistFans(data.userId)
+  }
+
+  // 获取相关视频
+  info = await getVideoRelated(data.vid);
+  data.videoRelated = info.data;
+};
+
+// 获取楼层评论
+const floorRequest = async (topComment: any, parentCommentId: number) => {
+  console.log("弹出楼层");
+
+  data.floorTopComment = topComment;
+  data.floorLoading = true;
+  store.set_floor_comment(true);
+  data.floorArr = [];
+  data.floorFinish = false;
+  data.floorPageNo = 0;
+  // 如果设置了:immediate-check="true"，第一次弹出楼层，组件会自己检查发一次请求；所以如果不是第一次的话，再弹出楼层评论就需要自己发第一次请求了
+  if (data.haveFirstFloorPop) {
+    let info = await getFloorComment(vid, parentCommentId, data.type, data.floorPageNo);
+    data.floorLoading = false;
+    if (info.code == 400) {
+      data.floorError = true;
+      return;
+    }
+    data.floorArr = info.data.comments;
+    if (data.floorArr.length) {
+      data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
+    }
+
+    if (!info.data.hasMore) {
+      data.floorFinish = true;
+    }
+  }
+};
+
+// 加载更多楼层评论
+const onLoadFloor = async () => {
+  data.floorError = false;
+  data.floorLoading = true;
+  // 触发了加载更多楼层评论方法说明已经弹出过一次楼层了
+  if (!data.haveFirstFloorPop) data.haveFirstFloorPop = true;
+  let info = await getFloorComment(vid, data.floorTopComment.commentId, data.type, data.floorPageNo);
+  data.floorLoading = false;
+  if (info.code == 400) {
+    data.floorError = true;
+    return;
+  }
+  data.floorArr = data.floorArr.concat(info.data.comments);
+  data.floorLoading = false;
+  if (data.floorArr.length) {
+    data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
+  }
+  if (!info.data.hasMore) {
+    data.floorFinish = true;
+  }
+};
+
+// 加载更多评论
+const onLoad = async () => {
+  data.error = false;
+  data.requestLoading = true;
+  let info = await getComment(vid, data.type, data.pageNo, 20, data.sortType, data.cursor);
+  data.arrloading = false;
+  data.requestLoading = false;
+  if (info.code == 400) {
+    data.error = true;
+    return;
+  }
+  data.commentCount = info.data.totalCount;
+  data.cursor = info.data.cursor;
+  data.arr = data.arr.concat(info.data.comments);
+  data.arrloading = false;
+  data.pageNo += 1;
+  if (!info.data.hasMore || data.arr.length >= info.data.totalCount) {
+    data.finish = true;
+  }
+};
+
+const change_sortType = async (index: any) => {
+  data.sortType = index;
+  data.finish = false;
+  data.pageNo = 1;
+  data.arr = [];
+  data.cursor = "";
+  onLoad();
+};
+
+// export default defineComponent({
+//   name: "vid",
+//   setup: () => {
+
+//     return {
+//       store,
+//       router,
+//       numFilter,
+//       timeFilter,
+//       getDate,
+//       change_sortType,
+//       floorRequest,
+//       onLoad,
+//       onLoadFloor,
+//       sendTimeConversion,
+//       ...toRefs(data),
+//     };
+//   },
+// });
 </script>
 
 <style lang="less" scoped>

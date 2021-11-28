@@ -1,43 +1,43 @@
 <template>
   <div>
     <!-- 侧边栏 -->
-    <van-popup v-model:show="show" position="left" :style="{ width: '80%', height: '100%' }" >
-      <div class="avatar" style="background-color: red; display: flex;padding-left: 30px;flex-direction: column">
-        <img src="../../public/img/icons/avatar.png" width="150">
-        <span style="color: #fff;padding-bottom: 20px;padding-top: 20px;font-size: 16px">1650024814@qq.com</span>
+    <van-popup v-model:show="show" position="left" :style="{ width: '80%', height: '100%' }">
+      <div class="avatar" style="background-color: red; display: flex; padding-left: 30px; flex-direction: column">
+        <img src="../../public/img/icons/avatar.png" width="150" />
+        <span style="color: #fff; padding-bottom: 20px; padding-top: 20px; font-size: 16px">1650024814@qq.com</span>
       </div>
-      <div @click="goToGithub" style="padding: 10px;padding-left:30px;display:flex;justify-content:space-between;color:red">
+      <div @click="goToGithub" style="padding: 10px; padding-left: 30px; display: flex; justify-content: space-between; color: red">
         <span>查看本应用数据来源</span>
         <span>></span>
       </div>
     </van-popup>
     <!-- 导航栏 -->
-    <div :class="{ nav: true, red: scrollY >= 50 }" @click="goSearch()">
+    <div :class="{ nav: true, red: info.scrollY >= 50 }" @click="goSearch()">
       <div class="pop" @click.stop="showLeftPop">
         <van-icon name="wap-nav" badge="" />
       </div>
       <div class="search">
         <van-icon name="search" />
-        <p>{{ searchWord }}</p>
+        <p>{{ info.searchWord }}</p>
       </div>
       <img @click.stop="router.push({ path: `/download` })" src="../../public/img/icons/download.svg" alt="" />
     </div>
-    <van-pull-refresh v-model="loading" @refresh="onRefresh">
-      <van-list v-model:loading="listLoading" v-model:error="listError" :immediate-check="true" :finished="listFinish" error-text="请求失败，点击重新加载" finished-text="" @load="loadMore">
+    <van-pull-refresh v-model="info.loading" @refresh="onRefresh">
+      <van-list v-model:loading="info.listLoading" v-model:error="info.listError" :immediate-check="true" :finished="info.listFinish" error-text="请求失败，点击重新加载" finished-text="" @load="loadMore">
         <template v-slot:loading>
-          <div style="display:flex;align-items:center;justify-content:center;">
+          <div style="display: flex; align-items: center; justify-content: center">
             <img width="18" src="../../public/img/icons/loading.svg" alt="" />
             <span>加载中...</span>
           </div>
         </template>
-        <div v-if="!swiper.length" style="height: 45vh"></div>
-        <div class="discover" v-if="swiper.length">
+        <div v-if="!info.swiper.length" style="height: 45vh"></div>
+        <div class="discover" v-if="info.swiper.length">
           <!-- <bsscroll :scrollY="true" name="discover_scroll" :scrollData="swiper" :pulldown="true"> -->
           <div class="top">
             <!-- 轮播图 -->
             <div class="swiper">
               <van-swipe class="my-swipe" :autoplay="3000" indicator-color="white" :lazy-render="true" @change="onChange">
-                <van-swipe-item v-for="(item, index) in swiper" :key="index">
+                <van-swipe-item v-for="(item, index) in info.swiper" :key="index">
                   <img @click="swiper_click(item)" :src="item.pic" />
                   <div class="title" :style="`background-color: ${item.titleColor == `blue` ? `#0099ff` : item.titleColor}`">{{ item.typeTitle }}</div>
                 </van-swipe-item>
@@ -47,9 +47,9 @@
             <div class="top_blur" ref="topBg"></div>
             <!-- 圆形图标区域 -->
             <div class="icon_top">
-              <bsscroll :scrollX="true" :scrollData="icon" name="icon_scroll">
+              <bsscroll :scrollX="true" :scrollData="info.icon" name="icon_scroll">
                 <div class="icon_wrapper">
-                  <div class="icon_item" v-for="item in icon" :key="item.id" @click="ballClick()">
+                  <div class="icon_item" v-for="item in info.icon" :key="item.id" @click="ballClick()">
                     <div class="img_wrapper">
                       <img :src="item.iconUrl" alt="" />
                     </div>
@@ -62,15 +62,15 @@
           <!-- 推荐歌单 -->
           <div class="recommend">
             <div class="rec_title">
-              <div class="rec_des">{{ recommend.titleTex }}</div>
+              <div class="rec_des">{{ info.recommend.titleTex }}</div>
               <div class="rec_more" @click="ballClick()">
-                <span>{{ recommend.button.text }}</span>
+                <span>{{ info.recommend.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="recommend.arrData" name="recommend_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.recommend.arrData" name="recommend_scroll">
               <div class="rec_song">
-                <div class="rec_item" v-for="item in recommend.arrData" :key="item.creativeId" @click="goSongList(item.resources[0].resourceId)">
+                <div class="rec_item" v-for="item in info.recommend.arrData" :key="item.creativeId" @click="goSongList(item.resources[0].resourceId)">
                   <van-image class="img" show-loading radius="8" :src="item.uiElement.image.imageUrl" />
                   <span>{{ item.uiElement.mainTitle.title }}</span>
                   <div class="playCount">
@@ -82,17 +82,17 @@
             </bsscroll>
           </div>
           <!-- 较长的区域 -->
-          <div class="long" v-if="long.uiElement.subTitle">
+          <div class="long" v-if="info.long.uiElement.subTitle">
             <div class="rec_title">
-              <div class="rec_des">{{ long.uiElement.subTitle.title }}</div>
+              <div class="rec_des">{{ info.long.uiElement.subTitle.title }}</div>
               <div class="rec_more" @click="add_song_list">
                 <img src="../../public/img/icons/videoPlay.svg" alt="" />
-                <span>{{ long.uiElement.button.text }}</span>
+                <span>{{ info.long.uiElement.button.text }}</span>
               </div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="long.creatives" name="long_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.long.creatives" name="long_scroll">
               <div class="swiper">
-                <div class="swiper_item" v-for="(item, index) in long.creatives" :key="index">
+                <div class="swiper_item" v-for="(item, index) in info.long.creatives" :key="index">
                   <div class="item" v-for="subItem in item.resources" :key="subItem.resourceId" @click="playMusicSingle(subItem)">
                     <div class="img_wrapper">
                       <van-image class="img" :src="subItem.uiElement.image.imageUrl">
@@ -131,21 +131,21 @@
               </div>
             </bsscroll>
           </div>
-          
+
           <!-- 雷达歌单 -->
-          <div class="recommend" v-if="HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle">
+          <div class="recommend" v-if="info.HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle">
             <div class="rec_title">
               <div class="rec_des">
-                {{ HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle.title }}
+                {{ info.HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle.title }}
               </div>
               <div class="rec_more" @click="ballClick()">
-                <span>{{ HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.button.text }}</span>
+                <span>{{ info.HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="HOMEPAGE_BLOCK_MGC_PLAYLIST.extInfo" name="HOMEPAGE_BLOCK_MGC_PLAYLIST_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_BLOCK_MGC_PLAYLIST.extInfo" name="HOMEPAGE_BLOCK_MGC_PLAYLIST_scroll">
               <div class="rec_song">
-                <div class="rec_item" v-for="item in HOMEPAGE_BLOCK_MGC_PLAYLIST.creatives" :key="item.creativeId" @click="goSongList(item.resources[0].resourceId)">
+                <div class="rec_item" v-for="item in info.HOMEPAGE_BLOCK_MGC_PLAYLIST.creatives" :key="item.creativeId" @click="goSongList(item.resources[0].resourceId)">
                   <van-image class="img" show-loading lazy-load radius="8" :src="item.uiElement.image.imageUrl" />
                   <span>{{ item.uiElement.mainTitle.title }}</span>
                   <div class="playCount">
@@ -157,19 +157,19 @@
             </bsscroll>
           </div>
           <!-- 视频合辑 -->
-          <div class="video" v-if="HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle">
+          <div class="video" v-if="info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle">
             <div class="rec_title">
               <div class="rec_des">
-                {{ HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle.title }}
+                {{ info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle.title }}
               </div>
               <div class="rec_more" @click="ballClick()">
-                <span>{{ HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.button.text }}</span>
+                <span>{{ info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="HOMEPAGE_BLOCK_VIDEO_PLAYLIST.creatives" name="HOMEPAGE_BLOCK_VIDEO_PLAYLIST_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST.creatives" name="HOMEPAGE_BLOCK_VIDEO_PLAYLIST_scroll">
               <div class="rec_song">
-                <div class="rec_item" v-for="item in HOMEPAGE_BLOCK_VIDEO_PLAYLIST.creatives" :key="item.creativeId" @click="goSongList(item.creativeId)">
+                <div class="rec_item" v-for="item in info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST.creatives" :key="item.creativeId" @click="goSongList(item.creativeId)">
                   <div class="img_wrapper">
                     <van-image class="img" lazy-load radius="8" :src="item.uiElement.image.imageUrl" />
                     <div class="mirror">
@@ -185,21 +185,21 @@
               </div>
             </bsscroll>
           </div>
-          
+
           <!-- 专属场景歌单 -->
-          <div class="recommend" v-if="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement">
+          <div class="recommend" v-if="info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement">
             <div class="rec_title">
               <div class="rec_des">
-                {{ HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.subTitle.title }}
+                {{ info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.subTitle.title }}
               </div>
               <div class="rec_more" @click="ballClick()">
-                <span>{{ HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.button.text }}</span>
+                <span>{{ info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.creatives" name="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.creatives" name="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST_scroll">
               <div class="rec_song">
-                <div class="rec_item" v-for="item in HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.creatives" :key="item.creativeId" @click="goSongList(item.resources[0].resourceId)">
+                <div class="rec_item" v-for="item in info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.creatives" :key="item.creativeId" @click="goSongList(item.resources[0].resourceId)">
                   <van-image class="img" show-loading lazy-load radius="8" :src="item.uiElement.image.imageUrl" />
                   <span>{{ item.uiElement.mainTitle.title }}</span>
                   <div class="playCount">
@@ -214,20 +214,20 @@
           <div class="new">
             <div class="rec_title">
               <div class="rec_des">
-                <span @click="change_new(0)" :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 0 }">新歌</span>
+                <span @click="change_new(0)" :class="{ notClick: info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 0 }">新歌</span>
                 <span style="color: #ccc; margin: 0 3px">|</span>
-                <span @click="change_new(1)" :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 1 }">新碟</span>
+                <span @click="change_new(1)" :class="{ notClick: info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 1 }">新碟</span>
                 <span style="color: #ccc; margin: 0 3px">|</span>
-                <span @click="change_new(2)" :class="{ notClick: HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 2 }">数字专辑</span>
+                <span @click="change_new(2)" :class="{ notClick: info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 2 }">数字专辑</span>
               </div>
               <div class="rec_more" @click="ballClick()">
                 <img src="../../public/img/icons/videoPlay.svg" alt="" />
                 <span>更多</span>
               </div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData" name="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData" name="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG_scroll">
               <div class="swiper">
-                <div class="swiper_item" v-for="(item, index) in HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index]" :key="index">
+                <div class="swiper_item" v-for="(item, index) in info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index]" :key="index">
                   <div class="item" v-for="subItem in item.resources" :key="subItem.resourceId" @click="new_three(subItem)">
                     <div class="img_wrapper">
                       <van-image class="img" lazy-load :src="subItem.uiElement.image.imageUrl">
@@ -258,13 +258,13 @@
             </bsscroll>
           </div>
           <!-- 推荐新歌云贝广告 -->
-          <div class="yunbei" v-if="HOMEPAGE_YUNBEI_NEW_SONG.uiElement.subTitle.title">
+          <div class="yunbei" v-if="info.HOMEPAGE_YUNBEI_NEW_SONG.uiElement.subTitle.title">
             <div class="rec_title">
-              <div class="rec_des">{{ HOMEPAGE_YUNBEI_NEW_SONG.uiElement.subTitle.title }}</div>
+              <div class="rec_des">{{ info.HOMEPAGE_YUNBEI_NEW_SONG.uiElement.subTitle.title }}</div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="HOMEPAGE_YUNBEI_NEW_SONG.creatives" name="yunbei_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_YUNBEI_NEW_SONG.creatives" name="yunbei_scroll">
               <div class="swiper">
-                <div class="swiper_item" v-for="(item, index) in HOMEPAGE_YUNBEI_NEW_SONG.creatives" :key="index">
+                <div class="swiper_item" v-for="(item, index) in info.HOMEPAGE_YUNBEI_NEW_SONG.creatives" :key="index">
                   <div class="item" @click="playMusicSingle(item.resources[0])">
                     <div class="img_wrapper">
                       <van-image class="img" lazy-load :src="item.resources[0].uiElement.image.imageUrl">
@@ -295,19 +295,19 @@
             </bsscroll>
           </div>
           <!-- 播客合辑 -->
-          <div class="recommend" v-if="HOMEPAGE_VOICELIST_RCMD.uiElement">
+          <div class="recommend" v-if="info.HOMEPAGE_VOICELIST_RCMD.uiElement">
             <div class="rec_title">
               <div class="rec_des">
-                {{ HOMEPAGE_VOICELIST_RCMD.uiElement.subTitle.title }}
+                {{ info.HOMEPAGE_VOICELIST_RCMD.uiElement.subTitle.title }}
               </div>
               <div class="rec_more" @click="ballClick()">
-                <span>{{ HOMEPAGE_VOICELIST_RCMD.uiElement.button.text }}</span>
+                <span>{{ info.HOMEPAGE_VOICELIST_RCMD.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="HOMEPAGE_VOICELIST_RCMD.creatives" name="HOMEPAGE_VOICELIST_RCMD_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_VOICELIST_RCMD.creatives" name="HOMEPAGE_VOICELIST_RCMD_scroll">
               <div class="rec_song">
-                <div class="rec_item" v-for="item in HOMEPAGE_VOICELIST_RCMD.creatives" :key="item.creativeId" @click="router.push({ path: `/djProgram`, query: { id: item.creativeId } })">
+                <div class="rec_item" v-for="item in info.HOMEPAGE_VOICELIST_RCMD.creatives" :key="item.creativeId" @click="router.push({ path: `/djProgram`, query: { id: item.creativeId } })">
                   <van-image class="img" show-loading lazy-load radius="8" :src="item.uiElement.image.imageUrl" />
                   <span>{{ item.uiElement.mainTitle.title }}</span>
                   <div class="playCount">
@@ -319,18 +319,18 @@
             </bsscroll>
           </div>
           <!-- 音乐日历 -->
-          <div class="calendar" v-if="HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle" @click="ballClick()">
-            <div class="rec_title" @click="logoutDD()">
+          <div class="calendar" v-if="info.HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle" @click="ballClick()">
+            <div class="rec_title">
               <div class="rec_des">
-                {{ HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle.title }}
+                {{ info.HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle.title }}
               </div>
               <div class="rec_more">
-                <span>{{ HOMEPAGE_MUSIC_CALENDAR.uiElement.button.text }}</span>
+                <span>{{ info.HOMEPAGE_MUSIC_CALENDAR.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
             </div>
             <!-- 今天 -->
-            <div class="item_calendar" v-for="item in HOMEPAGE_MUSIC_CALENDAR.creatives" :key="item.creativeId">
+            <div class="item_calendar" v-for="item in info.HOMEPAGE_MUSIC_CALENDAR.creatives" :key="item.creativeId">
               <div class="left">
                 <div class="left_top">
                   <span class="day">{{ item.resources[0].uiElement.labelTexts ? "今天" : "明天" }}</span>
@@ -347,19 +347,19 @@
             </div>
           </div>
           <!-- 精选音乐视频 -->
-          <div class="recommend MUSIC_MLOG" v-if="HOMEPAGE_MUSIC_MLOG.uiElement.subTitle" @click="ballClick()">
+          <div class="recommend MUSIC_MLOG" v-if="info.HOMEPAGE_MUSIC_MLOG.uiElement.subTitle" @click="ballClick()">
             <div class="rec_title">
               <div class="rec_des">
-                {{ HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title }}
+                {{ info.HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title }}
               </div>
               <div class="rec_more">
-                <span>{{ HOMEPAGE_MUSIC_MLOG.uiElement.button.text }}</span>
+                <span>{{ info.HOMEPAGE_MUSIC_MLOG.uiElement.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
               </div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="HOMEPAGE_MUSIC_MLOG.extInfo" name="HOMEPAGE_MUSIC_MLOG_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_MUSIC_MLOG.extInfo" name="HOMEPAGE_MUSIC_MLOG_scroll">
               <div class="rec_song">
-                <div class="rec_item" v-for="item in HOMEPAGE_MUSIC_MLOG.extInfo" :key="item.creativeId">
+                <div class="rec_item" v-for="item in info.HOMEPAGE_MUSIC_MLOG.extInfo" :key="item.creativeId">
                   <van-image class="img" show-loading lazy-load radius="8" :src="item.resource.mlogBaseData.coverUrl" />
                   <span>{{ item.resource.mlogBaseData.text }}</span>
                   <div class="playCount">
@@ -392,7 +392,7 @@
   </div>
 </template>
 
-<script lang="ts">
+<script name="discover" lang="ts" setup>
 import { defineComponent, ref, reactive, onMounted, toRefs, onBeforeMount, watch, nextTick } from "vue";
 import { getDiscoverInfo, getIconInfo, getSearchWord } from "../api/discover";
 import { getSongUrl } from "../api/song";
@@ -400,8 +400,7 @@ import { useRouter } from "vue-router";
 import { recentcontact, loginByPhoneAndPassword, logout } from "../api/user";
 import bsscroll from "./common/scroll.vue";
 import { numFilter } from "../utils/num";
-import { useStore } from "vuex";
-import axios from "axios";
+import songStore from "../store";
 
 interface data {
   numFilter: any;
@@ -413,460 +412,462 @@ interface data {
   HOMEPAGE_BLOCK_MGC_PLAYLIST: Record<string, unknown>;
   HOMEPAGE_MUSIC_CALENDAR: any;
 }
-// 首页的发现组件
-export default defineComponent({
-  name: "discover",
-  components: {
-    bsscroll,
+
+const name: string = "discover"
+const router = useRouter();
+const active = ref<number>(0);
+const topBg = ref<HTMLElement>();
+const store = songStore();
+let show = ref<boolean>(false);
+const info = reactive<any>({
+  loading: false,
+  listLoading: false,
+  listError: false,
+  listFinish: false,
+  scrollY: 0,
+  cursor: {}, // 首页在登录状态下需要带上上一次请求回来的 cursor，作用相当于分页的页数
+  numFilter: numFilter, // 播放量过滤函数
+  searchWord: "",
+  swiper: [], // 轮播图
+  icon: [], // 圆形图标数据
+  // 推荐歌单
+  recommend: {
+    arrData: [],
+    titleTex: "",
+    button: {},
   },
-  setup() {
-    const router = useRouter();
-    const active = ref<number>(0);
-    const topBg = ref<HTMLElement>();
-    const store = useStore();
-    let show = ref<boolean>(false);
-    const info = reactive<any>({
-      loading: false,
-      listLoading: false,
-      listError: false,
-      listFinish: false,
-      scrollY: 0,
-      cursor: {}, // 首页在登录状态下需要带上上一次请求回来的 cursor，作用相当于分页的页数
-      numFilter: numFilter, // 播放量过滤函数
-      searchWord: "",
-      swiper: [], // 轮播图
-      icon: [], // 圆形图标数据
-      // 推荐歌单
-      recommend: {
-        arrData: [],
-        titleTex: "",
-        button: {},
-      },
-      // 可刷新的长标题区域
-      long: {
-        uiElement: {
-          subTitle: {title: ''},
-          button: {},
-        },
-      },
-      // 精选音乐视频
-      HOMEPAGE_MUSIC_MLOG: {
-        img: [],
-        extInfo: [],
-        uiElement: {
-          subTitle: {title: ''},
-          button: {},
-        },
-      },
-      // 雷达歌单
-      HOMEPAGE_BLOCK_MGC_PLAYLIST: {
-        uiElement: {
-          subTitle: {title: ''},
-          button: {},
-        },
-      },
-      // 音乐日历
-      HOMEPAGE_MUSIC_CALENDAR: {
-        creatives: [],
-        uiElement: {
-          subTitle: {title: ''},
-          button: {},
-        },
-      },
-      // 专属场景歌单
-      HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST: {
-        uiElement: {
-          subTitle: {title: ''},
-          button: {},
-        },
-      },
-      // 新歌，新碟，数字专辑
-      HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG: {
-        index: 0,
-        title: [],
-        arrData: [[], [], []], // 存储排好顺序的数组
-        arrOri: [],
-      },
-      // 推荐新歌云贝广告
-      HOMEPAGE_YUNBEI_NEW_SONG: {
-        uiElement: {
-          subTitle: {title: ''},
-          button: {},
-        },
-      },
-      // 播客合集
-      HOMEPAGE_VOICELIST_RCMD: {
-        creatives: [],
-        uiElement: {
-          subTitle: {title: ''},
-          button: {},
-        },
-      },
-      // 24 小时播客
-      HOMEPAGE_PODCAST24: {
-        creatives: [],
-        uiElement: {
-          subTitle: {title: ''},
-          button: {},
-        },
-      },
-      // 视频合集
-      HOMEPAGE_BLOCK_VIDEO_PLAYLIST: {
-        creatives: [],
-        uiElement: {
-          subTitle: {title: ''},
-          button: {},
-        },
-      },
-    });
-
-    // 简单的节流
-    const decrease = (i: number) => {
-      let isDoing = false;
-      return () => {
-        let timer: number | undefined;
-        if (isDoing) {
-          return;
-        }
-        isDoing = true;
-        timer = setTimeout(() => {
-          isDoing = false;
-          info.scrollY = i;
-          clearTimeout(timer);
-        }, 500);
-      };
-    };
-
-    // 数据请求
-    onMounted(async () => {
-      
-      window.addEventListener("scroll", () => {
-        decrease(window.scrollY)();
-      });
-    });
-
-    const onRefresh = async () => {
-      let discoverInfo = await getDiscoverInfo(info.cursor);
-      // 分页数据
-      info.cursor = discoverInfo.data.cursor;
-      // 分配数据
-      discoverInfo.data.blocks.map((item: any) => {
-        // 轮播图
-        if (item.blockCode == "HOMEPAGE_BANNER") {
-          info["swiper"] = item.extInfo.banners;
-        }
-        // 推荐歌单
-        if (item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
-          info.recommend.arrData = item.creatives;
-          info.recommend.titleTex = item.uiElement.subTitle.title;
-          info.recommend.button = item.uiElement.button;
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
-          // 较长的推荐区域
-          info.long = item;
-        }
-        if (item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
-          // 精选音乐视频
-          info.HOMEPAGE_MUSIC_MLOG = item;
-          info.HOMEPAGE_MUSIC_MLOG.extInfo.map((i: any) => {});
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
-          // 雷达歌单
-          info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
-        }
-        if (item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
-          // 音乐日历
-          info.HOMEPAGE_MUSIC_CALENDAR = item;
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST") {
-          // 专属场景歌单
-          info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST = item;
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG") {
-          // 新歌，新碟，数字专辑
-          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri = item.creatives;
-          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri.map((item: { creativeType: string }) => {
-            // 如果是新歌
-            if (item.creativeType == "NEW_SONG_HOMEPAGE") {
-              info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].push(item);
-            }
-            // 新碟
-            if (item.creativeType == "NEW_ALBUM_HOMEPAGE") {
-              info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[1].push(item);
-            }
-            // 数字专辑
-            if (item.creativeType == "DIGITAL_ALBUM_HOMEPAGE") {
-              info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[2].push(item);
-            }
-          });
-        }
-        if (item.blockCode == "HOMEPAGE_YUNBEI_NEW_SONG") {
-          // 推荐新歌云贝广告
-          info.HOMEPAGE_YUNBEI_NEW_SONG = item;
-        }
-        if (item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
-          // 播客合辑
-          info.HOMEPAGE_VOICELIST_RCMD = item;
-        }
-        if (item.blockCode == "HOMEPAGE_PODCAST24") {
-          // 24小时播客
-          info.HOMEPAGE_PODCAST24 = item.creatives[1];
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
-          // 视频合集
-          info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = item;
-        }
-        info.loading = false;
-      });
-    };
-
-    const loadMore = async () => {
-      info.listLoading = true;
-      let discoverInfo = await getDiscoverInfo(info.cursor);
-      info.listLoading = false;
-      if (discoverInfo.code == 400) {
-        info.listError = true;
-        return;
-      }
-      info.listFinish = true;
-      // 分页数据
-      info.cursor = discoverInfo.data.cursor;
-      discoverInfo.data.blocks.map((item: any) => {
-        // 轮播图
-        if (item.blockCode == "HOMEPAGE_BANNER") {
-          info["swiper"] = item.extInfo.banners;
-          nextTick(() => {
-            topBg.value?.setAttribute("style", `background-image:url(${info.swiper[0].pic});background-color:red`);
-          });
-        }
-        // 推荐歌单
-        if (item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
-          info.recommend.arrData = item.creatives;
-          info.recommend.titleTex = item.uiElement.subTitle.title;
-          info.recommend.button = item.uiElement.button;
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
-          // 较长的推荐区域
-          info.long = item;
-        }
-        if (item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
-          // 精选音乐视频
-          info.HOMEPAGE_MUSIC_MLOG = item;
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
-          // 雷达歌单
-          info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
-        }
-        if (item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
-          // 音乐日历
-          info.HOMEPAGE_MUSIC_CALENDAR = item;
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST") {
-          // 专属场景歌单
-          info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST = item;
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG") {
-          // 新歌，新碟，数字专辑
-          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri = item.creatives;
-          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri.map((item: { creativeType: string }) => {
-            // 如果是新歌
-            if (item.creativeType == "NEW_SONG_HOMEPAGE") {
-              info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].push(item);
-            }
-            // 新碟
-            if (item.creativeType == "NEW_ALBUM_HOMEPAGE") {
-              info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[1].push(item);
-            }
-            // 数字专辑
-            if (item.creativeType == "DIGITAL_ALBUM_HOMEPAGE") {
-              info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[2].push(item);
-            }
-          });
-        }
-        if (item.blockCode == "HOMEPAGE_YUNBEI_NEW_SONG") {
-          // 推荐新歌云贝广告
-          info.HOMEPAGE_YUNBEI_NEW_SONG = item;
-        }
-        if (item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
-          // 播客合辑
-          info.HOMEPAGE_VOICELIST_RCMD = item;
-        }
-        if (item.blockCode == "HOMEPAGE_PODCAST24") {
-          // 24小时播客
-          info.HOMEPAGE_PODCAST24 = item;
-        }
-        if (item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
-          // 视频合集
-          info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = item;
-        }
-      });
-      const iconInfo = await getIconInfo();
-      // 圆形图标
-      info.icon = iconInfo.data;
-      let word = await getSearchWord();
-      info.searchWord = word.data.showKeyword;
-    };
-
-    // 获取 top 的dom 元素, 根据轮播图轮播事件动态改变背景图片模糊
-
-    const onChange = (index: number) => {
-      topBg.value?.setAttribute("style", `background-image:url(${info.swiper[index].pic});`);
-    };
-
-    // 新歌，新碟，数字专辑
-    function change_new(index: number): void {
-      info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index = index;
-    }
-    // 监听索引变化，改变为对应新歌，新碟，数字专辑的数组数据
-    watch(
-      () => info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index,
-      (i) => {
-        console.log(i);
-      }
-    );
-
-    // 点击播放歌曲
-    async function playMusicSingle(item: any): Promise<void> {
-      if (item.resourceId == store.state.song_info.id) {
-        store.commit("play", !store.state.song_info.isPlaying);
-      }
-      // 先判断和当前的歌曲是不是同一首,如果不是同一首
-      if (item.resourceId != store.state.song_info.id) {
-        store.commit("play", false);
-        // 请求URL
-        const info = await getSongUrl(item.resourceId);
-        let song = {
-          id: item.resourceId,
-          type: 0,
-          name: item.resourceExtInfo.songData.name,
-          author: item.resourceExtInfo.artists.map((i: any) => i.name).join("/"),
-          url: info.data[0].url,
-          img: item.uiElement.image.imageUrl,
-          al: item.resourceExtInfo.songData.album.name
-        };
-
-        // 设置歌曲信息
-        store.commit("setSongInfo", song);
-        // store.commit("add_songList",song)
-        // 再由 home 页面监听播放
-        // store.commit("play", true);
-      }
-    }
-
-    // 点击新歌 新碟 新专辑
-    const new_three = (item: any) => {
-      if (item.resourceType == `song`) {        
-        // let i: any = {
-        //   id: item.resourceId,
-        //   type: 0,
-        //   name: item!.resourceExtInfo!.songData.name,
-        //   author: item.resourceExtInfo.artists.map((i: any) => i.name).join("/"),
-        //   url: '',
-        //   img: item.uiElement.image.imageUrl,
-        //   al: item.resourceExtInfo.songData.album.name
-        // }
-        item.al = {name: ''}
-        item.al.name = item.resourceExtInfo.songData.album.name
-        playMusicSingle(item);
-      } else {
-        router.push({ path: `/album`, query: { id: item.resourceId } });
-      }
-      // if(item.resourceType == `album`) {
-
-      // }
-    };
-
-    // 点击圆形图标跳转
-    const ballClick = (a: string) => {
-      // if (a == `排行榜`) {
-        router.push({ path: `/rank` });
-      // }
-    };
-
-    const goSearch = () => {
-      router.push({ path: "/search", query: {} });
-    };
-
-    function recentcontactDD(): void {
-      recentcontact();
-    }
-
-    function goSongList(id: string): void {
-      router.push({ path: "/songList", query: { id } });
-    }
-
-    // 播放列表
-    const add_song_list = () => {
-      let list: any[] = [];
-      info.long.creatives.forEach((item: any, index: number) => {
-        item.resources.forEach((it: any) => {
-          list.push({
-            id: it.resourceId,
-            type: 0,
-            name: it.resourceExtInfo.songData.name,
-            author: it.resourceExtInfo.songData.artists.map((item: any) => item.name).join(`/`),
-            img: it.uiElement.image.imageUrl,
-          });
-        });
-      });
-      store.commit(`add_songList`, list);
-    };
-
-    // 轮播图点击
-    const swiper_click = (i: any) => {
-      if (i.url) window.location.href = i.url;
-      if (i.song) {
-        let temp = {
-          resourceId: i.song.id,
-          resourceExtInfo: {
-            songData: {
-              name: i.song.name
-            },
-            artists: i.song.ar
-          },
-          uiElement: {
-            image: {
-              imageUrl: i.song.al.picUrl
-            }
-          }
-        }
-        playMusicSingle(temp);
-      }
-    };
-
-    // 弹出侧边栏
-    const showLeftPop = ():void => {
-      show.value = !show.value;
-    }
-
-    // 跳转GitHub文档
-    const goToGithub = ():void => {
-      window.location.href = 'https://github.com/Binaryify/NeteaseCloudMusicApi';
-    }
-
-    return {
-      active,
-      ballClick,
-      goToGithub,
-      router,
-      show,
-      showLeftPop,
-      new_three,
-      goSearch,
-      onRefresh,
-      onChange,
-      topBg,
-      add_song_list,
-      change_new,
-      goSongList,
-      recentcontactDD,
-      ...toRefs(info),
-      playMusicSingle,
-      loadMore,
-      swiper_click
-    };
+  // 可刷新的长标题区域
+  long: {
+    uiElement: {
+      subTitle: { title: "" },
+      button: {},
+    },
+  },
+  // 精选音乐视频
+  HOMEPAGE_MUSIC_MLOG: {
+    img: [],
+    extInfo: [],
+    uiElement: {
+      subTitle: { title: "" },
+      button: {},
+    },
+  },
+  // 雷达歌单
+  HOMEPAGE_BLOCK_MGC_PLAYLIST: {
+    uiElement: {
+      subTitle: { title: "" },
+      button: {},
+    },
+  },
+  // 音乐日历
+  HOMEPAGE_MUSIC_CALENDAR: {
+    creatives: [],
+    uiElement: {
+      subTitle: { title: "" },
+      button: {},
+    },
+  },
+  // 专属场景歌单
+  HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST: {
+    uiElement: {
+      subTitle: { title: "" },
+      button: {},
+    },
+  },
+  // 新歌，新碟，数字专辑
+  HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG: {
+    index: 0,
+    title: [],
+    arrData: [[], [], []], // 存储排好顺序的数组
+    arrOri: [],
+  },
+  // 推荐新歌云贝广告
+  HOMEPAGE_YUNBEI_NEW_SONG: {
+    uiElement: {
+      subTitle: { title: "" },
+      button: {},
+    },
+  },
+  // 播客合集
+  HOMEPAGE_VOICELIST_RCMD: {
+    creatives: [],
+    uiElement: {
+      subTitle: { title: "" },
+      button: {},
+    },
+  },
+  // 24 小时播客
+  HOMEPAGE_PODCAST24: {
+    creatives: [],
+    uiElement: {
+      subTitle: { title: "" },
+      button: {},
+    },
+  },
+  // 视频合集
+  HOMEPAGE_BLOCK_VIDEO_PLAYLIST: {
+    creatives: [],
+    uiElement: {
+      subTitle: { title: "" },
+      button: {},
+    },
   },
 });
+
+// 简单的节流
+const decrease = (i: number) => {
+  let isDoing = false;
+  return () => {
+    let timer: any;
+    if (isDoing) {
+      return;
+    }
+    isDoing = true;
+    timer = setTimeout(() => {
+      isDoing = false;
+      info.scrollY = i;
+      clearTimeout(timer);
+    }, 500);
+  };
+};
+
+// 数据请求
+onMounted(async () => {
+  window.addEventListener("scroll", () => {
+    decrease(window.scrollY)();
+  });
+});
+
+const onRefresh = async () => {
+  let discoverInfo = await getDiscoverInfo(info.cursor);
+  // 分页数据
+  info.cursor = discoverInfo.data.cursor;
+  // 分配数据
+  discoverInfo.data.blocks.map((item: any) => {
+    // 轮播图
+    if (item.blockCode == "HOMEPAGE_BANNER") {
+      info["swiper"] = item.extInfo.banners;
+    }
+    // 推荐歌单
+    if (item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
+      info.recommend.arrData = item.creatives;
+      info.recommend.titleTex = item.uiElement.subTitle.title;
+      info.recommend.button = item.uiElement.button;
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
+      // 较长的推荐区域
+      info.long = item;
+    }
+    if (item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
+      // 精选音乐视频
+      info.HOMEPAGE_MUSIC_MLOG = item;
+      info.HOMEPAGE_MUSIC_MLOG.extInfo.map((i: any) => {});
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
+      // 雷达歌单
+      info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
+    }
+    if (item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
+      // 音乐日历
+      info.HOMEPAGE_MUSIC_CALENDAR = item;
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST") {
+      // 专属场景歌单
+      info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST = item;
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG") {
+      // 新歌，新碟，数字专辑
+      info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri = item.creatives;
+      info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri.map((item: { creativeType: string }) => {
+        // 如果是新歌
+        if (item.creativeType == "NEW_SONG_HOMEPAGE") {
+          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].push(item);
+        }
+        // 新碟
+        if (item.creativeType == "NEW_ALBUM_HOMEPAGE") {
+          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[1].push(item);
+        }
+        // 数字专辑
+        if (item.creativeType == "DIGITAL_ALBUM_HOMEPAGE") {
+          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[2].push(item);
+        }
+      });
+    }
+    if (item.blockCode == "HOMEPAGE_YUNBEI_NEW_SONG") {
+      // 推荐新歌云贝广告
+      info.HOMEPAGE_YUNBEI_NEW_SONG = item;
+    }
+    if (item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
+      // 播客合辑
+      info.HOMEPAGE_VOICELIST_RCMD = item;
+    }
+    if (item.blockCode == "HOMEPAGE_PODCAST24") {
+      // 24小时播客
+      info.HOMEPAGE_PODCAST24 = item.creatives[1];
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
+      // 视频合集
+      info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = item;
+    }
+    info.loading = false;
+  });
+};
+
+const loadMore = async () => {
+  info.listLoading = true;
+  let discoverInfo = await getDiscoverInfo(info.cursor);
+  info.listLoading = false;
+  if (discoverInfo.code == 400) {
+    info.listError = true;
+    return;
+  }
+  info.listFinish = true;
+  // 分页数据
+  info.cursor = discoverInfo.data.cursor;
+  discoverInfo.data.blocks.map((item: any) => {
+    // 轮播图
+    if (item.blockCode == "HOMEPAGE_BANNER") {
+      info["swiper"] = item.extInfo.banners;
+      nextTick(() => {
+        topBg.value?.setAttribute("style", `background-image:url(${info.swiper[0].pic});background-color:red`);
+      });
+    }
+    // 推荐歌单
+    if (item.blockCode == "HOMEPAGE_BLOCK_PLAYLIST_RCMD") {
+      info.recommend.arrData = item.creatives;
+      info.recommend.titleTex = item.uiElement.subTitle.title;
+      info.recommend.button = item.uiElement.button;
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_STYLE_RCMD") {
+      // 较长的推荐区域
+      info.long = item;
+    }
+    if (item.blockCode == "HOMEPAGE_MUSIC_MLOG") {
+      // 精选音乐视频
+      info.HOMEPAGE_MUSIC_MLOG = item;
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_MGC_PLAYLIST") {
+      // 雷达歌单
+      info.HOMEPAGE_BLOCK_MGC_PLAYLIST = item;
+    }
+    if (item.blockCode == "HOMEPAGE_MUSIC_CALENDAR") {
+      // 音乐日历
+      info.HOMEPAGE_MUSIC_CALENDAR = item;
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST") {
+      // 专属场景歌单
+      info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST = item;
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG") {
+      // 新歌，新碟，数字专辑
+      info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri = item.creatives;
+      info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrOri.map((item: { creativeType: string }) => {
+        // 如果是新歌
+        if (item.creativeType == "NEW_SONG_HOMEPAGE") {
+          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].push(item);
+        }
+        // 新碟
+        if (item.creativeType == "NEW_ALBUM_HOMEPAGE") {
+          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[1].push(item);
+        }
+        // 数字专辑
+        if (item.creativeType == "DIGITAL_ALBUM_HOMEPAGE") {
+          info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[2].push(item);
+        }
+      });
+    }
+    if (item.blockCode == "HOMEPAGE_YUNBEI_NEW_SONG") {
+      // 推荐新歌云贝广告
+      info.HOMEPAGE_YUNBEI_NEW_SONG = item;
+    }
+    if (item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
+      // 播客合辑
+      info.HOMEPAGE_VOICELIST_RCMD = item;
+    }
+    if (item.blockCode == "HOMEPAGE_PODCAST24") {
+      // 24小时播客
+      info.HOMEPAGE_PODCAST24 = item;
+    }
+    if (item.blockCode == "HOMEPAGE_BLOCK_VIDEO_PLAYLIST") {
+      // 视频合集
+      info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST = item;
+    }
+  });
+  const iconInfo = await getIconInfo();
+  // 圆形图标
+  info.icon = iconInfo.data;
+  let word = await getSearchWord();
+  info.searchWord = word.data.showKeyword;
+};
+
+// 获取 top 的dom 元素, 根据轮播图轮播事件动态改变背景图片模糊
+
+const onChange = (index: number) => {
+  topBg.value?.setAttribute("style", `background-image:url(${info.swiper[index].pic});`);
+};
+
+// 新歌，新碟，数字专辑
+function change_new(index: number): void {
+  info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index = index;
+}
+// 监听索引变化，改变为对应新歌，新碟，数字专辑的数组数据
+watch(
+  () => info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index,
+  (i) => {
+    console.log(i);
+  }
+);
+
+// 点击播放歌曲
+async function playMusicSingle(item: any): Promise<void> {
+  if (item.resourceId == store.song_info.id) {
+    store.play(!store.song_info.isPlaying);
+  }
+  // 先判断和当前的歌曲是不是同一首,如果不是同一首
+  if (item.resourceId != store.song_info.id) {
+    store.play(false);
+    // 请求URL
+    const info = await getSongUrl(item.resourceId);
+    let song = {
+      id: item.resourceId,
+      type: 0,
+      name: item.resourceExtInfo.songData.name,
+      author: item.resourceExtInfo.artists.map((i: any) => i.name).join("/"),
+      url: info.data[0].url,
+      img: item.uiElement.image.imageUrl,
+      al: item.resourceExtInfo.songData.album.name,
+    };
+
+    // 设置歌曲信息
+    store.setSongInfo(song);
+    // store.commit("add_songList",song)
+    // 再由 home 页面监听播放
+    // store.commit("play", true);
+  }
+}
+
+// 点击新歌 新碟 新专辑
+const new_three = (item: any) => {
+  if (item.resourceType == `song`) {
+    // let i: any = {
+    //   id: item.resourceId,
+    //   type: 0,
+    //   name: item!.resourceExtInfo!.songData.name,
+    //   author: item.resourceExtInfo.artists.map((i: any) => i.name).join("/"),
+    //   url: '',
+    //   img: item.uiElement.image.imageUrl,
+    //   al: item.resourceExtInfo.songData.album.name
+    // }
+    item.al = { name: "" };
+    item.al.name = item.resourceExtInfo.songData.album.name;
+    playMusicSingle(item);
+  } else {
+    router.push({ path: `/album`, query: { id: item.resourceId } });
+  }
+  // if(item.resourceType == `album`) {
+
+  // }
+};
+
+// 点击圆形图标跳转
+const ballClick = () => {
+  // if (a == `排行榜`) {
+  router.push({ path: `/rank` });
+  // }
+};
+
+const goSearch = () => {
+  router.push({ path: "/search", query: {} });
+};
+
+function recentcontactDD(): void {
+  recentcontact();
+}
+
+function goSongList(id: string): void {
+  router.push({ path: "/songList", query: { id } });
+}
+
+// 播放列表
+const add_song_list = () => {
+  let list: any[] = [];
+  info.long.creatives.forEach((item: any, index: number) => {
+    item.resources.forEach((it: any) => {
+      list.push({
+        id: it.resourceId,
+        type: 0,
+        name: it.resourceExtInfo.songData.name,
+        author: it.resourceExtInfo.songData.artists.map((item: any) => item.name).join(`/`),
+        img: it.uiElement.image.imageUrl,
+      });
+    });
+  });
+  store.add_songList(list);
+};
+
+// 轮播图点击
+const swiper_click = (i: any) => {
+  if (i.url) window.location.href = i.url;
+  if (i.song) {
+    let temp = {
+      resourceId: i.song.id,
+      resourceExtInfo: {
+        songData: {
+          name: i.song.name,
+        },
+        artists: i.song.ar,
+      },
+      uiElement: {
+        image: {
+          imageUrl: i.song.al.picUrl,
+        },
+      },
+    };
+    playMusicSingle(temp);
+  }
+};
+
+// 弹出侧边栏
+const showLeftPop = (): void => {
+  show.value = !show.value;
+};
+
+// 跳转GitHub文档
+const goToGithub = (): void => {
+  window.location.href = "https://github.com/Binaryify/NeteaseCloudMusicApi";
+};
+
+// 首页的发现组件
+// export default defineComponent({
+//   name: "discover",
+//   components: {
+//     bsscroll,
+//   },
+//   setup() {
+
+//     // return {
+//     //   active,
+//     //   ballClick,
+//     //   goToGithub,
+//     //   router,
+//     //   show,
+//     //   showLeftPop,
+//     //   new_three,
+//     //   goSearch,
+//     //   onRefresh,
+//     //   onChange,
+//     //   topBg,
+//     //   add_song_list,
+//     //   change_new,
+//     //   goSongList,
+//     //   recentcontactDD,
+//     //   ...toRefs(info),
+//     //   playMusicSingle,
+//     //   loadMore,
+//     //   swiper_click
+//     // };
+//   },
+// });
 </script>
 
 <style lang="less" scoped>

@@ -1,8 +1,9 @@
 import { createApp } from "vue";
 import App from "./App.vue";
-import "./registerServiceWorker";
+// import "./registerServiceWorker";
 import router from "./router";
-import store from "./store";
+import songStore from "./store/index";
+import { createPinia } from "pinia"
 import {
   Button,
   Tabbar,
@@ -17,50 +18,10 @@ import Vant from "vant";
 import { Lazyload } from 'vant';
 import "vant/lib/index.css";
 
+
 const app = createApp(App);
 
-router.beforeEach((to, from, next) => {
-  // 防止从 URL 直接输入跳转到需要参数页面的情况
-  if([`songList`, `searchResult`, `comment`, `djProgram`, `album`, `vid`, `singerDetail`].includes(to!.name!.toString()) && Object.keys(to.query).length == 0) {
-    Toast(`你可真是个小基佬`)
-    return next(`/gay`)
-  }
 
-  // 播放列表没有歌，输入URL跳转歌词页面会被拦截到错误页面
-  if(store.state.song_info.list.length == 0 && to.name == `song`) {
-    Toast(`你可真是个小基佬`)
-    return next(`/gay`)
-  }
-
-
-  if(to.name == `Home` && from.name ) {
-    // console.log(`不能回到Home`);
-    
-    store.commit("close")
-    return next(false)
-  }
-  if(to.name == `Home`) {
-    // console.log(`home重定向`);
-    
-    store.commit("close")
-    return next(`/discover`)
-  }
-  if(from.name == `searchResult` && to.name == `comment`) {
-    store.commit("close")
-    // next()
-  }else if(store.state.showPop) {
-    // console.log("当前有弹出框禁止后退");
-    
-    store.commit("close")
-    return next(false)
-  }
-  
-  next()
-})
-
-router.afterEach(() => {
-  
-})
 
 // 注册一个全局自定义指令 用来替换关键搜索词颜色的指令
 app.directive('word',(el,binding) => {
@@ -86,4 +47,4 @@ app.directive('word',(el,binding) => {
 // app.use(Toast);
 app.use(Lazyload);
 app.use(Vant);
-app.use(store).use(router).mount("#app");
+app.use(createPinia()).use(router).mount("#app");

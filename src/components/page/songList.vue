@@ -1,35 +1,35 @@
 <template>
-  <div :class="{first_div: true, first_div_song_height: store.state.song_info.id}">
+  <div :class="{ first_div: true, first_div_song_height: store.song_info.id }">
     <div class="top">
       <div class="img_blur">
-        <img :src="img" alt="" />
+        <img :src="data.img" alt="" />
       </div>
       <!-- <van-sticky> -->
-        <div class="navSongList">
-          <div class="left_arrow" @click="router.go(-1)">
-            <img src="../../../public/img/icons/left_arrow.svg" alt="" />
-          </div>
-          <div class="title">歌单</div>
-          <div class="search">
-            <img src="../../../public/img/icons/search.svg" alt="" />
-          </div>
+      <div class="navSongList">
+        <div class="left_arrow" @click="router.go(-1)">
+          <img src="../../../public/img/icons/left_arrow.svg" alt="" />
         </div>
+        <div class="title">歌单</div>
+        <div class="search">
+          <img src="../../../public/img/icons/search.svg" alt="" />
+        </div>
+      </div>
       <!-- </van-sticky> -->
       <div class="info">
         <div class="avatar">
-          <van-image radius="8" class="img" :src="img" />
+          <van-image radius="8" class="img" :src="data.img" />
         </div>
         <div class="detail">
-          <div class="title">{{ title }}</div>
+          <div class="title">{{ data.title }}</div>
           <div class="person">
             <van-image radius="50%" class="img" :src="author.avatar" />
             <span class="name">{{ author.nickname }}</span>
             <span class="Follow" v-if="author.followed">></span>
             <span class="notFollow" v-else>+</span>
           </div>
-          <div class="des" @click="show = true">
-            <div class="text">{{ description }}</div>
-            <img v-if="description" src="../../../public/img/icons/more.svg" alt="" />
+          <div class="des" @click="data.show = true">
+            <div class="text">{{ data.description }}</div>
+            <img v-if="data.description" src="../../../public/img/icons/more.svg" alt="" />
           </div>
         </div>
       </div>
@@ -38,38 +38,38 @@
     <div class="count">
       <div class="sub item">
         <!-- <img :src="subscribed ? subedIcon : subIcon" alt="" /> -->
-        <img v-if="subscribed" src="../../../public/img/icons/subed.svg" alt="" />
+        <img v-if="data.subscribed" src="../../../public/img/icons/subed.svg" alt="" />
         <img v-else src="../../../public/img/icons/sub.svg" alt="" />
-        <span>{{ numFilter(subscribedCount) }}</span>
+        <span>{{ data.numFilter(data.subscribedCount) }}</span>
       </div>
       <div class="line"></div>
       <div class="comment item" @click="router.push({ path: `/comment`, query: { id: id, type: 2 } })">
         <img src="../../../public/img/icons/comment.svg" alt="" />
-        <span>{{ numFilter(commentCount) }}</span>
+        <span>{{ data.numFilter(data.commentCount) }}</span>
       </div>
       <div class="line"></div>
       <div class="share item">
         <img src="../../../public/img/icons/share.svg" alt="" />
-        <span>{{ numFilter(shareCount) }}</span>
+        <span>{{ data.numFilter(data.shareCount) }}</span>
       </div>
     </div>
     <!-- 全部播放 -->
     <!-- <van-sticky offset-top="50"> -->
-      <div class="playAll">
-        <div class="icon">
-          <img @click="add_song_list" src="../../../public/img/icons/playAll.svg" alt="" />
-        </div>
-        <div class="text">
-          <div class="play_all_title">播放全部</div>
-        </div>
-        <div class="play_count">({{ songListInfo.length }})</div>
+    <div class="playAll">
+      <div class="icon">
+        <img @click="add_song_list" src="../../../public/img/icons/playAll.svg" alt="" />
       </div>
+      <div class="text">
+        <div class="play_all_title">播放全部</div>
+      </div>
+      <div class="play_count">({{ data.songListInfo.length }})</div>
+    </div>
     <!-- </van-sticky> -->
     <!-- 歌曲列表 -->
-    <div class="songList" :class="{ songList_no_bar: !store.state.song_info.id }">
-      <div class="song_item" v-for="(item, index) in songListInfo" :key="index">
+    <div class="songList" :class="{ songList_no_bar: !store.song_info.id }">
+      <div class="song_item" v-for="(item, index) in data.songListInfo" :key="index">
         <div class="index">
-          <img v-if="item.id == store.state.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="" />
+          <img v-if="item.id == store.song_info.id" width="18" src="../../../public/img/icons/loading.svg" alt="" />
           <span v-else>{{ index + 1 }}</span>
         </div>
         <div class="song_info" @click="playMusicSingle(item)">
@@ -96,26 +96,26 @@
         </div>
       </div>
     </div>
-    <van-overlay :show="show" @click="show = false" :lock-scroll="false">
-      <div class="wrapper" @click="show = false">
-        <van-image radius="8" class="img" :src="img" />
-        <span class="title">{{ title }}</span>
-        <div class="babel" v-if="tags.length">
+    <van-overlay :show="data.show" @click="data.show = false" :lock-scroll="false">
+      <div class="wrapper" @click="data.show = false">
+        <van-image radius="8" class="img" :src="data.img" />
+        <span class="title">{{ data.title }}</span>
+        <div class="babel" v-if="data.tags.length">
           <span>标签：</span>
-          <span class="babel_item" v-for="(it, i) in tags" :key="i">{{ it }}</span>
+          <span class="babel_item" v-for="(it, i) in data.tags" :key="i">{{ it }}</span>
         </div>
-        <p>{{ description }}</p>
+        <p>{{ data.description }}</p>
       </div>
     </van-overlay>
   </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import { defineComponent, ref, toRefs, onBeforeMount, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { getSongListInfo, getSongInfo, getSongUrl } from "../../api/song";
 import { numFilter } from "../../utils/num";
-import { useStore } from "vuex";
+import songStore from "../../store";
 import { Toast } from "vant";
 
 // 歌单
@@ -146,6 +146,7 @@ interface song {
   sq: boolean;
   vip: boolean;
   dujia: boolean;
+  mv: number
 }
 
 // 作者
@@ -156,157 +157,158 @@ interface author {
   followed: false; // 是否关注
 }
 
-export default defineComponent({
-  name: "songList",
-  setup() {
-    //实例化路由
-    const router = useRouter();
-    const store = useStore();
-    const img = ref<string>();
-    const data = reactive<songList>({
-      id: 0,
-      numFilter: numFilter,
-      title: "",
-      img: "",
-      description: "",
-      tags: [],
-      subscribed: false,
-      songListInfo: [],
-      shareCount: 0,
-      subscribedCount: 0,
-      commentCount: 0,
-      // subedIcon: require("../../../public/img/icons/subed.svg"),
-      // subIcon: require("../../../public/img/icons/sub.svg"),
-      show: false,
-    });
-    const author = reactive<author>({
-      avatar: "",
-      nickname: "",
-      userId: "",
-      followed: false, // 是否关注
-    });
-    const id: any = router.currentRoute.value.query.id; //获取参数
-    onBeforeMount(async () => {
-      // console.log(router.currentRoute.value);
-      store.commit("set_load", true);
-      data.id = id;
-      // 得到歌单数据
-      const songList = await getSongListInfo(id);
-      // 组装歌单数据
-      data.title = songList.playlist.name;
-      
-      data.img = songList.playlist.coverImgUrl;
-      data.description = songList.playlist.description;
-      data.tags = songList.playlist.tags;
-      data.subscribed = songList.playlist.subscribed;
-
-      data.subscribedCount = songList.playlist.subscribedCount;
-      data.commentCount = songList.playlist.commentCount;
-      data.shareCount = songList.playlist.shareCount;
-
-      author.avatar = songList.playlist.creator.avatarUrl;
-      author.userId = songList.playlist.creator.userId;
-      author.nickname = songList.playlist.creator.nickname;
-      author.followed = songList.playlist.creator.followed;
-
-      let allId = songList.playlist.trackIds.map((item: { id: string }) => {
-        return item.id;
-      });
-      // 得到歌单里的全部歌曲信息
-      const songListInfo: any = await getSongInfo(allId.join(","));
-
-      data.songListInfo = songListInfo.songs.map((item: any) => {
-        return {
-          id: item.id,
-          name: item.name,
-          Tv: item.alia.join("/"), // 歌曲可能会有剧名
-          author: item.ar.map((item: any) => item.name).join("/"),
-          img: item.al.picUrl,
-          des: item.al.name,
-          ar: item.ar,
-          al: item.al,
-          mv: item.mv,
-          // sq: item.maxbr >= 999000,
-          // vip: item.fee == 1,
-          // dujia: item.flag == 1092
-        };
-      });
-
-      store.commit("set_load", false);
-
-      songListInfo.privileges.forEach((item: any, index: number) => {
-        data.songListInfo[index].sq = item.maxbr >= 999000;
-        data.songListInfo[index].vip = item.fee == 1;
-        data.songListInfo[index].dujia = item.flag == 1092;
-      });
-    });
-
-    // 点击播放歌曲
-    function playMusicSingle(item: any): void {
-      if (item.id == store.state.song_info.id) {
-        store.commit("play", !store.state.song_info.isPlaying);
-        return;
-      }
-      // 先判断和当前的歌曲是不是同一首,如果不是同一首
-      if (item.resourceId != store.state.song_info.id) {
-        store.commit("play", false);
-        // 请求URL
-        // const info = await getSongUrl(item.resourceId);
-        let song = {
-          id: item.id,
-          name: item.name,
-          author: item.ar.map((i: any) => i.name).join("/"),
-          type: 0,
-          al: item.al.name,
-          img: item.al.picUrl,
-        };
-        // 设置歌曲信息
-        store.commit("setSongInfo", song);
-      }
-    }
-
-    // 播放列表
-    const add_song_list = () => {
-      if (data.songListInfo.length == 0) {
-        Toast(`还未获取到音乐列表，请稍后`);
-        return;
-      }
-      let list: any[] = [];
-      data.songListInfo.forEach((item: any, index: number) => {
-        list.push({
-          id: item.id,
-          type: 0,
-          name: item.name,
-          author: item.author,
-          img: item.img,
-        });
-      });
-      store.commit(`add_songList`, list);
-    };
-
-    // 弹出更多信息
-    const popMoreInfo = (item: any, type: number): void => {
-      item.type = type;
-      store.dispatch(`set_pop_detail`, item);
-    };
-
-    // 点击跳转 mv
-    const goMv = (mvId: number): void => {
-      router.push({ name: "vid", query: { vid: mvId } });
-    };
-
-    return {
-      ...toRefs(data),
-      author,
-      popMoreInfo,
-      store,
-      add_song_list,
-      goMv,
-      router,
-      playMusicSingle,
-    };
-  },
+//实例化路由
+const router = useRouter();
+const store = songStore();
+const img = ref<string>();
+const data = reactive<songList>({
+  id: 0,
+  numFilter: numFilter,
+  title: "",
+  img: "",
+  description: "",
+  tags: [],
+  subscribed: false,
+  songListInfo: [],
+  shareCount: 0,
+  subscribedCount: 0,
+  commentCount: 0,
+  // subedIcon: require("../../../public/img/icons/subed.svg"),
+  // subIcon: require("../../../public/img/icons/sub.svg"),
+  show: false,
 });
+const author = reactive<author>({
+  avatar: "",
+  nickname: "",
+  userId: "",
+  followed: false, // 是否关注
+});
+const id: any = router.currentRoute.value.query.id; //获取参数
+onBeforeMount(async () => {
+  // console.log(router.currentRoute.value);
+  store.set_load(true);
+  data.id = id;
+  // 得到歌单数据
+  const songList = await getSongListInfo(id);
+  // 组装歌单数据
+  data.title = songList.playlist.name;
+
+  data.img = songList.playlist.coverImgUrl;
+  data.description = songList.playlist.description;
+  data.tags = songList.playlist.tags;
+  data.subscribed = songList.playlist.subscribed;
+
+  data.subscribedCount = songList.playlist.subscribedCount;
+  data.commentCount = songList.playlist.commentCount;
+  data.shareCount = songList.playlist.shareCount;
+
+  author.avatar = songList.playlist.creator.avatarUrl;
+  author.userId = songList.playlist.creator.userId;
+  author.nickname = songList.playlist.creator.nickname;
+  author.followed = songList.playlist.creator.followed;
+
+  let allId = songList.playlist.trackIds.map((item: { id: string }) => {
+    return item.id;
+  });
+  // 得到歌单里的全部歌曲信息
+  const songListInfo: any = await getSongInfo(allId.join(","));
+
+  data.songListInfo = songListInfo.songs.map((item: any) => {
+    return {
+      id: item.id,
+      name: item.name,
+      Tv: item.alia.join("/"), // 歌曲可能会有剧名
+      author: item.ar.map((item: any) => item.name).join("/"),
+      img: item.al.picUrl,
+      des: item.al.name,
+      ar: item.ar,
+      al: item.al,
+      mv: item.mv,
+      // sq: item.maxbr >= 999000,
+      // vip: item.fee == 1,
+      // dujia: item.flag == 1092
+    };
+  });
+
+  store.set_load(false);
+
+  songListInfo.privileges.forEach((item: any, index: number) => {
+    data.songListInfo[index].sq = item.maxbr >= 999000;
+    data.songListInfo[index].vip = item.fee == 1;
+    data.songListInfo[index].dujia = item.flag == 1092;
+  });
+});
+
+// 点击播放歌曲
+function playMusicSingle(item: any): void {
+  if (item.id == store.song_info.id) {
+    store.play(!store.song_info.isPlaying);
+    return;
+  }
+  // 先判断和当前的歌曲是不是同一首,如果不是同一首
+  if (item.resourceId != store.song_info.id) {
+    store.play(false);
+    // 请求URL
+    // const info = await getSongUrl(item.resourceId);
+    let song = {
+      id: item.id,
+      name: item.name,
+      author: item.ar.map((i: any) => i.name).join("/"),
+      type: 0,
+      al: item.al.name,
+      img: item.al.picUrl,
+    };
+    // 设置歌曲信息
+    store.setSongInfo(song);
+  }
+}
+
+// 播放列表
+const add_song_list = () => {
+  if (data.songListInfo.length == 0) {
+    Toast(`还未获取到音乐列表，请稍后`);
+    return;
+  }
+  let list: any[] = [];
+  data.songListInfo.forEach((item: any, index: number) => {
+    list.push({
+      id: item.id,
+      type: 0,
+      name: item.name,
+      author: item.author,
+      img: item.img,
+    });
+  });
+  store.add_songList(list);
+};
+
+// 弹出更多信息
+const popMoreInfo = (item: any, type: number): void => {
+  item.type = type;
+  store.set_pop_detail(item);
+};
+
+// 点击跳转 mv
+const goMv = (mvId: number): void => {
+  router.push({ name: "vid", query: { vid: mvId } });
+};
+
+// export default defineComponent({
+//   name: "songList",
+//   setup() {
+
+//     return {
+//       ...toRefs(data),
+//       author,
+//       popMoreInfo,
+//       store,
+//       add_song_list,
+//       goMv,
+//       router,
+//       playMusicSingle,
+//     };
+//   },
+// });
 </script>
 
 <style lang="less" scoped>

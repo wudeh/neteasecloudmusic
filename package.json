@@ -1,36 +1,25 @@
 {
-  "name": "netcloudmusic",
-  "version": "0.1.0",
-  "private": true,
+  "name": "vite-neteasemusic",
+  "version": "0.0.0",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "serve": "vite preview"
   },
   "dependencies": {
-    "@better-scroll/core": "^2.3.0",
-    "axios": "^0.21.1",
-    "core-js": "^3.6.5",
-    "register-service-worker": "^1.7.1",
-    "vant": "^3.2.5",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.0-0",
-    "vuex": "^4.0.0-0"
+    "@better-scroll/core": "^2.4.2",
+    "axios": "^0.24.0",
+    "less": "^4.1.2",
+    "pinia": "^2.0.4",
+    "vant": "^3.3.1",
+    "vue": "^3.2.16",
+    "vue-router": "^4.0.12"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-pwa": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-typescript": "~4.5.0",
-    "@vue/cli-plugin-vuex": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0",
-    "less": "^3.0.4",
-    "less-loader": "^5.0.0",
-    "typescript": "~4.1.5"
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead"
-  ]
+    "@types/node": "^16.11.10",
+    "@vitejs/plugin-vue": "^1.9.3",
+    "typescript": "^4.4.3",
+    "vite": "^2.6.4",
+    "vue-tsc": "^0.3.0"
+  }
 }

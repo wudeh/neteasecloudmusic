@@ -1,5 +1,5 @@
 import { Toast } from "vant";
-import store from "../store";
+import songStore from "../store";
 // 点击下载文件
 export default function downloadFile(url: string, item: any) {
   if(!url) {
@@ -46,9 +46,9 @@ export default function downloadFile(url: string, item: any) {
       function(event) {
         if (event.lengthComputable) {
           let percentComplete = (event.loaded / event.total) * 100;
-          // const store = useStore();
+          const store = songStore();
           // console.log(`当前下载进度${percentComplete.toFixed(2)}%`);
-          store.commit("download_progress", {
+          store.download_progress({
             id: item.id,
             name: item.name,
             author: item.author,
