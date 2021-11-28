@@ -8,22 +8,22 @@
         歌手榜单
       </div>
     </div>
-    <van-tabs v-model:active="data.activeName" sticky>
+    <van-tabs v-model:active="activeName" sticky>
       <!-- <van-tab disabled></van-tab>
       <van-tab disabled></van-tab>
       <van-tab disabled></van-tab> -->
       <van-tab title="华语" name="1">
         <!-- <div class="wrapper"> -->
-          <van-list v-model:loading="data.cn.loading" v-model:error="data.cn.error" :immediate-check="true" :finished="data.cn.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="cn.loading" v-model:error="cn.error" :immediate-check="true" :finished="cn.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display: flex; align-items: center; justify-content: center">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
             </template>
-            <div class="time" v-if="data.cn.info.updateTime">更新时间：{{ new Date(data.cn.info.updateTime).getMonth() + 1 }}月{{ new Date(data.cn.info.updateTime).getDate() }}日</div>
+            <div class="time" v-if="cn.info.updateTime">更新时间：{{ new Date(cn.info.updateTime).getMonth() + 1 }}月{{ new Date(cn.info.updateTime).getDate() }}日</div>
             <div class="info">
-              <div class="item" v-for="(it, i) in data.cn.info.artists" :key="it.id"  @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
+              <div class="item" v-for="(it, i) in cn.info.artists" :key="it.id"  @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
                 <div class="index">
                   <span :class="{ num: true, red: i < 3 }">{{ i + 1 }}</span>
                   <span v-if="it.rank == i">-</span>
@@ -44,16 +44,16 @@
       </van-tab>
       <van-tab title="欧美" name="2">
         <!-- <div class="wrapper"> -->
-          <van-list v-model:loading="data.en.loading" v-model:error="data.en.error" :immediate-check="true" :finished="data.en.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="en.loading" v-model:error="en.error" :immediate-check="true" :finished="en.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display: flex; align-items: center; justify-content: center">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
             </template>
-            <div class="time" v-if="data.en.info.updateTime">更新时间：{{ new Date(data.en.info.updateTime).getMonth() + 1 }}月{{ new Date(data.en.info.updateTime).getDate() }}日</div>
+            <div class="time" v-if="en.info.updateTime">更新时间：{{ new Date(en.info.updateTime).getMonth() + 1 }}月{{ new Date(en.info.updateTime).getDate() }}日</div>
             <div class="info">
-              <div class="item" v-for="(it, i) in data.en.info.artists" :key="it.id" @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
+              <div class="item" v-for="(it, i) in en.info.artists" :key="it.id" @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
                 <div class="index">
                   <span :class="{ num: true, red: i < 3 }">{{ i + 1 }}</span>
                   <span v-if="it.rank == i">-</span>
@@ -74,16 +74,16 @@
       </van-tab>
       <van-tab title="韩国" name="3">
         <!-- <div class="wrapper"> -->
-          <van-list v-model:loading="data.ko.loading" v-model:error="data.ko.error" :immediate-check="true" :finished="data.ko.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="ko.loading" v-model:error="ko.error" :immediate-check="true" :finished="ko.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display: flex; align-items: center; justify-content: center">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
             </template>
-            <div class="time" v-if="data.ko.info.updateTime">更新时间：{{ new Date(data.ko.info.updateTime).getMonth() + 1 }}月{{ new Date(data.ko.info.updateTime).getDate() }}日</div>
+            <div class="time" v-if="ko.info.updateTime">更新时间：{{ new Date(ko.info.updateTime).getMonth() + 1 }}月{{ new Date(ko.info.updateTime).getDate() }}日</div>
             <div class="info">
-              <div class="item" v-for="(it, i) in data.ko.info.artists" :key="it.id" @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
+              <div class="item" v-for="(it, i) in ko.info.artists" :key="it.id" @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
                 <div class="index">
                   <span :class="{ num: true, red: i < 3 }">{{ i + 1 }}</span>
                   <span v-if="it.rank == i">-</span>
@@ -104,16 +104,16 @@
       </van-tab>
       <van-tab title="日本" name="4">
         <!-- <div class="wrapper"> -->
-          <van-list v-model:loading="data.ja.loading" v-model:error="data.ja.error" :immediate-check="true" :finished="data.ja.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
+          <van-list v-model:loading="ja.loading" v-model:error="ja.error" :immediate-check="true" :finished="ja.finish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="loadMore">
             <template v-slot:loading>
               <div style="display: flex; align-items: center; justify-content: center">
                 <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
                 <span>加载中...</span>
               </div>
             </template>
-            <div class="time" v-if="data.ja.info.updateTime">更新时间：{{ new Date(data.ja.info.updateTime).getMonth() + 1 }}月{{ new Date(data.ja.info.updateTime).getDate() }}日</div>
+            <div class="time" v-if="ja.info.updateTime">更新时间：{{ new Date(ja.info.updateTime).getMonth() + 1 }}月{{ new Date(ja.info.updateTime).getDate() }}日</div>
             <div class="info">
-              <div class="item" v-for="(it, i) in data.ja.info.artists" :key="it.id" @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
+              <div class="item" v-for="(it, i) in ja.info.artists" :key="it.id" @click="router.push({ name: `singerDetail`,query:{id:it.id}})">
                 <div class="index">
                   <span :class="{ num: true, red: i < 3 }">{{ i + 1 }}</span>
                   <span v-if="it.rank == i">-</span>
@@ -139,147 +139,101 @@
   </div>
 </template>
 
-<script name="singer" lang="ts" setup>
+<script lang="ts">
 import { defineComponent, onBeforeMount, reactive, toRefs, watch } from "vue";
 import { getTopList } from "../../api/song";
+import { sendTimeConversion, numFilter } from "../../utils/num";
 import { useRouter } from "vue-router";
+export default defineComponent({
+  name: `singer`,
+  setup: () => {
+    const router = useRouter();
+    const data = reactive({
+      activeName: 1,
+      cn: {
+        loading: false,
+        finish: false,
+        error: false,
+        info: {
+          artists: [],
+        },
+      },
+      en: {
+        loading: false,
+        finish: false,
+        error: false,
+        info: {
+          artists: [],
+        },
+      },
+      ko: {
+        loading: false,
+        finish: false,
+        error: false,
+        info: {
+          artists: [],
+        },
+      },
+      ja: {
+        loading: false,
+        finish: false,
+        error: false,
+        info: {
+          artists: [],
+        },
+      },
+    });
 
-interface info {
-  activeName: number,
-  cn: {
-    loading: boolean,
-    finish: boolean,
-    error: boolean,
-    info: {
-      artists: any[],
-      updateTime: number
-    },
-  },
-  en: {
-    loading: boolean,
-    finish: boolean,
-    error: boolean,
-    info: {
-      artists: any[],
-      updateTime: number
-    },
-  },
-  ko: {
-    loading: boolean,
-    finish: boolean,
-    error: boolean,
-    info: {
-      artists: any[],
-      updateTime: number
-    },
-  },
-  ja: {
-    loading: boolean,
-    finish: boolean,
-    error: boolean,
-    info: {
-      artists: any[],
-      updateTime: number
-    },
-  },
-}
+    // dfsdfdf
+    const loadMore = async () => {
+      if (data.activeName == 1) {
+        if (data.cn.info.artists.length || data.cn.loading) return;
+        data.cn.loading = true;
+        let res = await getTopList(data.activeName);
+        data.cn.loading = false;
+        data.cn.info = res.list;
+        data.cn.finish = true;
+      }
+      if (data.activeName == 2) {
+        if (data.en.info.artists.length || data.en.loading) return;
+        data.en.loading = true;
+        let res = await getTopList(data.activeName);
+        data.en.loading = false;
+        data.en.info = res.list;
+        data.en.finish = true;
+      }
+      if (data.activeName == 3) {
+        if (data.ko.info.artists.length || data.ko.loading) return;
+        data.ko.loading = true;
+        let res = await getTopList(data.activeName);
+        data.ko.loading = false;
+        data.ko.info = res.list;
+        data.ko.finish = true;
+      }
+      if (data.activeName == 4) {
+        if (data.ja.info.artists.length || data.ja.loading) return;
+        data.ja.loading = true;
+        let res = await getTopList(data.activeName);
+        data.ja.loading = false;
+        data.ja.info = res.list;
+        data.ja.finish = true;
+      }
+    };
 
-const router = useRouter();
-const data = reactive<info>({
-  activeName: 1,
-  cn: {
-    loading: false,
-    finish: false,
-    error: false,
-    info: {
-      artists: [],
-      updateTime: 0
-    },
-  },
-  en: {
-    loading: false,
-    finish: false,
-    error: false,
-    info: {
-      artists: [],
-      updateTime: 0
-    },
-  },
-  ko: {
-    loading: false,
-    finish: false,
-    error: false,
-    info: {
-      artists: [],
-      updateTime: 0
-    },
-  },
-  ja: {
-    loading: false,
-    finish: false,
-    error: false,
-    info: {
-      artists: [],
-      updateTime: 0
-    },
+    watch(
+      () => data.activeName,
+      () => {
+        loadMore();
+      }
+    );
+
+    return {
+      ...toRefs(data),
+      loadMore,
+      router,
+    };
   },
 });
-
-// dfsdfdf
-const loadMore = async () => {
-  if (data.activeName == 1) {
-    if (data.cn.info.artists.length || data.cn.loading) return;
-    data.cn.loading = true;
-    let res = await getTopList(data.activeName);
-    data.cn.loading = false;
-    data.cn.info = res.list;
-    data.cn.finish = true;
-  }
-  if (data.activeName == 2) {
-    if (data.en.info.artists.length || data.en.loading) return;
-    data.en.loading = true;
-    let res = await getTopList(data.activeName);
-    data.en.loading = false;
-    data.en.info = res.list;
-    data.en.finish = true;
-  }
-  if (data.activeName == 3) {
-    if (data.ko.info.artists.length || data.ko.loading) return;
-    data.ko.loading = true;
-    let res = await getTopList(data.activeName);
-    data.ko.loading = false;
-    data.ko.info = res.list;
-    data.ko.finish = true;
-  }
-  if (data.activeName == 4) {
-    if (data.ja.info.artists.length || data.ja.loading) return;
-    data.ja.loading = true;
-    let res = await getTopList(data.activeName);
-    data.ja.loading = false;
-    data.ja.info = res.list;
-    data.ja.finish = true;
-  }
-};
-
-watch(
-  () => data.activeName,
-  () => {
-    loadMore();
-  }
-);
-
-// export default defineComponent({
-//   name: `singer`,
-//   setup: () => {
-    
-
-//     return {
-//       ...toRefs(data),
-//       loadMore,
-//       router,
-//     };
-//   },
-// });
 </script>
 
 <style lang="less" scoped>

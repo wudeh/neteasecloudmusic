@@ -1,8 +1,8 @@
 <template>
   <div>
-    <van-list v-model:loading="data.requestLoading" v-model:error="data.error" :finished="data.finish" :immediate-check="false" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoad">
+    <van-list v-model:loading="requestLoading" v-model:error="error" :finished="finish" :immediate-check="false" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoad">
       <template v-slot:loading>
-        <div style="display: flex; align-items: center; justify-content: center">
+        <div style="display:flex;align-items:center;justify-content:center;">
           <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
           <span>加载中...</span>
         </div>
@@ -14,18 +14,18 @@
           <div class="back" @click="router.go(-1)">
             <img src="../../../public/img/icons/left_arrow_black.svg" alt="" />
           </div>
-          <div class="comment_count">评论({{ data.commentTotal }})</div>
+          <div class="comment_count">评论({{ commentTotal }})</div>
         </div>
       </van-sticky>
       <!-- 音乐信息 -->
       <div class="song_info">
         <div class="img">
-          <van-image radius="8" class="song_img" :src="data.img" />
+          <van-image radius="8" class="song_img" :src="img" />
         </div>
-        <van-skeleton title :row="3" :loading="data.name == ``" />
-        <div class="info" v-if="data.name">
-          <div class="title">{{ data.name }}</div>
-          <div class="singer"><span style="color: black">by&nbsp;</span>{{ data.singer }}</div>
+        <van-skeleton title :row="3" :loading="name == ``" />
+        <div class="info" v-if="name">
+          <div class="title">{{ name }}</div>
+          <div class="singer"><span style="color: black">by&nbsp;</span>{{ singer }}</div>
         </div>
       </div>
       <!-- </van-skeleton> -->
@@ -33,10 +33,10 @@
       <van-sticky :offset-top="50">
         <div class="comment_choose">
           <div class="title">评论区</div>
-          <div class="choose" v-show="!data.arrloading">
+          <div class="choose" v-show="!arrloading">
             <!-- <span :class="{choosed: sortType == 1}" @click="change_sortType(1)">推荐</span> -->
-            <span :class="{ choosed: data.sortType == 2 }" @click="change_sortType(2)">最热</span>
-            <span :class="{ choosed: data.sortType == 3 }" @click="change_sortType(3)">最新</span>
+            <span :class="{ choosed: sortType == 2 }" @click="change_sortType(2)">最热</span>
+            <span :class="{ choosed: sortType == 3 }" @click="change_sortType(3)">最新</span>
             <!-- <van-dropdown-menu >
             <van-dropdown-item @change="change_sortType()" v-model="sortType" :options="sortTypeList" />
           </van-dropdown-menu> -->
@@ -44,9 +44,9 @@
         </div>
       </van-sticky>
       <!-- 评论区 -->
-      <van-skeleton title avatar :row="3" :loading="data.arrloading">
+      <van-skeleton title avatar :row="3" :loading="arrloading">
         <div class="comment_area">
-          <div class="comment_item" v-for="item in data.arr" :key="item.commentId">
+          <div class="comment_item" v-for="item in arr" :key="item.commentId">
             <div class="avatar">
               <van-image round width="30" height="30" :src="item.user.avatarUrl" />
             </div>
@@ -55,7 +55,7 @@
                 <div class="top_left">
                   <div class="name">
                     {{ item.user.nickname }} &nbsp;
-                    <span v-if="item.user.vipRights" style="display: flex; align-items: center">
+                    <span v-if="item.user.vipRights" style="display:flex;align-items: center">
                       <img src="../../../public/img/icons/1.png" alt="" />
                       <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
                       <span v-if="item.user.vipRights.redVipLevel == 5" class="level">·伍</span>
@@ -83,47 +83,47 @@
           </div>
         </div>
       </van-skeleton>
-      <van-skeleton title avatar :row="3" :loading="data.arrloading" />
-      <van-skeleton title avatar :row="3" :loading="data.arrloading" />
-      <van-skeleton title avatar :row="3" :loading="data.arrloading" />
+      <van-skeleton title avatar :row="3" :loading="arrloading" />
+      <van-skeleton title avatar :row="3" :loading="arrloading" />
+      <van-skeleton title avatar :row="3" :loading="arrloading" />
     </van-list>
 
     <!-- 楼层弹出评论 -->
-    <van-popup v-model:show="store.showFloor" closeable round @close="store.close()" :close-on-popstate="true" close-icon-position="top-left" position="bottom" :style="{ height: '80%' }">
-      <van-list v-model:loading="data.floorLoading" v-model:error="data.floorError" :immediate-check="true" :finished="data.floorFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoadFloor">
+    <van-popup v-model:show="store.state.showFloor" closeable round @close="store.commit(`close`)" :close-on-popstate="true" close-icon-position="top-left" position="bottom" :style="{ height: '80%' }">
+      <van-list v-model:loading="floorLoading" v-model:error="floorError" :immediate-check="true" :finished="floorFinish" error-text="请求失败，点击重新加载" finished-text="已经到底啦" @load="onLoadFloor">
         <template v-slot:loading>
-          <div style="display: flex; align-items: center; justify-content: center">
+          <div style="display:flex;align-items:center;justify-content:center;">
             <img width="18" src="../../../public/img/icons/loading.svg" alt="" />
             <span>加载中...</span>
           </div>
         </template>
         <div class="floor">
-          <div class="reply_count">回复({{ data.floorArr.length }})</div>
+          <div class="reply_count">回复({{ floorArr.length }})</div>
           <div class="comment_item floor_top">
             <div class="avatar">
-              <van-image round width="30" height="30" :src="data.floorTopComment.user.avatarUrl" />
+              <van-image round width="30" height="30" :src="floorTopComment.user.avatarUrl" />
             </div>
             <div class="info">
               <div class="top">
                 <div class="top_left">
-                  <div class="name">{{ data.floorTopComment.user.nickname }}</div>
+                  <div class="name">{{ floorTopComment.user.nickname }}</div>
                   <div class="time">
-                    <span class="time">{{ sendTimeConversion(data.floorTopComment.time) }}</span>
+                    <span class="time">{{ sendTimeConversion(floorTopComment.time) }}</span>
                     <!-- <span v-if="item.tag.datas" style="margin: 0 2px">-</span> -->
                     <!-- <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span> -->
                   </div>
                 </div>
                 <div class="like_count">
-                  <span class="count">{{ numFilter(data.floorTopComment.likedCount) }}</span>
-                  <img v-if="data.floorTopComment.liked" src="../../../public/img/icons/liked.svg" alt="" />
+                  <span class="count">{{ numFilter(floorTopComment.likedCount) }}</span>
+                  <img v-if="floorTopComment.liked" src="../../../public/img/icons/liked.svg" alt="" />
                   <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
                 </div>
               </div>
-              <div class="text">{{ data.floorTopComment.content }}</div>
+              <div class="text">{{ floorTopComment.content }}</div>
             </div>
           </div>
           <div class="all_reply">全部回复</div>
-          <div class="comment_item" v-for="item in data.floorArr" :key="item.commentId">
+          <div class="comment_item" v-for="item in floorArr" :key="item.commentId">
             <div class="avatar">
               <van-image round width="30" height="30" :src="item.user.avatarUrl" />
             </div>
@@ -132,7 +132,7 @@
                 <div class="top_left">
                   <div class="name">
                     {{ item.user.nickname }} &nbsp;
-                    <span v-if="item.user.vipRights" style="display: flex; align-items: center">
+                    <span v-if="item.user.vipRights" style="display:flex;align-items: center">
                       <img src="../../../public/img/icons/1.png" alt="" />
                       <span v-if="item.user.vipRights.redVipLevel == 6" class="level">·陆</span>
                       <span v-if="item.user.vipRights.redVipLevel == 5" class="level">·伍</span>
@@ -155,7 +155,7 @@
                 </div>
               </div>
               <div class="text">{{ item.content }}</div>
-              <div class="beReplied_item" v-if="item.beReplied.length && item.beReplied[0].beRepliedCommentId != data.floorTopComment.commentId">
+              <div class="beReplied_item" v-if="item.beReplied[0].beRepliedCommentId != floorTopComment.commentId">
                 <span class="beReplied_name">@{{ item.beReplied[0].user.nickname }}：</span>
                 <span class="beReplied_content" v-if="item.beReplied[0].content">{{ item.beReplied[0].content }}</span>
                 <span class="beReplied_content" v-else>该评论已删除</span>
@@ -168,12 +168,12 @@
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts">
 import { defineComponent, onMounted, reactive, onBeforeMount, toRefs } from "vue";
 import { getComment, getSongInfo, getFloorComment, getPlayListDetail } from "../../api/song";
 import { useRouter } from "vue-router";
 import { sendTimeConversion, numFilter } from "../../utils/num";
-import songStore from "../../store";
+import { useStore } from "vuex";
 import { Toast } from "vant";
 interface info {
   img: string;
@@ -201,175 +201,173 @@ interface info {
   finish: boolean; // 是否没有更多数据了
   haveFirstFloorPop: boolean;
 }
+export default defineComponent({
+  name: "comment",
+  setup() {
+    const router = useRouter();
+    const store = useStore();
+    const id: any = router.currentRoute.value.query.id; //获取参数
+    let type: any = router.currentRoute.value.query.type; //获取参数
+    const data = reactive<info>({
+      img: "",
+      name: "",
+      singer: "",
+      singerInfo: [],
+      commentTotal: 0,
+      pageNo: 1,
+      floorPageNo: 0,
+      sortType: 2,
+      sortTypeName: "",
+      sortTypeList: [],
+      cursor: "",
+      arr: [],
+      floorArr: [],
+      floorTopComment: { user: { avatarUrl: "" } },
+      floorLoading: false,
+      floorError: false,
+      floorFinish: false,
+      showFloor: false,
+      imgloading: true,
+      arrloading: true,
+      requestLoading: false,
+      error: false,
+      finish: false,
+      haveFirstFloorPop: false,
+    });
+    onBeforeMount(async () => {
+      // 获取音乐图片，标题，歌手
+      let info;
+      if (type == 2) {
+        // 歌单
+        info = await getPlayListDetail(id);
+        data.img = info.playlist.coverImgUrl;
+        data.singer = info.playlist.creator.nickname;
+        data.name = info.playlist.name;
+      }
+      // 等于 0 或者不传默认是歌曲
+      if (type == 0 || type == undefined) {
+        type = 0;
+        info = await getSongInfo(id);
+        data.img = info.songs[0].al.picUrl;
+        data.name = info.songs[0].name;
+        data.singerInfo.concat(info.songs[0].ar);
+        info.songs[0].ar.forEach((item: any, index: number) => {
+          if (index == 0) {
+            data.singer += `${item.name}`;
+          } else {
+            data.singer += `/${item.name}`;
+          }
+        });
+      }
 
-const router = useRouter();
-const store = songStore();
-const id: any = router.currentRoute.value.query.id; //获取参数
-let type: any = router.currentRoute.value.query.type; //获取参数
-const data = reactive<info>({
-  img: "",
-  name: "",
-  singer: "",
-  singerInfo: [],
-  commentTotal: 0,
-  pageNo: 1,
-  floorPageNo: 0,
-  sortType: 2,
-  sortTypeName: "",
-  sortTypeList: [],
-  cursor: "",
-  arr: [],
-  floorArr: [],
-  floorTopComment: { user: { avatarUrl: "" } },
-  floorLoading: false,
-  floorError: false,
-  floorFinish: false,
-  showFloor: false,
-  imgloading: true,
-  arrloading: true,
-  requestLoading: false,
-  error: false,
-  finish: false,
-  haveFirstFloorPop: false,
-});
-onBeforeMount(async () => {
-  // 获取音乐图片，标题，歌手
-  let info;
-  if (type == 2) {
-    // 歌单
-    info = await getPlayListDetail(id);
-    data.img = info.playlist.coverImgUrl;
-    data.singer = info.playlist.creator.nickname;
-    data.name = info.playlist.name;
-  }
-  // 等于 0 或者不传默认是歌曲
-  if (type == 0 || type == undefined) {
-    type = 0;
-    info = await getSongInfo(id);
-    data.img = info.songs[0].al.picUrl;
-    data.name = info.songs[0].name;
-    data.singerInfo.concat(info.songs[0].ar);
-    info.songs[0].ar.forEach((item: any, index: number) => {
-      if (index == 0) {
-        data.singer += `${item.name}`;
-      } else {
-        data.singer += `/${item.name}`;
+      // 电台评论由于未知原因暂时无法获取
+      if (type == 4) Toast("电台评论暂时无法获取");
+
+      info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
+      data.commentTotal = info.data.totalCount;
+      data.arr = info.data.comments;
+      if (info.data.cursor) data.cursor = info.data.cursor;
+      info.data.sortTypeList.forEach((item: any, index: number) => {
+        data.sortTypeList.push({
+          text: item.sortTypeName,
+          value: item.sortType,
+        });
+      });
+      // data.sortType = data.sortTypeList[0].value;
+
+      data.arrloading = false;
+      data.pageNo += 1;
+
+      if (!info.data.hasMore) {
+        data.finish = true;
       }
     });
-  }
 
-  // 电台评论由于未知原因暂时无法获取
-  if (type == 4) Toast("电台评论暂时无法获取");
+    onMounted(() => {});
 
-  info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor); // 默认按推荐排序
-  data.commentTotal = info.data.totalCount;
-  data.arr = info.data.comments;
-  if (info.data.cursor) data.cursor = info.data.cursor;
-  info.data.sortTypeList.forEach((item: any, index: number) => {
-    data.sortTypeList.push({
-      text: item.sortTypeName,
-      value: item.sortType,
-    });
-  });
-  // data.sortType = data.sortTypeList[0].value;
+    // 获取楼层评论
+    const floorRequest = async (topComment: any, parentCommentId: number) => {
+      data.floorTopComment = topComment;
+      data.floorLoading = true;
+      store.commit("set_floor_comment", true);
+      data.floorArr = [];
+      data.floorFinish = false;
+      data.floorPageNo = 0;
+      if (data.haveFirstFloorPop) {
+        let info = await getFloorComment(id, parentCommentId, type, data.floorPageNo);
+        data.floorArr = info.data.comments;
+        data.floorPageNo += 1;
+        if (data.floorArr.length) {
+          data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
+        }
+        if (!info.data.hasMore) {
+          data.floorFinish = true;
+        }
+        data.floorLoading = false;
+      }
+    };
 
-  data.arrloading = false;
-  data.pageNo += 1;
+    // 加载更多楼层评论
+    const onLoadFloor = async () => {
+      data.floorLoading = true;
+      // 触发了加载更多楼层评论方法说明已经弹出过一次楼层了
+      if (!data.haveFirstFloorPop) data.haveFirstFloorPop = true;
+      let info = await getFloorComment(id, data.floorTopComment.commentId, type, data.floorPageNo);
+      data.floorArr = data.floorArr.concat(info.data.comments);
+      data.floorPageNo += 1;
+      data.floorLoading = false;
+      // data.floorPageNo = info.data.time;
+      if (data.floorArr.length) {
+        data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
+      }
+      if (!info.data.hasMore) {
+        data.floorFinish = true;
+      }
+    };
 
-  if (!info.data.hasMore) {
-    data.finish = true;
-  }
+    // 加载更多评论
+    const onLoad = async () => {
+      data.requestLoading = true;
+      let info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor);
+      if (info.code != 200) {
+        data.error = true;
+        data.requestLoading = false;
+        return;
+      }
+      data.requestLoading = false;
+      data.commentTotal = info.data.totalCount;
+      data.cursor = info.data.cursor;
+      data.arr = data.arr.concat(info.data.comments);
+      data.arrloading = false;
+      data.pageNo += 1;
+      if (!info.data.hasMore) {
+        data.finish = true;
+      }
+    };
+
+    const change_sortType = async (index: any) => {
+      data.sortType = index;
+      data.finish = false;
+      data.cursor = "";
+      data.pageNo = 1;
+      data.arr = [];
+      data.error = false;
+      onLoad();
+    };
+
+    return {
+      ...toRefs(data),
+      sendTimeConversion,
+      numFilter,
+      onLoad,
+      onLoadFloor,
+      router,
+      store,
+      change_sortType,
+      floorRequest,
+    };
+  },
 });
-
-onMounted(() => {});
-
-// 获取楼层评论
-const floorRequest = async (topComment: any, parentCommentId: number) => {
-  data.floorTopComment = topComment;
-  data.floorLoading = true;
-  store.set_floor_comment(true);
-  data.floorArr = [];
-  data.floorFinish = false;
-  data.floorPageNo = 0;
-  if (data.haveFirstFloorPop) {
-    let info = await getFloorComment(id, parentCommentId, type, data.floorPageNo);
-    data.floorArr = info.data.comments;
-    data.floorPageNo += 1;
-    if (data.floorArr.length) {
-      data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
-    }
-    if (!info.data.hasMore) {
-      data.floorFinish = true;
-    }
-    data.floorLoading = false;
-  }
-};
-
-// 加载更多楼层评论
-const onLoadFloor = async () => {
-  data.floorLoading = true;
-  // 触发了加载更多楼层评论方法说明已经弹出过一次楼层了
-  if (!data.haveFirstFloorPop) data.haveFirstFloorPop = true;
-  let info = await getFloorComment(id, data.floorTopComment.commentId, type, data.floorPageNo);
-  data.floorArr = data.floorArr.concat(info.data.comments);
-  data.floorPageNo += 1;
-  data.floorLoading = false;
-  // data.floorPageNo = info.data.time;
-  if (data.floorArr.length) {
-    data.floorPageNo = data.floorArr[data.floorArr.length - 1].time;
-  }
-  if (!info.data.hasMore) {
-    data.floorFinish = true;
-  }
-};
-
-// 加载更多评论
-const onLoad = async () => {
-  data.requestLoading = true;
-  let info = await getComment(id, type, data.pageNo, 20, data.sortType, data.cursor);
-  if (info.code != 200) {
-    data.error = true;
-    data.requestLoading = false;
-    return;
-  }
-  data.requestLoading = false;
-  data.commentTotal = info.data.totalCount;
-  data.cursor = info.data.cursor;
-  data.arr = data.arr.concat(info.data.comments);
-  data.arrloading = false;
-  data.pageNo += 1;
-  if (!info.data.hasMore) {
-    data.finish = true;
-  }
-};
-
-const change_sortType = async (index: any) => {
-  data.sortType = index;
-  data.finish = false;
-  data.cursor = "";
-  data.pageNo = 1;
-  data.arr = [];
-  data.error = false;
-  onLoad();
-};
-
-// export default defineComponent({
-//   name: "comment",
-//   setup() {
-
-//     // return {
-//     //   ...toRefs(data),
-//     //   sendTimeConversion,
-//     //   numFilter,
-//     //   onLoad,
-//     //   onLoadFloor,
-//     //   router,
-//     //   store,
-//     //   change_sortType,
-//     //   floorRequest,
-//     // };
-//   },
-// });
 </script>
 
 <style lang="less" scoped>

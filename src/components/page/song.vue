@@ -2,7 +2,7 @@
   <div class="popup">
     <div class="song_pop">
       <div class="bg_blur">
-        <img :src="store.song_info.img" alt="" />
+        <img :src="store.state.song_info.img" alt="" />
       </div>
       <!-- 顶部 -->
       <div class="nav">
@@ -10,8 +10,8 @@
           <img src="../../../public/img/icons/arrow_down.svg" @click="back" alt="" />
         </div>
         <div class="title">
-          <div class="name">{{ store.song_info.name }}</div>
-          <div class="author">{{ store.song_info.author }}</div>
+          <div class="name">{{ store.state.song_info.name }}</div>
+          <div class="author">{{ store.state.song_info.author }}</div>
         </div>
         <div class="share" style="opacity: 0">
           <img src="../../../public/img/icons/share.svg" alt="" />
@@ -30,11 +30,11 @@
           <img src="../../../public/img/icons/volume.svg" alt="" />
         </div>
       </div>
-      <img class="needle" v-if="!showLyric" :class="{ needle_play: store.song_info.isPlaying, hidden: showLyric }" src="../../../public/img/player/needle.png" alt="" />
+      <img class="needle" v-if="!showLyric" :class="{ needle_play: store.state.song_info.isPlaying, hidden: showLyric }" src="../../../public/img/player/needle.png" alt="" />
       <!-- 旋转唱片 -->
-      <div class="rotate" :class="{ hidden: showLyric }" :style="{ animationPlayState: store.song_info.isPlaying ? 'running' : 'paused' }" @click="showAllLyric()">
+      <div class="rotate" :class="{ hidden: showLyric }" :style="{ animationPlayState: store.state.song_info.isPlaying ? 'running' : 'paused' }" @click="showAllLyric()">
         <div class="middle">
-          <img :src="store.song_info.img" alt="" />
+          <img :src="store.state.song_info.img" alt="" />
         </div>
       </div>
       <!-- 歌词 -->
@@ -62,33 +62,32 @@
       </div>
       <!-- 进度条 -->
       <div class="progress">
-        <div class="current_time">{{ getTime(store.song_info.currentTime) }}</div>
+        <div class="current_time">{{ getTime(store.state.song_info.currentTime) }}</div>
         <div class="line" ref="line" @touchstart="processControlStart($event)" @touchmove="processControlMove($event)" @touchend="processControlEnd($event)">
           <div class="past" ref="linePast"></div>
           <div class="circle_point" ref="point"></div>
           <div class="not_play"></div>
         </div>
-        <div class="durasion">{{ getTime(store.song_info.duration) }}</div>
+        <div class="durasion">{{ getTime(store.state.song_info.duration) }}</div>
       </div>
       <!-- 播放图标 -->
       <div class="bottom_icon">
-        <img @click="store.set_circulate()" v-if="store.song_info.playMode == 1" src="../../../public/img/icons/circulate.svg" alt="" />
-        <img @click="store.set_circulate()" v-else-if="store.song_info.playMode == 2" src="../../../public/img/icons/circulate_random.svg" alt="" />
-        <img @click="store.set_circulate()" v-else-if="store.song_info.playMode == 3" src="../../../public/img/icons/circulate_one.svg" alt="" />
-        <img @click="store.play_next(-1)" src="../../../public/img/icons/last_song.svg" alt="" />
-        <img class="bigPlay" @click.stop="change_play()" v-if="store.song_info.isPlaying" src="../../../public/img/icons/stop_white.svg" alt="" />
-        <img class="bigPlay" @click.stop="change_play()" v-else src="../../../public/img/icons/play_white.svg" alt="" />
-        <img @click="store.play_next(null)" src="../../../public/img/icons/last_song.svg" style="transform: rotate(180deg)" alt="" />
-        <img @click="store.set_pop_list(true)" src="../../../public/img/icons/list_white.svg" alt="" />
+        <img @click="store.commit(`set_circulate`)" v-if="store.state.song_info.playMode == 1" src="../../../public/img/icons/circulate.svg" alt="" />
+        <img @click="store.commit(`set_circulate`)" v-else-if="store.state.song_info.playMode == 2" src="../../../public/img/icons/circulate_random.svg" alt="" />
+        <img @click="store.commit(`set_circulate`)" v-else-if="store.state.song_info.playMode == 3" src="../../../public/img/icons/circulate_one.svg" alt="" />
+        <img @click="store.dispatch(`play_next`, -1)" src="../../../public/img/icons/last_song.svg" alt="" />
+        <img class="bigPlay" @click.stop="change_play()" :src="store.state.song_info.isPlaying ? stopWhite : playWhite" alt="" />
+        <img @click="store.dispatch(`play_next`)" src="../../../public/img/icons/last_song.svg" style="transform:rotate(180deg)" alt="" />
+        <img @click="store.commit(`set_pop_list`, true)" src="../../../public/img/icons/list_white.svg" alt="" />
       </div>
     </div>
   </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts">
 import { defineComponent, ref, onBeforeMount, onMounted, watch, onBeforeUnmount, reactive, nextTick } from "vue";
 import { useRouter } from "vue-router";
-import songStore from "../../store";
+import { useStore } from "vuex";
 import { getTime } from "../../utils/num";
 import downloadFile from "../../utils/download";
 import BScroll from "@better-scroll/core";
@@ -97,400 +96,399 @@ import { getLyric, getSongUrl, getSongComment, getComment } from "../../api/song
 interface info {
   bs: any;
 }
+export default defineComponent({
+  name: "song",
+  setup() {
+    const router = useRouter();
+    const active = ref(0);
+    const store = useStore();
 
-const router = useRouter();
-const active = ref(0);
-const store = songStore();
 
-// 防止从 URL 直接输入链接到歌词滚动页面的情况
-if (store.song_info.id === ``) {
-  Toast(`你可真是个小基佬`);
-  router.push({ name: "404" });
-}
+    // 防止从 URL 直接输入链接到歌词滚动页面的情况
+    if(store.state.song_info.id === ``) {
+      Toast(`你可真是个小基佬`)
+      router.push({name: "404"})
+    }
 
-// const playWhite = new URL("../../../public/img/icons/play_white.svg");
-// const stopWhite = new URL("../../../public/img/icons/stop_white.svg");
+    const playWhite = require("../../../public/img/icons/play_white.svg");
+    const stopWhite = require("../../../public/img/icons/stop_white.svg");
 
-const showLyric = ref(false); // 控制是否显示全部歌词
-const showLyricLine = ref(false);
-const autoMovePoint = ref(true); // 是否自动随歌曲播放自动移动圆点，为了实现手动移动进度条，在点击进度条时置为 false，
-let lyric: Array<{ time: number; lyric: string }> = reactive([]);
-const scroll = ref(true);
-let lyricRef = ref();
+    const showLyric = ref(false); // 控制是否显示全部歌词
+    const showLyricLine = ref(false);
+    const autoMovePoint = ref(true); // 是否自动随歌曲播放自动移动圆点，为了实现手动移动进度条，在点击进度条时置为 false，
+    let lyric: Array<{ time: number; lyric: string }> = reactive([]);
+    const scroll = ref(true);
+    let lyricRef = ref();
 
-const tempCurrentTime = ref(0); // 临时时间，用来计算手动点击进度条的时间
-let current_song_time = ref(0);
-const commentNum = ref("");
+    const tempCurrentTime = ref(0); // 临时时间，用来计算手动点击进度条的时间
+    let current_song_time = ref(0);
+    const commentNum = ref("");
 
-const linePast = ref();
-const point = ref();
-const line = ref();
-let lyricScorll = reactive<info>({
-  bs: "",
-});
-
-const back = () => {
-  router.go(-1);
-};
-
-const download = () => {
-  downloadFile(store.song_info.url, {
-    id: store.song_info.id,
-    name: store.song_info.name,
-    author: store.song_info.author,
-  });
-};
-
-const lyricRequest = async () => {
-  // lyric = []
-  const data = await getLyric(store.song_info.id);
-  if (data.lrc?.lyric) {
-    let i = data.lrc.lyric.split("[");
-    i.forEach((item: any, index: number) => {
-      let temp = {
-        time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1,
-        lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
-      };
-      if (temp.lyric != "\n" && !Number.isNaN(temp.time)) lyric.push(temp);
-    });
-    // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
-    lyric.push({
-      time: 9999,
-      lyric: "wudeh",
+    const linePast = ref();
+    const point = ref();
+    const line = ref();
+    let lyricScorll = reactive<info>({
+      bs: "",
     });
 
-    lyric.sort((a: any, b: any) => {
-      return a.time - b.time;
-    });
-    // 如果有翻译歌词
-    if (data.tlyric.lyric) {
-      let i = data.tlyric.lyric.split("[");
-      i.forEach((item: any, index: number) => {
-        let temp = {
-          time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 || 0,
-          lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
-        };
-        lyric.forEach((item: any, index: number) => {
-          if (item.time == temp.time) {
-            lyric[index].lyric += `<br>${temp.lyric}`;
-          }
+    const back = () => {
+      router.go(-1);
+    };
+
+    const download = () => {
+      downloadFile(store.state.song_info.url, {
+        id: store.state.song_info.id,
+        name: store.state.song_info.name,
+        author: store.state.song_info.author,
+      });
+    };
+
+    const lyricRequest = async () => {
+      // lyric = []
+      const data = await getLyric(store.state.song_info.id);
+      if (data.lrc?.lyric) {
+        let i = data.lrc.lyric.split("[");
+        i.forEach((item: any, index: number) => {
+          let temp = {
+            time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1,
+            lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
+          };
+          if (temp.lyric != "\n" && !Number.isNaN(temp.time)) lyric.push(temp);
         });
-      });
-    }
-  } else {
-    // lyric = reactive([])
-    lyric.push({
-      time: 9999,
-      lyric: "当前音乐暂无歌词",
-    });
-  }
-  nextTick(() => {
-    lyricScorll.bs.refresh();
-  });
-};
-// 获取评论
-const commentRequest = async () => {
-  try {
-    const info = await getComment(store.song_info.id, 0, 1, 20, 3, "");
-    let total = info.data.totalCount;
-    if (total >= 100 && total < 1000) {
-      commentNum.value = "99+";
-    } else if (total >= 1000 && total < 10000) {
-      commentNum.value = "999+";
-    } else if (total === 10000) {
-      commentNum.value = "1w";
-    } else if (total > 10000 && total < 100000) {
-      commentNum.value = "1w+";
-    } else if (total >= 100000) {
-      commentNum.value = "10w+";
-    } else {
-      commentNum.value = commentNum.value.toString();
-    }
-  } catch (error) {
-    Toast(`获取歌词出错`);
-  }
-};
+        // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
+        lyric.push({
+          time: 9999,
+          lyric: "wudeh",
+        });
 
-// 去评论区
-const goComment = () => {
-  router.push({ path: "/comment", query: { id: store.song_info.id, type: store.song_info.type } });
-};
-
-onBeforeMount(() => {
-  if (!store.song_info.id) {
-    router.push(`/`);
-  }
-});
-
-onMounted(async () => {
-  // 可能会出现首页已经缓冲好了导致vuex中的缓冲时间不变化，进而导致缓冲进度条监听不执行，所以一进来就设置一下
-  linePast.value.style.width = `${(store.song_info.buffered / store.song_info.duration) * 100}%`;
-
-  // 如果有歌曲id 而没有歌词就请求歌词
-  if (store.song_info.id && !lyric.length) {
-    lyricRequest();
-  }
-
-  lyricScorll.bs = new BScroll(".lyric", {
-    probeType: 2, // 2 代表仅当用户手指滑动的时候触发 scroll 事件，3 的话 srollto 事件也会触发 scroll 事件
-    momentum: false, // 不允许惯性滑动
-    scrollX: false,
-    scrollY: true,
-    click: true,
-    disableTouch: false,
-    // bounce: false,
-    // mouseWheel: false,
-    // disableMouse: true
-  });
-  lyricScorll.bs.on("beforeScrollStart", () => {
-    // showLyricLine.value = true;
-    // scroll.value = false;
-  });
-  lyricScorll.bs.on("scroll", (position: any) => {
-    // 用户滑动歌词显示指示线
-    showLyricLine.value = true;
-    let index = Math.abs(position.y) / lyricRef.value.children[0].offsetHeight;
-
-    current_song_time.value = lyric[Math.ceil(index) - 1 <= 0 ? 0 : Math.ceil(index) - 1].time;
-  });
-  lyricScorll.bs.on("scrollEnd", () => {
-    // 由于 better-scroll 插件自动滚动也会触发滚动结束事件，所以这里判断一下是不是手动滑动的，手动滑动才设置时间，否则自动滑动也设置的话会造成音乐播放卡顿
-    if (showLyricLine.value) store.set_progress_time(current_song_time.value);
-    showLyricLine.value = false;
-    //   // 设置拖动进度条时间
-    //
-  });
-  lyricScorll.bs.disable();
-
-  // 如果有歌曲id 而没有评论数量就请求评论
-  if (store.song_info.id && !commentNum.value) {
-    commentRequest();
-  }
-});
-
-// 歌词变更重新计算滚动高度
-watch(
-  () => lyric.length,
-  () => {
-    nextTick(() => {
-      lyricScorll.bs.refresh();
-    });
-  }
-);
-
-// 歌曲变更重新请求歌词，评论
-watch(
-  () => store.song_info.id,
-  (id) => {
-    if (id != "") {
-      lyric.splice(0);
-      lyricRequest();
-      commentRequest();
-    }
-  }
-);
-
-// 不在歌词页面不让滚动
-watch(
-  () => router.currentRoute.value.name,
-  (value: any) => {
-    if (value != "song") {
-      // console.log("不能滚动");
-      scroll.value = false;
-    } else {
-      // console.log("可以滚动");
-      scroll.value = true;
-    }
-  }
-);
-
-// 监听歌曲时间，用来设置歌词滚动和圆点移动
-watch(
-  () => store.song_info.currentTime,
-  () => {
-    // 不在歌词页面 和 展示指示线的情况下不能自动滚动歌词
-    if (scroll.value && !showLyricLine.value) {
-      current_song_time.value = store.song_info.currentTime;
-      // 歌词滚动
-      lyric.forEach((i: any, index, arr) => {
-        if (current_song_time.value >= i.time && current_song_time.value <= arr[index + 1].time) {
-          lyricScorll.bs.scrollToElement(`#s${index}`, 100);
+        lyric.sort((a: any, b: any) => {
+          return a.time - b.time;
+        });
+        // 如果有翻译歌词
+        if (data.tlyric.lyric) {
+          let i = data.tlyric.lyric.split("[");
+          i.forEach((item: any, index: number) => {
+            let temp = {
+              time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 || 0,
+              lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
+            };
+            lyric.forEach((item: any, index: number) => {
+              if (item.time == temp.time) {
+                lyric[index].lyric += `<br>${temp.lyric}`;
+              }
+            });
+          });
         }
+      } else {
+        // lyric = reactive([])
+        lyric.push({
+          time: 9999,
+          lyric: "当前音乐暂无歌词",
+        });
+      }
+      nextTick(() => {
+        lyricScorll.bs.refresh();
+      });
+    };
+    // 获取评论
+    const commentRequest = async () => {
+      try {
+        const info = await getComment(store.state.song_info.id, 0, 1, 20, 3, "");
+        let total = info.data.totalCount;
+        if (total >= 100 && total < 1000) {
+          commentNum.value = "99+";
+        } else if (total >= 1000 && total < 10000) {
+          commentNum.value = "999+";
+        } else if (total === 10000) {
+          commentNum.value = "1w";
+        } else if (total > 10000 && total < 100000) {
+          commentNum.value = "1w+";
+        } else if (total >= 100000) {
+          commentNum.value = "10w+";
+        } else {
+          commentNum.value = commentNum.value.toString();
+        }
+      } catch (error) {
+        Toast(`获取歌词出错`);
+      }
+    };
+
+    // 去评论区
+    const goComment = () => {
+      router.push({ path: "/comment", query: { id: store.state.song_info.id, type: store.state.song_info.type } });
+    };
+
+    onBeforeMount(() => {
+      if (!store.state.song_info.id) {
+        router.push(`/`);
+      }
+    });
+
+    onMounted(async () => {
+      // 可能会出现首页已经缓冲好了导致vuex中的缓冲时间不变化，进而导致缓冲进度条监听不执行，所以一进来就设置一下
+      linePast.value.style.width = `${(store.state.song_info.buffered / store.state.song_info.duration) * 100}%`;
+
+      // 如果有歌曲id 而没有歌词就请求歌词
+      if (store.state.song_info.id && !lyric.length) {
+        lyricRequest();
+      }
+
+      lyricScorll.bs = new BScroll(".lyric", {
+        probeType: 2, // 2 代表仅当用户手指滑动的时候触发 scroll 事件，3 的话 srollto 事件也会触发 scroll 事件
+        momentum: false, // 不允许惯性滑动
+        scrollX: false,
+        scrollY: true,
+        click: true,
+        disableTouch: false,
+        // bounce: false,
+        // mouseWheel: false,
+        // disableMouse: true
+      });
+      lyricScorll.bs.on("beforeScrollStart", () => {
+        // showLyricLine.value = true;
+        // scroll.value = false;
+      });
+      lyricScorll.bs.on("scroll", (position: any) => {
+        // 用户滑动歌词显示指示线
+        showLyricLine.value = true;
+        let index = Math.abs(position.y) / lyricRef.value.children[0].offsetHeight;
+
+        current_song_time.value = lyric[Math.ceil(index) - 1 <= 0 ? 0 : Math.ceil(index) - 1].time;
+      });
+      lyricScorll.bs.on("scrollEnd", () => {
+        // 由于 better-scroll 插件自动滚动也会触发滚动结束事件，所以这里判断一下是不是手动滑动的，手动滑动才设置时间，否则自动滑动也设置的话会造成音乐播放卡顿
+        if (showLyricLine.value) store.commit("set_progress_time", current_song_time.value);
+        showLyricLine.value = false;
+        //   // 设置拖动进度条时间
+        //
+      });
+      lyricScorll.bs.disable();
+
+      // 如果有歌曲id 而没有评论数量就请求评论
+      if (store.state.song_info.id && !commentNum.value) {
+        commentRequest();
+      }
+    });
+
+    // 歌词变更重新计算滚动高度
+    watch(
+      () => lyric.length,
+      () => {
+        nextTick(() => {
+          lyricScorll.bs.refresh();
+        });
+      }
+    );
+
+    // 歌曲变更重新请求歌词，评论
+    watch(
+      () => store.state.song_info.id,
+      (id) => {
+        if (id != "") {
+          lyric.splice(0);
+          lyricRequest();
+          commentRequest();
+        }
+      }
+    );
+
+    // 不在歌词页面不让滚动
+    watch(
+      () => router.currentRoute.value.name,
+      (value: any) => {
+        if (value != "song") {
+          // console.log("不能滚动");
+          scroll.value = false;
+        } else {
+          // console.log("可以滚动");
+          scroll.value = true;
+        }
+      }
+    );
+
+    // 监听歌曲时间，用来设置歌词滚动和圆点移动
+    watch(
+      () => store.state.song_info.currentTime,
+      () => {
+        // 不在歌词页面 和 展示指示线的情况下不能自动滚动歌词
+        if (scroll.value && !showLyricLine.value) {
+          current_song_time.value = store.state.song_info.currentTime;
+          // 歌词滚动
+          lyric.forEach((i: any, index, arr) => {
+            if (current_song_time.value >= i.time && current_song_time.value <= arr[index + 1].time) {
+              lyricScorll.bs.scrollToElement(`#s${index}`, 100);
+            }
+          });
+        }
+
+        // 判断是否可以随歌曲播放自动移动圆点
+        if (autoMovePoint.value) {
+          point.value.style.left = `${(store.state.song_info.currentTime / store.state.song_info.duration) * 100}%`;
+        }
+      }
+    );
+
+    // 监听歌曲缓冲时间，用来缓冲进度条
+    watch(
+      () => store.state.song_info.buffered,
+      () => {
+        linePast.value.style.width = `${(store.state.song_info.buffered / store.state.song_info.duration) * 100}%`;
+      }
+    );
+
+    // 暂停或者开始播放
+    function change_play(): void {
+      store.commit("play", !store.state.song_info.isPlaying);
+      nextTick(() => {
+        lyricScorll.bs.refresh();
       });
     }
 
-    // 判断是否可以随歌曲播放自动移动圆点
-    if (autoMovePoint.value) {
-      point.value.style.left = `${(store.song_info.currentTime / store.song_info.duration) * 100}%`;
-    }
-  }
-);
+    // 控制是否显示全部歌词
+    const showAllLyric = () => {
+      showLyric.value = !showLyric.value;
+      nextTick(() => {
+        lyricScorll.bs.refresh();
+      });
+      // 不显示全部歌词时候不让用户手指可以滑动
+      if (!showLyric.value) {
+        lyricScorll.bs.disable();
+        showLyricLine.value = false;
+      } else {
+        lyricScorll.bs.enable();
+      }
+    };
 
-// 监听歌曲缓冲时间，用来缓冲进度条
-watch(
-  () => store.song_info.buffered,
-  () => {
-    linePast.value.style.width = `${(store.song_info.buffered / store.song_info.duration) * 100}%`;
-  }
-);
+    // 进度条拖动部分，ev 是事件对象，用来获取点击的位置
+    const processControlStart = (ev: any) => {
+      // console.log(ev.touches[0].clientX);
+      // console.log(line.value.offsetWidth);
+      // console.log(line.value.offsetLeft);
 
-// 暂停或者开始播放
-function change_play(): void {
-  store.play(!store.song_info.isPlaying);
-  nextTick(() => {
-    lyricScorll.bs.refresh();
-  });
-}
+      autoMovePoint.value = false;
+      // 获得总进度条宽度
+      let barOffsetWidth = line.value.offsetWidth;
+      // 算出点击位置距离总进度条左边的距离
+      // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
+      let slideLength = ev.touches[0].clientX - line.value.offsetLeft;
+      // console.log(slideLength);
 
-// 控制是否显示全部歌词
-const showAllLyric = () => {
-  showLyric.value = !showLyric.value;
-  nextTick(() => {
-    lyricScorll.bs.refresh();
-  });
-  // 不显示全部歌词时候不让用户手指可以滑动
-  if (!showLyric.value) {
-    lyricScorll.bs.disable();
-    showLyricLine.value = false;
-  } else {
-    lyricScorll.bs.enable();
-  }
-};
+      // 算出点击位置距离总进度条左边距离的百分比
+      let slidePercent = slideLength / barOffsetWidth;
+      // this.process = Math.floor(slidePercent * 100)
+      // tempCurrentTime.value = Math.floor(getMusicList().duration / 1000 * slidePercent)
+      tempCurrentTime.value = store.state.song_info.duration * slidePercent;
+      // console.log("这是tempCurrentTime");
 
-// 进度条拖动部分，ev 是事件对象，用来获取点击的位置
-const processControlStart = (ev: any) => {
-  // console.log(ev.touches[0].clientX);
-  // console.log(line.value.offsetWidth);
-  // console.log(line.value.offsetLeft);
+      // console.log(tempCurrentTime.value);
 
-  autoMovePoint.value = false;
-  // 获得总进度条宽度
-  let barOffsetWidth = line.value.offsetWidth;
-  // 算出点击位置距离总进度条左边的距离
-  // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
-  let slideLength = ev.touches[0].clientX - line.value.offsetLeft;
-  // console.log(slideLength);
+      point.value.style.left = `${slidePercent * 100}%`;
+    };
+    // 圆点进度移动过程中
+    const processControlMove = (ev: any) => {
+      let barOffsetWidth = line.value.offsetWidth;
+      // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
+      let slideLength = ev.touches[0].clientX - line.value.offsetLeft;
+      let slidePercent = slideLength / barOffsetWidth;
+      tempCurrentTime.value = store.state.song_info.duration * slidePercent;
+      if (slidePercent >= 0 && slidePercent <= 1) {
+        point.value.style.left = `${slidePercent * 100}%`;
+      }
+    };
+    // 点击结束或者移动结束
+    const processControlEnd = (ev: any) => {
+      // console.log("移动结束");
 
-  // 算出点击位置距离总进度条左边距离的百分比
-  let slidePercent = slideLength / barOffsetWidth;
-  // this.process = Math.floor(slidePercent * 100)
-  // tempCurrentTime.value = Math.floor(getMusicList().duration / 1000 * slidePercent)
-  tempCurrentTime.value = store.song_info.duration * slidePercent;
-  // console.log("这是tempCurrentTime");
+      autoMovePoint.value = true;
+      // audio.value.currentTime = tempCurrentTime.value;
+      // 设置拖动进度条时间
+      store.commit("set_progress_time", tempCurrentTime.value);
+      // point.value.style.left = `${slidePercent / 100}%`
+      // this.SET_PAGE_DATA(['trigger', 'process', this.tempCurrentTime])
+    };
 
-  // console.log(tempCurrentTime.value);
+    const volume_line = ref();
+    const volume_linePast = ref();
+    const volume_point = ref();
+    // 进度条拖动部分，ev 是事件对象，用来获取点击的位置
+    const processControlStart_volume = (ev: any) => {
+      // 获得总进度条宽度
+      let barOffsetWidth = volume_line.value.offsetWidth;
+      // 算出点击位置距离总进度条左边的距离
+      // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
+      let slideLength = ev.touches[0].clientX - volume_line.value.offsetLeft;
+      // console.log(slideLength);
 
-  point.value.style.left = `${slidePercent * 100}%`;
-};
-// 圆点进度移动过程中
-const processControlMove = (ev: any) => {
-  let barOffsetWidth = line.value.offsetWidth;
-  // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
-  let slideLength = ev.touches[0].clientX - line.value.offsetLeft;
-  let slidePercent = slideLength / barOffsetWidth;
-  tempCurrentTime.value = store.song_info.duration * slidePercent;
-  if (slidePercent >= 0 && slidePercent <= 1) {
-    point.value.style.left = `${slidePercent * 100}%`;
-  }
-};
-// 点击结束或者移动结束
-const processControlEnd = (ev: any) => {
-  // console.log("移动结束");
+      // 算出点击位置距离总进度条左边距离的百分比
+      let slidePercent = slideLength / barOffsetWidth;
+      // console.log(slidePercent.toFixed(1));
 
-  autoMovePoint.value = true;
-  // audio.value.currentTime = tempCurrentTime.value;
-  // 设置拖动进度条时间
-  store.set_progress_time(tempCurrentTime.value);
-  // point.value.style.left = `${slidePercent / 100}%`
-  // this.SET_PAGE_DATA(['trigger', 'process', this.tempCurrentTime])
-};
+      if (slidePercent >= 0 && slidePercent <= 1) {
+        store.commit("set_volume", slidePercent.toFixed(1));
+        volume_point.value.style.left = `${slidePercent * 100}%`;
+        volume_linePast.value.style.width = `${slidePercent * 100}%`;
+      }
+    };
+    // 圆点进度移动过程中
+    const processControlMove_volume = (ev: any) => {
+      let barOffsetWidth = volume_line.value.offsetWidth;
+      // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
+      let slideLength = ev.touches[0].clientX - volume_line.value.offsetLeft;
+      let slidePercent = slideLength / barOffsetWidth;
+      if (slidePercent >= 0 && slidePercent <= 1) {
+        store.commit("set_volume", slidePercent.toFixed(1));
+        volume_point.value.style.left = `${slidePercent * 100}%`;
+        volume_linePast.value.style.width = `${slidePercent * 100}%`;
+      }
+    };
 
-const volume_line = ref();
-const volume_linePast = ref();
-const volume_point = ref();
-// 进度条拖动部分，ev 是事件对象，用来获取点击的位置
-const processControlStart_volume = (ev: any) => {
-  // 获得总进度条宽度
-  let barOffsetWidth = volume_line.value.offsetWidth;
-  // 算出点击位置距离总进度条左边的距离
-  // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
-  let slideLength = ev.touches[0].clientX - volume_line.value.offsetLeft;
-  // console.log(slideLength);
+    // 弹出更多信息
+    const popMoreInfo = (): void => {
+      let item = {
+        id: store.state.song_info.id,
+        name: store.state.song_info.name,
+        author: store.state.song_info.author,
+        img: store.state.song_info.img,
+        type: store.state.song_info.type,
+        isSongClik: true,
+        al: store.state.song_info.al,
+      }
+      
+      store.dispatch(`set_pop_detail`, item);
+    };
 
-  // 算出点击位置距离总进度条左边距离的百分比
-  let slidePercent = slideLength / barOffsetWidth;
-  // console.log(slidePercent.toFixed(1));
-
-  if (slidePercent >= 0 && slidePercent <= 1) {
-    store.set_volume(parseFloat(slidePercent.toFixed(1)));
-    volume_point.value.style.left = `${slidePercent * 100}%`;
-    volume_linePast.value.style.width = `${slidePercent * 100}%`;
-  }
-};
-// 圆点进度移动过程中
-const processControlMove_volume = (ev: any) => {
-  let barOffsetWidth = volume_line.value.offsetWidth;
-  // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
-  let slideLength = ev.touches[0].clientX - volume_line.value.offsetLeft;
-  let slidePercent = slideLength / barOffsetWidth;
-  if (slidePercent >= 0 && slidePercent <= 1) {
-    store.set_volume(parseFloat(slidePercent.toFixed(1)));
-    volume_point.value.style.left = `${slidePercent * 100}%`;
-    volume_linePast.value.style.width = `${slidePercent * 100}%`;
-  }
-};
-
-// 弹出更多信息
-const popMoreInfo = (): void => {
-  let item = {
-    id: store.song_info.id,
-    name: store.song_info.name,
-    author: store.song_info.author,
-    img: store.song_info.img,
-    type: store.song_info.type,
-    isSongClik: true,
-    al: store.song_info.al,
-  };
-
-  store.set_pop_detail(item);
-};
-
-// export default defineComponent({
-//   name: "song",
-//   setup() {
-
-//     return {
-//       goComment,
-//       back,
-//       playWhite,
-//       stopWhite,
-//       active,
-//       change_play,
-//       store,
-//       linePast,
-//       point,
-//       lyric,
-//       lyricRef,
-//       showLyricLine,
-//       commentNum,
-//       getTime,
-//       line,
-//       processControlStart,
-//       processControlMove,
-//       processControlEnd,
-//       current_song_time,
-//       showAllLyric,
-//       download,
-//       showLyric,
-//       processControlMove_volume,
-//       processControlStart_volume,
-//       volume_line,
-//       volume_point,
-//       volume_linePast,
-//       popMoreInfo
-//     };
-//   },
-// });
+    return {
+      goComment,
+      back,
+      playWhite,
+      stopWhite,
+      active,
+      change_play,
+      store,
+      linePast,
+      point,
+      lyric,
+      lyricRef,
+      showLyricLine,
+      commentNum,
+      getTime,
+      line,
+      processControlStart,
+      processControlMove,
+      processControlEnd,
+      current_song_time,
+      showAllLyric,
+      download,
+      showLyric,
+      processControlMove_volume,
+      processControlStart_volume,
+      volume_line,
+      volume_point,
+      volume_linePast,
+      popMoreInfo
+    };
+  },
+});
 </script>
 <style lang="less" scoped>
 @keyframes rotate_img {
