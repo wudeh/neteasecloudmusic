@@ -7,7 +7,7 @@
     </div>
     <video class="vid" webkit-playsinline playsinline x5-playsinline :src="data.url" controls></video>
     <div class="info">
-      <van-tabs v-model:active="data.activeName" sticky swipeable>
+      <van-tabs v-model:active="data.activeName" sticky>
         <van-tab title="简介" name="1">
           <div class="author">
             <div class="img">
