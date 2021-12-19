@@ -12,10 +12,8 @@ import {
   defineComponent,
   reactive,
   onMounted,
-  onUpdated,
   nextTick,
   watch,
-  onBeforeUnmount,
   toRefs,
   PropType,
 } from "vue";
@@ -100,10 +98,6 @@ export default defineComponent({
         disableTouch: false,
         // eventPassthrough: "vertical",
       });
-
-      // data.bs.on("scrollEnd", () => {
-
-      // })
     }
 
     watch(
@@ -123,16 +117,6 @@ export default defineComponent({
         
       // })
     });
-
-    // onBeforeUnmount(() => {
-    //   window.removeEventListener("resize", () => {
-    //     data.bs.refresh();
-    //   });
-    // });
-
-    // onUpdated(() => {
-    //   data.bs.refresh();
-    // });
 
     return {
       initScroll,

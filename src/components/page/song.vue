@@ -65,7 +65,7 @@
         <div class="current_time">{{ getTime(store.song_info.currentTime) }}</div>
         <div class="line" ref="line" @touchstart="processControlStart($event)" @touchmove="processControlMove($event)" @touchend="processControlEnd($event)">
           <div class="past" ref="linePast"></div>
-          <div class="circle_point" ref="point"></div>
+          <div :class="{circle_point_down: tapOnProgress,circle_point: true}" ref="point"></div>
           <div class="not_play"></div>
         </div>
         <div class="durasion">{{ getTime(store.song_info.duration) }}</div>
@@ -363,8 +363,10 @@ const showAllLyric = () => {
   }
 };
 
+let tapOnProgress = ref<boolean>(false);
 // 进度条拖动部分，ev 是事件对象，用来获取点击的位置
 const processControlStart = (ev: any) => {
+  tapOnProgress.value = true;
   // console.log(ev.touches[0].clientX);
   // console.log(line.value.offsetWidth);
   // console.log(line.value.offsetLeft);
@@ -390,6 +392,8 @@ const processControlStart = (ev: any) => {
 };
 // 圆点进度移动过程中
 const processControlMove = (ev: any) => {
+  tapOnProgress.value = true;
+
   let barOffsetWidth = line.value.offsetWidth;
   // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
   let slideLength = ev.touches[0].clientX - line.value.offsetLeft;
@@ -402,6 +406,7 @@ const processControlMove = (ev: any) => {
 // 点击结束或者移动结束
 const processControlEnd = (ev: any) => {
   // console.log("移动结束");
+  tapOnProgress.value = false;
 
   autoMovePoint.value = true;
   // audio.value.currentTime = tempCurrentTime.value;
@@ -728,6 +733,11 @@ const popMoreInfo = (): void => {
         border-radius: 50%;
         width: 6px;
         height: 6px;
+        transition: width 0.3s;
+      }
+      .circle_point_down {
+        width: 12px;
+        height: 12px;
       }
       .not_play {
         width: 280px;

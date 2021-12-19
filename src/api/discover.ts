@@ -16,6 +16,17 @@ export function getSearchWord(): any {
   return axios.get("/search/default");
 }
 
+// 首页推荐歌单
+export function getRecommendSongList(): Promise<any> {
+  return axios.get("/personalized");
+}
+
+
+// 首页轮播图
+export function getSwiperInfo(): Promise<any> {
+  return axios.get("/banner?type=1");
+}
+
 // 热搜
 export function getSearchHot(): any {
   return axios.get("/search/hot/detail");

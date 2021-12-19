@@ -59,10 +59,10 @@
               </bsscroll>
             </div>
           </div>
-          <!-- 推荐歌单 -->
+          <!-- APP 端推荐歌单，由于目前接口数据不刷新，先注释 -->
           <div class="recommend">
             <div class="rec_title">
-              <div class="rec_des">{{ info.recommend.titleTex }}</div>
+              <div class="rec_des">{{ info.recommend.titleTex }}（APP 端暂未修复）</div>
               <div class="rec_more" @click="ballClick()">
                 <span>{{ info.recommend.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />
@@ -76,6 +76,28 @@
                   <div class="playCount">
                     <img src="../../public/img/icons/play.svg" alt="" />
                     <span>{{ numFilter(item.resources[0].resourceExtInfo.playCount) }}</span>
+                  </div>
+                </div>
+              </div>
+            </bsscroll>
+          </div>
+          <!-- PC 端推荐歌单 -->
+          <div class="recommend">
+            <div class="rec_title">
+              <div class="rec_des">推荐歌单（PC）</div>
+              <div class="rec_more" @click="ballClick()">
+                <span>更多</span>
+                <img src="../../public/img/icons/more.svg" alt="" />
+              </div>
+            </div>
+            <bsscroll :scrollX="true" :scrollData="recommendSongList" name="recommend_PCscroll">
+              <div class="rec_song">
+                <div class="rec_item" v-for="item in recommendSongList" :key="item.id" @click="goSongList(item.id)">
+                  <van-image class="img" show-loading radius="8" :src="item.picUrl" />
+                  <span>{{ item.name }}</span>
+                  <div class="playCount">
+                    <img src="../../public/img/icons/play.svg" alt="" />
+                    <span>{{ numFilter(item.playCount) }}</span>
                   </div>
                 </div>
               </div>
@@ -398,7 +420,7 @@ export default {
 </script>
 <script lang="ts" setup>
 import { defineComponent, ref, reactive, onMounted, toRefs, onBeforeMount, watch, nextTick } from "vue";
-import { getDiscoverInfo, getIconInfo, getSearchWord } from "../api/discover";
+import { getDiscoverInfo, getIconInfo, getSearchWord, getRecommendSongList, getSwiperInfo } from "../api/discover";
 import { getSongUrl } from "../api/song";
 import { useRouter } from "vue-router";
 import { recentcontact, loginByPhoneAndPassword, logout } from "../api/user";
@@ -518,6 +540,9 @@ const info = reactive<any>({
   },
 });
 
+// 替换移动端的歌单
+let recommendSongList = ref<any[]>([]);
+
 // 简单的节流
 const decrease = (i: number) => {
   let isDoing = false;
@@ -535,7 +560,7 @@ const decrease = (i: number) => {
   };
 };
 
-// 数据请求
+// 监听导航栏变红
 onMounted(async () => {
   window.addEventListener("scroll", () => {
     decrease(window.scrollY)();
@@ -543,6 +568,10 @@ onMounted(async () => {
 });
 
 const onRefresh = async () => {
+  // PC 推荐歌单
+  let recommendSongListAll = await getRecommendSongList();
+  recommendSongList.value = [].concat(recommendSongListAll.result);
+
   let discoverInfo = await getDiscoverInfo(info.cursor);
   // 分页数据
   info.cursor = discoverInfo.data.cursor;
@@ -615,11 +644,22 @@ const onRefresh = async () => {
     }
     info.loading = false;
   });
+
+  
 };
 
 const loadMore = async () => {
   info.listLoading = true;
   let discoverInfo = await getDiscoverInfo(info.cursor);
+
+  // PC 推荐歌单
+  let recommendSongListAll = await getRecommendSongList();
+  recommendSongList.value = [].concat(recommendSongListAll.result);
+
+  // 单独获得轮播图数据
+  let swiperData = await getSwiperInfo();
+
+
   info.listLoading = false;
   if (discoverInfo.code == 400) {
     info.listError = true;
@@ -631,7 +671,9 @@ const loadMore = async () => {
   discoverInfo.data.blocks.map((item: any) => {
     // 轮播图
     if (item.blockCode == "HOMEPAGE_BANNER") {
-      info["swiper"] = item.extInfo.banners;
+      // 原移动端注释
+      // info["swiper"] = item.extInfo.banners;
+      info["swiper"] = swiperData.banners;
       nextTick(() => {
         topBg.value?.setAttribute("style", `background-image:url(${info.swiper[0].pic});background-color:red`);
       });
@@ -700,6 +742,10 @@ const loadMore = async () => {
   const iconInfo = await getIconInfo();
   // 圆形图标
   info.icon = iconInfo.data;
+
+  
+
+  // 搜索词
   let word = await getSearchWord();
   info.searchWord = word.data.showKeyword;
 };
@@ -753,15 +799,6 @@ async function playMusicSingle(item: any): Promise<void> {
 // 点击新歌 新碟 新专辑
 const new_three = (item: any) => {
   if (item.resourceType == `song`) {
-    // let i: any = {
-    //   id: item.resourceId,
-    //   type: 0,
-    //   name: item!.resourceExtInfo!.songData.name,
-    //   author: item.resourceExtInfo.artists.map((i: any) => i.name).join("/"),
-    //   url: '',
-    //   img: item.uiElement.image.imageUrl,
-    //   al: item.resourceExtInfo.songData.album.name
-    // }
     item.al = { name: "" };
     item.al.name = item.resourceExtInfo.songData.album.name;
     playMusicSingle(item);
@@ -818,6 +855,7 @@ const swiper_click = (i: any) => {
       resourceExtInfo: {
         songData: {
           name: i.song.name,
+          album: i.song.album ?? i.song.name
         },
         artists: i.song.ar,
       },
@@ -840,38 +878,6 @@ const showLeftPop = (): void => {
 const goToGithub = (): void => {
   window.location.href = "https://github.com/Binaryify/NeteaseCloudMusicApi";
 };
-
-// 首页的发现组件
-// export default defineComponent({
-//   name: "discover",
-//   components: {
-//     bsscroll,
-//   },
-//   setup() {
-
-//     // return {
-//     //   active,
-//     //   ballClick,
-//     //   goToGithub,
-//     //   router,
-//     //   show,
-//     //   showLeftPop,
-//     //   new_three,
-//     //   goSearch,
-//     //   onRefresh,
-//     //   onChange,
-//     //   topBg,
-//     //   add_song_list,
-//     //   change_new,
-//     //   goSongList,
-//     //   recentcontactDD,
-//     //   ...toRefs(info),
-//     //   playMusicSingle,
-//     //   loadMore,
-//     //   swiper_click
-//     // };
-//   },
-// });
 </script>
 
 <style lang="less" scoped>
