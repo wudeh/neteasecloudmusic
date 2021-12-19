@@ -81,7 +81,7 @@
               </div>
             </bsscroll>
           </div>
-          <!-- PC 端推荐歌单 -->
+          <!-- 由于目前 AP P接口数据不刷新，增加 PC 端推荐歌单 -->
           <div class="recommend">
             <div class="rec_title">
               <div class="rec_des">推荐歌单（PC）</div>
