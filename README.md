@@ -3,7 +3,8 @@
 ## 说明
 
 - 技术栈：Vue3 + Vant + pinia + Typescript + Vite2
-- 线上预览：https://neteasecloudmusic.vercel.app
+- 线上预览：https://neteasecloudmusic.vercel.app（PC 请切换为移动端 或者使用手机浏览器扫描以下二维码）
+![image](./screenshot/mobile.png)
 - 数据来源：https://github.com/Binaryify/NeteaseCloudMusicApi
 - Flutter 版：https://github.com/wudeh/flutter_music_code
 - 对您有一丁点帮助的话给个 star 吧 【哭唧唧】
