@@ -1215,6 +1215,7 @@ const goSingerDetail = (id: string): void => {
           border: 1px solid rgb(0, 153, 255);
           border-radius: 3px;
           opacity: 0.6;
+          font-size: 12px;
         }
         .author {
           font-size: 14px;

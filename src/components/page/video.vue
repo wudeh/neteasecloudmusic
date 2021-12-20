@@ -118,7 +118,8 @@
                         <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
                       </div>
                     </div>
-                    <div class="text">{{ item.content }}</div>
+                    <!-- <div class="text">{{ item.content }}</div> -->
+                    <comment-text :content="item.content"></comment-text>
                     <div class="reply_count" @click="floorRequest(item, item.commentId)" v-if="item.showFloorComment.showReplyCount">{{ item.showFloorComment.replyCount }}条回复&nbsp;></div>
                   </div>
                 </div>
@@ -163,7 +164,8 @@
                   <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
                 </div>
               </div>
-              <div class="text">{{ data.floorTopComment.content }}</div>
+              <!-- <div class="text">{{ data.floorTopComment.content }}</div> -->
+              <comment-text :content="data.floorTopComment.content"></comment-text>
             </div>
           </div>
           <div class="all_reply">全部回复</div>
@@ -198,7 +200,8 @@
                   <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
                 </div>
               </div>
-              <div class="text">{{ item.content }}</div>
+              <!-- <div class="text">{{ item.content }}</div> -->
+              <comment-text :content="item.content"></comment-text>
               <!-- 回复的是楼主就不显示了，回复其他人才显示 -->
               <div class="beReplied_item" v-if="item.beReplied.length && item.beReplied[0].beRepliedCommentId != data.floorTopComment.commentId">
                 <span class="beReplied_name">@{{ item.beReplied[0].user.nickname }}：</span>
@@ -228,6 +231,8 @@ import { getComment, getSongInfo, getFloorComment, getPlayListDetail } from "../
 import { getUserDetail } from "../../api/user";
 import { Toast } from "vant";
 import { getVideoDetail, getVideoUrl, getVideoRelated, getMvUrl, getMvDetail, getArtistFans, getArtistDetail } from "../../api/video";
+import commentText from "../common/commentText.vue"
+
 interface creator {
   vid: string;
   type: number;

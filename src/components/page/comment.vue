@@ -68,7 +68,7 @@
                   <div class="time">
                     <span class="time">{{ sendTimeConversion(item.time) }}</span>
                     <span v-if="item.tag.datas" style="margin: 0 2px">-</span>
-                    <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span>
+                    <span class="tag" v-if="item.tag.datas != null && item.tag.datas.length">{{ item.tag.datas[0].text }}</span>
                   </div>
                 </div>
                 <div class="like_count">
@@ -77,7 +77,8 @@
                   <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
                 </div>
               </div>
-              <div class="text">{{ item.content }}</div>
+              <!-- <div class="text">{{ item.content }}</div> -->
+              <comment-text :content="item.content"></comment-text>
               <div class="reply_count" @click="floorRequest(item, item.commentId)" v-if="item.showFloorComment.showReplyCount">{{ item.showFloorComment.replyCount }}条回复&nbsp;></div>
             </div>
           </div>
@@ -119,7 +120,8 @@
                   <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
                 </div>
               </div>
-              <div class="text">{{ data.floorTopComment.content }}</div>
+              <!-- <div class="text">{{ data.floorTopComment.content }}</div> -->
+              <comment-text :content="data.floorTopComment.content"></comment-text>
             </div>
           </div>
           <div class="all_reply">全部回复</div>
@@ -154,7 +156,8 @@
                   <img v-else src="../../../public/img/icons/like_gray.svg" alt="" />
                 </div>
               </div>
-              <div class="text">{{ item.content }}</div>
+              <!-- <div class="text">{{ item.content }}</div> -->
+              <comment-text :content="item.content"></comment-text>
               <div class="beReplied_item" v-if="item.beReplied.length && item.beReplied[0].beRepliedCommentId != data.floorTopComment.commentId">
                 <span class="beReplied_name">@{{ item.beReplied[0].user.nickname }}：</span>
                 <span class="beReplied_content" v-if="item.beReplied[0].content">{{ item.beReplied[0].content }}</span>
@@ -179,6 +182,8 @@ import { useRouter } from "vue-router";
 import { sendTimeConversion, numFilter } from "../../utils/num";
 import songStore from "../../store";
 import { Toast } from "vant";
+import commentText from "../common/commentText.vue"
+
 interface info {
   img: string;
   name: string;
@@ -357,23 +362,6 @@ const change_sortType = async (index: any) => {
   onLoad();
 };
 
-// export default defineComponent({
-//   name: "comment",
-//   setup() {
-
-//     // return {
-//     //   ...toRefs(data),
-//     //   sendTimeConversion,
-//     //   numFilter,
-//     //   onLoad,
-//     //   onLoadFloor,
-//     //   router,
-//     //   store,
-//     //   change_sortType,
-//     //   floorRequest,
-//     // };
-//   },
-// });
 </script>
 
 <style lang="less" scoped>

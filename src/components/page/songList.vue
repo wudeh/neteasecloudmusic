@@ -219,7 +219,7 @@ onBeforeMount(async () => {
   // 得到歌单里的全部歌曲信息
   const songListInfo: any = await getSongInfo(allId.join(","));
 
-  data.songListInfo = songListInfo.songs.map((item: any) => {
+  data.songListInfo = songListInfo.songs.map((item: any, index: number) => {
     return {
       id: item.id,
       name: item.name,
@@ -230,19 +230,20 @@ onBeforeMount(async () => {
       ar: item.ar,
       al: item.al,
       mv: item.mv,
-      // sq: item.maxbr >= 999000,
-      // vip: item.fee == 1,
-      // dujia: item.flag == 1092
+      sq: songListInfo.privileges[index].maxbr >= 999000,
+      vip: songListInfo.privileges[index].fee == 1,
+      dujia: songListInfo.privileges[index].flag == 1092
     };
   });
 
   store.set_load(false);
+  
 
-  songListInfo.privileges.forEach((item: any, index: number) => {
-    data.songListInfo[index].sq = item.maxbr >= 999000;
-    data.songListInfo[index].vip = item.fee == 1;
-    data.songListInfo[index].dujia = item.flag == 1092;
-  });
+  // songListInfo.privileges.forEach((item: any, index: number) => {
+  //   data.songListInfo[index].sq =  item.maxbr >= 999000;
+  //   data.songListInfo[index].vip = item.fee == 1;
+  //   data.songListInfo[index].dujia = item.flag == 1092;
+  // });
 });
 
 // 点击播放歌曲
@@ -299,22 +300,6 @@ const goMv = (mvId: number): void => {
   router.push({ name: "vid", query: { vid: mvId } });
 };
 
-// export default defineComponent({
-//   name: "songList",
-//   setup() {
-
-//     return {
-//       ...toRefs(data),
-//       author,
-//       popMoreInfo,
-//       store,
-//       add_song_list,
-//       goMv,
-//       router,
-//       playMusicSingle,
-//     };
-//   },
-// });
 </script>
 
 <style lang="less" scoped>
@@ -539,7 +524,8 @@ const goMv = (mvId: number): void => {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        height: 20px;
+        height: 16px;
+        display: flex;
         .vip {
           color: red;
           border: 1px solid red;

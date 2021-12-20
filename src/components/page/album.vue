@@ -524,7 +524,8 @@ const goMv = (mvId: number): void => {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        height: 20px;
+        height: 16px;
+        display: flex;
         .vip {
           color: red;
           border: 1px solid red;

@@ -500,7 +500,8 @@ const popMoreInfo = (item: any, type: number): void => {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        height: 20px;
+        height: 16px;
+        display: flex;
       }
     }
     .more {
