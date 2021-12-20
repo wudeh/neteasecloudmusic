@@ -54,8 +54,14 @@
                         <span v-for="(it, i) in item.originSongSimpleData.artists" :key="i"><i v-if="i > 0">/</i>{{ it.name }}</span>
                       </div>
                     </div>
-                    <div class="rignt" @click="popMoreInfo(item, 0)">
+                    <!-- <div class="rignt" @click="popMoreInfo(item, 0)">
                       <img src="../../../public/img/icons/more_gray.svg" alt="" />
+                    </div> -->
+                    <div class="more">
+                      <!-- 歌曲可能有相关 mv -->
+                      <van-icon v-if="item.mv != 0" name="play-circle-o" @click="goMv(item.mv)" />
+                      <!-- 点击弹出歌曲底部弹框信息 -->
+                      <img @click="popMoreInfo(item, 0)" src="../../../public/img/icons/more_gray.svg" alt="" />
                     </div>
                   </div>
                 </div>
@@ -216,9 +222,15 @@
                       <span v-for="(it, i) in item.originSongSimpleData.artists" :key="i"><i v-if="i > 0">/</i>{{ it.name }}</span>
                     </div>
                   </div>
-                  <div class="rignt" @click="popMoreInfo(item, 0)">
+                  <!-- <div class="rignt" @click="popMoreInfo(item, 0)">
                     <img src="../../../public/img/icons/more_gray.svg" alt="" />
-                  </div>
+                  </div> -->
+                  <div class="more">
+                      <!-- 歌曲可能有相关 mv -->
+                      <van-icon v-if="item.mv != 0" name="play-circle-o" @click="goMv(item.mv)" />
+                      <!-- 点击弹出歌曲底部弹框信息 -->
+                      <img @click="popMoreInfo(item, 0)" src="../../../public/img/icons/more_gray.svg" alt="" />
+                    </div>
                 </div>
               </div>
             </div>
@@ -656,7 +668,6 @@ const suggest = async () => {
       info.result.allMatch.forEach((item: any) => {
         data.suggestWord.push(item.keyword);
       });
-      console.log(data.suggestWord);
     }
   }, 500);
 };
@@ -732,7 +743,7 @@ const suggestClick = (i: string) => {
 // 重新搜索
 const onSearch = () => {
   data.suggestWord.splice(0);
-
+  router.replace({ path: "/searchResult", query: { word: data.word }});
   (data.allLoading = false), (data.allError = false), (data.allFinish = false), (data.pageNo = 0), (data.Loading = false), (data.Error = false), (data.Finish = false), (data.hotWord = []), (data.suggestWord = []), (data.timer = null), (data.song = { songs: [] }), (data.songs = []), (data.songPageNo = 0), (data.songFinish = false);
   (data.playList = { playLists: [] }),
     (data.playLists = []),
@@ -964,50 +975,9 @@ const loadMore = async () => {
 // 综合 tab 页里面点击跳转的方法
 const changeActive = (i: any) => {
   tab.value.scrollTo(i);
-  // if (data.activeName == 1 && data.songs.length) {
-  //   return;
-  // }
-  // if (data.activeName == 10 && data.albums.length) {
-  //   return;
-  // }
-  // if (data.activeName == 100 && data.artists.length) {
-  //   return;
-  // }
-  // if (data.activeName == 1000 && data.playLists.length) {
-  //   return;
-  // }
-  // if (data.activeName == 1002 && data.users.length) {
-  //   return;
-  // }
-  // if (data.activeName == 1004 && data.mvs.length) {
-  //   return;
-  // }
-  // if (data.activeName == 1006 && data.lyric.length) {
-  //   return;
-  // }
-  // if (data.activeName == 1009 && data.djRadios.length) {
-  //   return;
-  // }
-  // if (data.activeName == 1014 && data.videos.length) {
-  //   return;
-  // }
-  // if (data.activeName == 1018 && data.song.songs.length) {
-  //   return;
-  // }
-  // data.pageNo += 1;
-
-  // data.activeName = i;
-  // loadMore();
 };
 
-// 手动滑动需要监听
-// watch(
-//   () => data.activeName,
-//   (value) => {
-//     console.log(value);
 
-//   }
-// );
 
 // 点击播放歌曲
 function playMusicSingle(item: any): void {
@@ -1017,9 +987,6 @@ function playMusicSingle(item: any): void {
   }
   // 先判断和当前的歌曲是不是同一首,如果不是同一首
   if (item.resourceId != store.song_info.id) {
-    // store.commit("play", false);
-    // 请求URL
-    // const info = await getSongUrl(item.resourceId);
     let song = {
       id: item.id,
       name: item.name,
@@ -1035,7 +1002,6 @@ function playMusicSingle(item: any): void {
 
 // 输入框失去焦点就不显示搜索建议
 const notShowSuggest = (): void => {
-  console.log("触发了不显示");
 
   data.showSuggest = false;
   data.suggestWord.splice(0);
@@ -1074,33 +1040,12 @@ const goSingerDetail = (id: string): void => {
   router.push({ name: "singerDetail", query: { id } });
 };
 
-// export default defineComponent({
-//   name: "searchResult",
-//   setup: () => {
+// 点击跳转 mv
+const goMv = (mvId: number): void => {
+  router.push({ name: "vid", query: { vid: mvId } });
+};
 
-//     return {
-//       suggest,
-//       onSearch,
-//       popMoreInfo,
-//       tab,
-//       suggestClick,
-//       onRefresh,
-//       numFilter,
-//       timeFilter,
-//       playMusicSingle,
-//       router,
-//       store,
-//       changeActive,
-//       loadMore,
-//       getDate,
-//       notDone,
-//       notShowSuggest,
-//       ShowSuggest,
-//       goSingerDetail,
-//       ...toRefs(data),
-//     };
-//   },
-// });
+
 </script>
 
 <style lang="less" scoped>
@@ -1226,6 +1171,16 @@ const goSingerDetail = (id: string): void => {
         }
         .originSinger {
           font-size: 12px;
+        }
+      }
+      .more {
+        width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        img {
+          float: right;
+          width: 20px;
         }
       }
     }

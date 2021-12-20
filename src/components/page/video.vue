@@ -71,7 +71,7 @@
               </div>
             </template>
             <!-- 评论选择区 -->
-            <van-sticky :offset-top="50">
+            <van-sticky :offset-top="44">
               <div class="comment_choose">
                 <div class="title">评论区</div>
                 <div class="choose" v-show="!data.arrloading">
@@ -109,7 +109,7 @@
                         <div class="time">
                           <span class="time">{{ sendTimeConversion(item.time) }}</span>
                           <span v-if="item.tag.datas" style="margin: 0 2px">-</span>
-                          <span class="tag" v-if="item.tag.datas">{{ item.tag.datas[0].text }}</span>
+                          <span class="tag" v-if=" item.tag.datas != null && item.tag.datas.length">{{ item.tag.datas[0].text }}</span>
                         </div>
                       </div>
                       <div class="like_count">
