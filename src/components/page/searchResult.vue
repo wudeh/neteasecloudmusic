@@ -68,9 +68,9 @@
                 <div v-if="data.song.more" @click="changeActive(`1`)" v-word="data.word" class="more">{{ data.song.moreText }}&nbsp;></div>
               </div>
               <!-- 歌手艺人 -->
-              <div class="user" v-if="data.user" @click="notDone()">
+              <div class="user" v-if="data.user">
                 <div class="title">艺人</div>
-                <div class="item" v-for="(item, index) in data.artist.artists" :key="index">
+                <div class="item" v-for="(item, index) in data.artist.artists" :key="index" @click="goSingerDetail(item.id)">
                   <div class="left">
                     <van-image class="img" radius="50%" :src="item.img1v1Url" />
                     <img v-if="item.picUrl" src="https://p5.music.126.net/obj/wo3DlcOGw6DClTvDisK1/4874132307/4499/f228/d867/da64b9725e125943ad4e14e4c72d0884.png" alt="" />
@@ -88,7 +88,7 @@
               <!-- 歌单 -->
               <div class="playList" v-if="data.playList">
                 <div class="title">歌单</div>
-                <div class="item" v-for="(item, index) in data.playList.playLists" :key="index" @click="router.push({ path: `/songList`, query: { id: item.id } })">
+                <div class="item" v-for="(item, index) in data.playList.playLists" :key="index" @click="router.push({ path: `/songList`, query: { id: item.id,type: 2 } })">
                   <div class="left">
                     <van-image class="img" radius="8" :src="item.coverImgUrl" />
                   </div>
@@ -126,7 +126,7 @@
               <!-- 专辑 -->
               <div class="playList" v-if="data.album">
                 <div class="title">专辑</div>
-                <div class="item" v-for="(item, index) in data.album.albums" :key="index" @click="router.push({ path: `/album`, query: { id: item.id } })">
+                <div class="item" v-for="(item, index) in data.album.albums" :key="index" @click="router.push({ path: `/songList`, query: { id: item.id,type: 10 } })">
                   <div class="left">
                     <van-image class="img" radius="8" :src="item.picUrl" />
                   </div>
@@ -253,7 +253,7 @@
               </div>
             </template>
             <div class="playList">
-              <div class="item" v-for="(item, index) in data.albums" :key="index" @click="router.push({ path: `/album`, query: { id: item.id } })">
+              <div class="item" v-for="(item, index) in data.albums" :key="index" @click="router.push({ path: `/songList`, query: { id: item.id,type: 10 } })">
                 <div class="left">
                   <van-image class="img" radius="8" :src="item.picUrl" />
                 </div>
@@ -316,7 +316,7 @@
               </div>
             </template>
             <div class="playList">
-              <div class="item" v-for="(item, index) in data.playLists" :key="index" @click="router.push({ path: `/songList`, query: { id: item.id } })">
+              <div class="item" v-for="(item, index) in data.playLists" :key="index" @click="router.push({ path: `/songList`, query: { id: item.id,type: 2 } })">
                 <div class="left">
                   <van-image class="img" radius="8" :src="item.coverImgUrl" />
                 </div>

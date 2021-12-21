@@ -803,7 +803,7 @@ const new_three = (item: any) => {
     item.al.name = item.resourceExtInfo.songData.album.name;
     playMusicSingle(item);
   } else {
-    router.push({ path: `/album`, query: { id: item.resourceId } });
+    router.push({ path: `/songList`, query: { id: item.resourceId, type: 10 } });
   }
   // if(item.resourceType == `album`) {
 
@@ -826,7 +826,7 @@ function recentcontactDD(): void {
 }
 
 function goSongList(id: string): void {
-  router.push({ path: "/songList", query: { id } });
+  router.push({ path: "/songList", query: { id, type: 2 } });
 }
 
 // 播放列表

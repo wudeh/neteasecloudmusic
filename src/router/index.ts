@@ -95,15 +95,6 @@ const routes: Array<RouteRecordRaw> = [
         },
       },
       {
-        path: "/album",
-        name: "album",
-        component: () => import(/* webpackChunkName: "login" */ "@/components/page/album.vue"),
-        meta: {
-          keepAlive: true,
-          level: 9,
-        },
-      },
-      {
         path: "/vid",
         name: "vid",
         component: () => import(/* webpackChunkName: "login" */ "@/components/page/video.vue"),
@@ -136,7 +127,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import(/* webpackChunkName: "login" */ "@/components/page/singer_detail.vue"),
         meta: {
           keepAlive: true,
-          level: 10,
+          level: 101,
         },
       },
     ],

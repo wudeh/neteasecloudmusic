@@ -254,7 +254,7 @@ watch(
       audio.value.play();
       store.play(true);
       if (store.song_info.id) {
-        lyricRequest();
+        store.lyricRequest();
       }
     }
   }
@@ -316,54 +316,54 @@ watch(
   }
 );
 
-const lyricRequest = async () => {
-  let lyric: { lyric: string }[] | { time: string | number; lyric: any }[] = [];
-  const data = await getLyric(store.song_info.id);
-  // console.log(data);
-  // console.log(data.lrc.lyric.split("["));
-  if (data.lrc?.lyric) {
-    let i = data.lrc.lyric.split("[");
-    i.forEach((item: any, index: number) => {
-      let temp = {
-        time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1,
-        lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
-      };
-      if (temp.lyric != "\n" && !Number.isNaN(temp.time)) lyric.push(temp);
-    });
-    // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
-    lyric.push({
-      time: `9999`,
-      lyric: "wudeh",
-    });
+// const lyricRequest = async () => {
+//   let lyric: { lyric: string }[] | { time: string | number; lyric: any }[] = [];
+//   const data = await getLyric(store.song_info.id);
+//   // console.log(data);
+//   // console.log(data.lrc.lyric.split("["));
+//   if (data.lrc?.lyric) {
+//     let i = data.lrc.lyric.split("[");
+//     i.forEach((item: any, index: number) => {
+//       let temp = {
+//         time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1,
+//         lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
+//       };
+//       if (temp.lyric != "\n" && !Number.isNaN(temp.time)) lyric.push(temp);
+//     });
+//     // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
+//     lyric.push({
+//       time: `9999`,
+//       lyric: "wudeh",
+//     });
 
-    lyric.sort((a: any, b: any) => {
-      return a.time - b.time;
-    });
-    // console.log(lyric);
-    // console.log("这是歌词");
-    // 如果有翻译歌词
-    if (data.tlyric.lyric) {
-      let i = data.tlyric.lyric.split("[");
-      i.forEach((item: any, index: number) => {
-        let temp = {
-          time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 || 0,
-          lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
-        };
-        lyric.forEach((item: any, index: number) => {
-          if (item.time == temp.time) {
-            lyric[index].lyric += `<br>${temp.lyric}`;
-          }
-        });
-      });
-    }
-  } else {
-    lyric.push({
-      time: `9999`,
-      lyric: "当前音乐暂无歌词",
-    });
-  }
-  store.set_all_lyric(lyric);
-};
+//     lyric.sort((a: any, b: any) => {
+//       return a.time - b.time;
+//     });
+//     // console.log(lyric);
+//     // console.log("这是歌词");
+//     // 如果有翻译歌词
+//     if (data.tlyric.lyric) {
+//       let i = data.tlyric.lyric.split("[");
+//       i.forEach((item: any, index: number) => {
+//         let temp = {
+//           time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 || 0,
+//           lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
+//         };
+//         lyric.forEach((item: any, index: number) => {
+//           if (item.time == temp.time) {
+//             lyric[index].lyric += `<br>${temp.lyric}`;
+//           }
+//         });
+//       });
+//     }
+//   } else {
+//     lyric.push({
+//       time: `9999`,
+//       lyric: "当前音乐暂无歌词",
+//     });
+//   }
+//   store.set_all_lyric(lyric);
+// };
 
 onMounted(async () => {
   if (store.song_info.id) {
@@ -463,7 +463,7 @@ onMounted(async () => {
   audio.value.addEventListener("ready", () => {
     // console.log("<-- 准备完毕 -->");
   });
-  if (store.song_info.id) lyricRequest();
+  if (store.song_info.id) store.lyricRequest();
   window.addEventListener(`popstate`, () => {
     // console.log(`后退了`);
     // 由于 keep-alive 缓存导致 scrollBehavior 滚动失效，但是可以获取滚动高度，所以在路由变化这里判断在路由动画时间过渡过后滚动到之前的位置

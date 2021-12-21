@@ -119,7 +119,7 @@ export default {
 <script lang="ts" setup>
 import { defineComponent, ref, toRefs, onBeforeMount, reactive } from "vue";
 import { useRouter } from "vue-router";
-import { getSongListInfo, getSongInfo, getSongUrl } from "../../api/song";
+import { getSongListInfo, getSongInfo, getSongUrl, getAlbumDetail, getDjDetail,getDjProgram } from "../../api/song";
 import { numFilter } from "../../utils/num";
 import songStore from "../../store";
 import { Toast } from "vant";
@@ -129,6 +129,7 @@ interface songList {
   id: number;
   numFilter: any;
   title: string;
+  navTitle: string;
   img: string;
   description: string;
   tags: Array<string>;
@@ -140,6 +141,7 @@ interface songList {
   // subedIcon: string;
   // subIcon: string;
   show: boolean; // 控制歌单详情遮罩层
+  asc: boolean; // 电台播客的排序方式,默认为 false (新 => 老 ) 设置 true 可改为 老 => 新
 }
 
 // 歌曲
@@ -171,6 +173,7 @@ const data = reactive<songList>({
   id: 0,
   numFilter: numFilter,
   title: "",
+  navTitle: "歌单",
   img: "",
   description: "",
   tags: [],
@@ -182,6 +185,7 @@ const data = reactive<songList>({
   // subedIcon: require("../../../public/img/icons/subed.svg"),
   // subIcon: require("../../../public/img/icons/sub.svg"),
   show: false,
+  asc: false // 电台播客的排序方式
 });
 const author = reactive<author>({
   avatar: "",
@@ -189,51 +193,99 @@ const author = reactive<author>({
   userId: "",
   followed: false, // 是否关注
 });
-const id: any = router.currentRoute.value.query.id; //获取参数
+const id: any = router.currentRoute.value.query.id; //获取 id
+const type: any = router.currentRoute.value.query.type; //获取 分类
+
 onBeforeMount(async () => {
   store.set_load(true);
   data.id = id;
-  // 得到歌单数据
-  const songList = await getSongListInfo(id);
-  // 组装歌单数据
-  data.title = songList.playlist.name;
 
-  data.img = songList.playlist.coverImgUrl;
-  data.description = songList.playlist.description;
-  data.tags = songList.playlist.tags;
-  data.subscribed = songList.playlist.subscribed;
+  // 如果是 歌单
+  if(type == 2) {
+    // 得到歌单数据
+    const songList = await getSongListInfo(id);
+    // 组装歌单数据
+    data.title = songList.playlist.name;
 
-  data.subscribedCount = songList.playlist.subscribedCount;
-  data.commentCount = songList.playlist.commentCount;
-  data.shareCount = songList.playlist.shareCount;
+    data.img = songList.playlist.coverImgUrl;
+    data.description = songList.playlist.description;
+    data.tags = songList.playlist.tags;
+    data.subscribed = songList.playlist.subscribed;
 
-  author.avatar = songList.playlist.creator.avatarUrl;
-  author.userId = songList.playlist.creator.userId;
-  author.nickname = songList.playlist.creator.nickname;
-  author.followed = songList.playlist.creator.followed;
+    data.subscribedCount = songList.playlist.subscribedCount;
+    data.commentCount = songList.playlist.commentCount;
+    data.shareCount = songList.playlist.shareCount;
 
-  let allId = songList.playlist.trackIds.map((item: { id: string }) => {
-    return item.id;
-  });
-  // 得到歌单里的全部歌曲信息
-  const songListInfo: any = await getSongInfo(allId.join(","));
+    author.avatar = songList.playlist.creator.avatarUrl;
+    author.userId = songList.playlist.creator.userId;
+    author.nickname = songList.playlist.creator.nickname;
+    author.followed = songList.playlist.creator.followed;
 
-  data.songListInfo = songListInfo.songs.map((item: any, index: number) => {
-    return {
-      id: item.id,
-      name: item.name,
-      Tv: item.alia.join("/"), // 歌曲可能会有剧名
-      author: item.ar.map((item: any) => item.name).join("/"),
-      img: item.al.picUrl,
-      des: item.al.name,
-      ar: item.ar,
-      al: item.al,
-      mv: item.mv,
-      sq: songListInfo.privileges[index].maxbr >= 999000,
-      vip: songListInfo.privileges[index].fee == 1,
-      dujia: songListInfo.privileges[index].flag == 1092
-    };
-  });
+    let allId = songList.playlist.trackIds.map((item: { id: string }) => {
+      return item.id;
+    });
+    // 得到歌单里的全部歌曲信息
+    const songListInfo: any = await getSongInfo(allId.join(","));
+
+    data.songListInfo = songListInfo.songs.map((item: any, index: number) => {
+      return {
+        id: item.id,
+        name: item.name,
+        Tv: item.alia.join("/"), // 歌曲可能会有剧名
+        author: item.ar.map((item: any) => item.name).join("/"),
+        img: item.al.picUrl,
+        des: item.al.name,
+        ar: item.ar,
+        al: item.al,
+        mv: item.mv,
+        sq: songListInfo.privileges[index].maxbr >= 999000,
+        vip: songListInfo.privileges[index].fee == 1,
+        dujia: songListInfo.privileges[index].flag == 1092
+      };
+    });
+  }else if(type == 10) {
+    data.navTitle = "专辑"
+    Toast("专辑部分歌曲可能无法播放");
+    data.id = id;
+    // 得到专辑数据
+    const songList = await getAlbumDetail(id);
+    // 组装歌单数据
+    data.title = songList.album.name;
+
+    data.img = songList.album.picUrl;
+    data.description = songList.album.description;
+    data.tags = songList.album.tags;
+    data.subscribed = songList.album.info.liked;
+
+    data.subscribedCount = songList.album.info.likedCount;
+    data.commentCount = songList.album.info.commentCount;
+    data.shareCount = songList.album.info.shareCount;
+
+    author.avatar = songList.album.artist.img1v1Url;
+    author.userId = songList.album.artist.id;
+    author.nickname = songList.album.artist.name;
+    author.followed = songList.album.artist.followed;
+
+    // 得到歌单里的全部歌曲信息
+
+    data.songListInfo = songList.songs.map((item: any) => {
+      return {
+        id: item.id,
+        name: item.name,
+        Tv: item.alia.join("/"), // 歌曲可能会有剧名
+        author: item.ar.map((item: any) => item.name).join("/"),
+        img: item.al.picUrl,
+        des: item.al.name,
+        ar: item.ar,
+        al: item.al,
+        sq: item.privilege.maxbr >= 999000,
+        vip: item.privilege.fee == 1,
+        dujia: item.privilege.flag == 1092,
+        mv: item.mv,
+      };
+    });
+  }
+  
 
   store.set_load(false);
   

@@ -42,18 +42,18 @@
         <div class="lyric_line" :class="{ lyric_lineTime_show: showLyricLine }"></div>
         <div class="lyric_line_time" :class="{ lyric_lineTime_show: showLyricLine }">{{ getTime(current_song_time) }}</div>
         <div class="lyric" :class="{ lyric_show: showLyric }">
-          <span v-if="lyric.length == 0">获取歌词中</span>
+          <span v-if="store.song_info.lyricAll.length == 0">获取歌词中</span>
           <div ref="lyricRef">
-            <div v-for="(item, index) in lyric" :key="index" :id="`s` + index" :class="{ lyric_base: true, lyric_white: item.time <= current_song_time && current_song_time < lyric[index + 1].time }" v-html="item.lyric"></div>
+            <div v-for="(item, index) in store.song_info.lyricAll" :key="index" :id="`s` + index" :class="{ lyric_base: true, lyric_white: item.time <= current_song_time && current_song_time < store.song_info.lyricAll[index + 1].time }" v-html="item.lyric"></div>
             <div class="lyric_bottom"></div>
           </div>
         </div>
       </div>
       <!-- 收藏，评论 -->
       <div class="icon_top">
-        <img src="../../../public/img/icons/like_white.svg" alt="" />
+        <img src="../../../public/img/icons/like_white.svg" @click="notDone()" alt="" />
         <img src="../../../public/img/icons/download.svg" @click="download()" alt="" />
-        <img src="../../../public/img/icons/sing.svg" alt="" />
+        <img src="../../../public/img/icons/sing.svg" @click="notDone()" alt="" />
         <div class="comment" @click="goComment()">
           <img src="../../../public/img/icons/comment_num.svg" alt="" />
           <div class="comment_num">{{ commentNum }}</div>
@@ -65,7 +65,7 @@
         <div class="current_time">{{ getTime(store.song_info.currentTime) }}</div>
         <div class="line" ref="line" @touchstart="processControlStart($event)" @touchmove="processControlMove($event)" @touchend="processControlEnd($event)">
           <div class="past" ref="linePast"></div>
-          <div :class="{circle_point_down: tapOnProgress,circle_point: true}" ref="point"></div>
+          <div :class="{circle_point: true}" ref="point"></div>
           <div class="not_play"></div>
         </div>
         <div class="durasion">{{ getTime(store.song_info.duration) }}</div>
@@ -147,53 +147,7 @@ const download = () => {
   });
 };
 
-const lyricRequest = async () => {
-  // lyric = []
-  const data = await getLyric(store.song_info.id);
-  if (data.lrc?.lyric) {
-    let i = data.lrc.lyric.split("[");
-    i.forEach((item: any, index: number) => {
-      let temp = {
-        time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1,
-        lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
-      };
-      if (temp.lyric != "\n" && !Number.isNaN(temp.time)) lyric.push(temp);
-    });
-    // 给歌词列表最后再加上一个最长的时间，因为判断歌词高亮的时间是当前播放时间大于上一条歌词时间，小于下一条歌词时间，让最后的歌词高亮的时候不会出 bug
-    lyric.push({
-      time: 9999,
-      lyric: "wudeh",
-    });
 
-    lyric.sort((a: any, b: any) => {
-      return a.time - b.time;
-    });
-    // 如果有翻译歌词
-    if (data.tlyric.lyric) {
-      let i = data.tlyric.lyric.split("[");
-      i.forEach((item: any, index: number) => {
-        let temp = {
-          time: item.split("]")[0].split(":")[0] * 60 + item.split("]")[0].split(":")[1] * 1 || 0,
-          lyric: item.split("]")[1] || i[index + 1].split("]")[1] || "", // 有些重复的歌词会有两个时间段
-        };
-        lyric.forEach((item: any, index: number) => {
-          if (item.time == temp.time) {
-            lyric[index].lyric += `<br>${temp.lyric}`;
-          }
-        });
-      });
-    }
-  } else {
-    // lyric = reactive([])
-    lyric.push({
-      time: 9999,
-      lyric: "当前音乐暂无歌词",
-    });
-  }
-  nextTick(() => {
-    lyricScorll.bs.refresh();
-  });
-};
 // 获取评论
 const commentRequest = async () => {
   try {
@@ -233,9 +187,9 @@ onMounted(async () => {
   linePast.value.style.width = `${(store.song_info.buffered / store.song_info.duration) * 100}%`;
 
   // 如果有歌曲id 而没有歌词就请求歌词
-  if (store.song_info.id && !lyric.length) {
-    lyricRequest();
-  }
+  // if (store.song_info.id && !lyric.length) {
+  //   lyricRequest();
+  // }
 
   lyricScorll.bs = new BScroll(".lyric", {
     probeType: 2, // 2 代表仅当用户手指滑动的时候触发 scroll 事件，3 的话 srollto 事件也会触发 scroll 事件
@@ -257,7 +211,7 @@ onMounted(async () => {
     showLyricLine.value = true;
     let index = Math.abs(position.y) / lyricRef.value.children[0].offsetHeight;
 
-    current_song_time.value = lyric[Math.ceil(index) - 1 <= 0 ? 0 : Math.ceil(index) - 1].time;
+    current_song_time.value = store.song_info.lyricAll[Math.ceil(index) - 1 <= 0 ? 0 : Math.ceil(index) - 1].time;
   });
   lyricScorll.bs.on("scrollEnd", () => {
     // 由于 better-scroll 插件自动滚动也会触发滚动结束事件，所以这里判断一下是不是手动滑动的，手动滑动才设置时间，否则自动滑动也设置的话会造成音乐播放卡顿
@@ -276,7 +230,7 @@ onMounted(async () => {
 
 // 歌词变更重新计算滚动高度
 watch(
-  () => lyric.length,
+  () => store.song_info.lyricAll.length,
   () => {
     nextTick(() => {
       lyricScorll.bs.refresh();
@@ -289,8 +243,8 @@ watch(
   () => store.song_info.id,
   (id) => {
     if (id != "") {
-      lyric.splice(0);
-      lyricRequest();
+      // lyric.splice(0);
+      // lyricRequest();
       commentRequest();
     }
   }
@@ -318,7 +272,7 @@ watch(
     if (scroll.value && !showLyricLine.value) {
       current_song_time.value = store.song_info.currentTime;
       // 歌词滚动
-      lyric.forEach((i: any, index, arr) => {
+      store.song_info.lyricAll.forEach((i: any, index, arr) => {
         if (current_song_time.value >= i.time && current_song_time.value <= arr[index + 1].time) {
           lyricScorll.bs.scrollToElement(`#s${index}`, 100);
         }
@@ -366,7 +320,6 @@ const showAllLyric = () => {
 let tapOnProgress = ref<boolean>(false);
 // 进度条拖动部分，ev 是事件对象，用来获取点击的位置
 const processControlStart = (ev: any) => {
-  tapOnProgress.value = true;
   // console.log(ev.touches[0].clientX);
   // console.log(line.value.offsetWidth);
   // console.log(line.value.offsetLeft);
@@ -388,11 +341,12 @@ const processControlStart = (ev: any) => {
 
   // console.log(tempCurrentTime.value);
 
-  point.value.style.left = `${slidePercent * 100}%`;
+  if (slidePercent >= 0 && slidePercent <= 1) {    
+    point.value.style.left = `${slidePercent * 100}%`;
+  }
 };
 // 圆点进度移动过程中
 const processControlMove = (ev: any) => {
-  tapOnProgress.value = true;
 
   let barOffsetWidth = line.value.offsetWidth;
   // let slideLength = Math.floor(ev.touches[0].clientX) - line.value.offsetLeft
@@ -406,7 +360,6 @@ const processControlMove = (ev: any) => {
 // 点击结束或者移动结束
 const processControlEnd = (ev: any) => {
   // console.log("移动结束");
-  tapOnProgress.value = false;
 
   autoMovePoint.value = true;
   // audio.value.currentTime = tempCurrentTime.value;
@@ -466,42 +419,12 @@ const popMoreInfo = (): void => {
   store.set_pop_detail(item);
 };
 
-// export default defineComponent({
-//   name: "song",
-//   setup() {
+// 提示还没做
+const notDone = () => {
+  Toast("敬请期待");
+};
 
-//     return {
-//       goComment,
-//       back,
-//       playWhite,
-//       stopWhite,
-//       active,
-//       change_play,
-//       store,
-//       linePast,
-//       point,
-//       lyric,
-//       lyricRef,
-//       showLyricLine,
-//       commentNum,
-//       getTime,
-//       line,
-//       processControlStart,
-//       processControlMove,
-//       processControlEnd,
-//       current_song_time,
-//       showAllLyric,
-//       download,
-//       showLyric,
-//       processControlMove_volume,
-//       processControlStart_volume,
-//       volume_line,
-//       volume_point,
-//       volume_linePast,
-//       popMoreInfo
-//     };
-//   },
-// });
+
 </script>
 <style lang="less" scoped>
 @keyframes rotate_img {
@@ -564,6 +487,10 @@ const popMoreInfo = (): void => {
       text-align: center;
       .name {
         font-size: 20px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 270px;
       }
       .author {
         font-size: 12px;
@@ -731,13 +658,9 @@ const popMoreInfo = (): void => {
         position: absolute;
         background-color: #fff;
         border-radius: 50%;
-        width: 6px;
-        height: 6px;
-        transition: width 0.3s;
-      }
-      .circle_point_down {
         width: 12px;
         height: 12px;
+        transition: width 0.3s;
       }
       .not_play {
         width: 280px;
@@ -763,6 +686,7 @@ const popMoreInfo = (): void => {
     .line {
       z-index: 1111;
       height: 10px;
+      box-sizing: border-box;
       .past {
         width: 100%;
         transition: all 0s;

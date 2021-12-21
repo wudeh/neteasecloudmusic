@@ -259,22 +259,6 @@ const popMoreInfo = (item: any, type: number): void => {
   store.set_pop_detail(item);
 };
 
-// export default defineComponent({
-//   name: "djProgram",
-//   setup() {
-
-//     // return {
-//     //   ...toRefs(data),
-//     //   id,
-//     //   popMoreInfo,
-//     //   author,
-//     //   router,
-//     //   store,
-//     //   playMusicSingle,
-//     //   add_song_list,
-//     // };
-//   },
-// });
 </script>
 
 <style lang="less" scoped>

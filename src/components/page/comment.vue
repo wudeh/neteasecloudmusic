@@ -28,7 +28,7 @@
           <div v-if="type == 2" class="singer"><span style="color: black">by&nbsp;</span>{{ data.singer }}</div>
           <div v-else class="singer">
             <span style="color: black">by&nbsp;</span>
-            <span  v-for="(item,index) in data.singerInfo" :key="item.id" style="color: black" @click="goSingerDetail(item.id)">{{ item.name }}<span v-if="index < data.singerInfo.length - 1">/</span></span>
+            <span  v-for="(item,index) in data.singerInfo" :key="item.id" @click="goSingerDetail(item.id)">{{ item.name }}<span v-if="index < data.singerInfo.length - 1">/</span></span>
           </div>
         </div>
       </div>

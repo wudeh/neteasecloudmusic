@@ -364,7 +364,7 @@ watch(
   () => data.vid,
   (value, pre) => {
     data.url = "";
-
+    router.replace({ name: "vid", query: { vid: value } })
     init();
   }
 );
@@ -521,25 +521,7 @@ const change_sortType = async (index: any) => {
   onLoad();
 };
 
-// export default defineComponent({
-//   name: "vid",
-//   setup: () => {
 
-//     return {
-//       store,
-//       router,
-//       numFilter,
-//       timeFilter,
-//       getDate,
-//       change_sortType,
-//       floorRequest,
-//       onLoad,
-//       onLoadFloor,
-//       sendTimeConversion,
-//       ...toRefs(data),
-//     };
-//   },
-// });
 </script>
 
 <style lang="less" scoped>

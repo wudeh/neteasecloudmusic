@@ -164,6 +164,11 @@ onBeforeMount(async () => {
       flex-direction: column;
       align-items: center;
     }
+    .img {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
     .name {
       font-weight: 600;
       font-size: 18px;
