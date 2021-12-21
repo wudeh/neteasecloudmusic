@@ -25,9 +25,9 @@
             <span class="Follow" v-if="author.followed">></span>
             <span class="notFollow" v-else>+</span>
           </div>
-          <div class="des" @click="data.show = true">
+          <div class="des" @click="data.show = true" v-if="data.description">
             <div class="text">{{ data.description }}</div>
-            <img v-if="data.description" src="../../../public/img/icons/more.svg" alt="" />
+            <van-icon name="arrow" />
           </div>
         </div>
       </div>
@@ -383,6 +383,7 @@ const popMoreInfo = (item: any, type: number): void => {
         color: #fff;
         opacity: 0.5;
         display: flex;
+        align-items: center;
         .text {
           // width: 180px;
           white-space: nowrap;

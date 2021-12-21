@@ -62,7 +62,7 @@
           <!-- APP 端推荐歌单，由于目前接口数据不刷新，先注释 -->
           <div class="recommend">
             <div class="rec_title">
-              <div class="rec_des">{{ info.recommend.titleTex }}（APP 端暂未修复）</div>
+              <div class="rec_des">{{ info.recommend.titleTex }}（APP 端）</div>
               <div class="rec_more" @click="ballClick()">
                 <span>{{ info.recommend.button.text }}</span>
                 <img src="../../public/img/icons/more.svg" alt="" />

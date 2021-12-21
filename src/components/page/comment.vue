@@ -25,7 +25,11 @@
         <van-skeleton title :row="3" :loading="data.name == ``" />
         <div class="info" v-if="data.name">
           <div class="title">{{ data.name }}</div>
-          <div class="singer"><span style="color: black">by&nbsp;</span>{{ data.singer }}</div>
+          <div v-if="type == 2" class="singer"><span style="color: black">by&nbsp;</span>{{ data.singer }}</div>
+          <div v-else class="singer">
+            <span style="color: black">by&nbsp;</span>
+            <span  v-for="(item,index) in data.singerInfo" :key="item.id" style="color: black" @click="goSingerDetail(item.id)">{{ item.name }}<span v-if="index < data.singerInfo.length - 1">/</span></span>
+          </div>
         </div>
       </div>
       <!-- </van-skeleton> -->
@@ -257,7 +261,8 @@ onBeforeMount(async () => {
     info = await getSongInfo(id);
     data.img = info.songs[0].al.picUrl;
     data.name = info.songs[0].name;
-    data.singerInfo.concat(info.songs[0].ar);
+    data.singerInfo = data.singerInfo.concat(info.songs[0].ar);
+    
     info.songs[0].ar.forEach((item: any, index: number) => {
       if (index == 0) {
         data.singer += `${item.name}`;
@@ -352,6 +357,7 @@ const onLoad = async () => {
   }
 };
 
+// 改变评论排序方式
 const change_sortType = async (index: any) => {
   data.sortType = index;
   data.finish = false;
@@ -362,6 +368,9 @@ const change_sortType = async (index: any) => {
   onLoad();
 };
 
+const goSingerDetail = (id: any):void => {
+  router.push({ name: "singerDetail", query:{id}})
+}
 </script>
 
 <style lang="less" scoped>
@@ -419,6 +428,7 @@ const change_sortType = async (index: any) => {
     .singer {
       font-size: 12px;
       color: rgb(0, 153, 255);
+      display: flex;
     }
   }
 }
