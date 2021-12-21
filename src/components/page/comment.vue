@@ -181,7 +181,7 @@ export default {
 </script>
 <script lang="ts" setup>
 import { defineComponent, onMounted, reactive, onBeforeMount, toRefs } from "vue";
-import { getComment, getSongInfo, getFloorComment, getPlayListDetail } from "../../api/song";
+import { getComment, getSongInfo, getFloorComment, getPlayListDetail, getAlbumDetail } from "../../api/song";
 import { useRouter } from "vue-router";
 import { sendTimeConversion, numFilter } from "../../utils/num";
 import songStore from "../../store";
@@ -270,6 +270,17 @@ onBeforeMount(async () => {
         data.singer += `/${item.name}`;
       }
     });
+  }
+
+  // 专辑
+  if(type == 3) {
+    // 得到专辑数据
+    const songList = await getAlbumDetail(id);
+    // 组装歌单数据
+    data.name = songList.album.name;
+
+    data.img = songList.album.picUrl;
+    data.singerInfo = songList.album.artists;
   }
 
   // 电台评论由于未知原因暂时无法获取

@@ -43,7 +43,7 @@
         <span>{{ data.numFilter(data.subscribedCount) }}</span>
       </div>
       <div class="line"></div>
-      <div class="comment item" @click="router.push({ path: `/comment`, query: { id: id, type: 2 } })">
+      <div class="comment item" @click="router.push({ path: `/comment`, query: { id: id, type: data.type } })">
         <img src="../../../public/img/icons/comment.svg" alt="" />
         <span>{{ data.numFilter(data.commentCount) }}</span>
       </div>
@@ -127,6 +127,7 @@ import { Toast } from "vant";
 // 歌单
 interface songList {
   id: number;
+  type: number;
   numFilter: any;
   title: string;
   navTitle: string;
@@ -171,6 +172,7 @@ const store = songStore();
 const img = ref<string>();
 const data = reactive<songList>({
   id: 0,
+  type: 2,
   numFilter: numFilter,
   title: "",
   navTitle: "歌单",
@@ -199,6 +201,7 @@ const type: any = router.currentRoute.value.query.type; //获取 分类
 onBeforeMount(async () => {
   store.set_load(true);
   data.id = id;
+  data.type = type;
 
   // 如果是 歌单
   if(type == 2) {
@@ -245,6 +248,7 @@ onBeforeMount(async () => {
     });
   }else if(type == 10) {
     data.navTitle = "专辑"
+    data.type = 3;
     Toast("专辑部分歌曲可能无法播放");
     data.id = id;
     // 得到专辑数据
