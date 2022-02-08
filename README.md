@@ -2,12 +2,13 @@
 
 ## 说明
 
-- 技术栈：Vue3 + Vant + pinia + Typescript + Vite2
+- 技术栈：Vue3 + Vant + Pinia + Typescript + Vite2
 - 线上预览：https://neteasecloudmusic.vercel.app（PC 请 F12 切换为移动端 或者使用手机浏览器扫描以下二维码）
 ![image](./screenshot/mobile.png)
 - 数据来源：https://github.com/Binaryify/NeteaseCloudMusicApi
 - Flutter 版：https://github.com/wudeh/flutter_music_code
 - 对您有一丁点帮助的话给个 star 吧 【哭唧唧】
+- 试听的歌曲只能下载到片段，而且项目里默认下载的不是无损音质，想要无损音质可以尝试使用 Flutter 版，默认下载的是无损音质
 
 - 2021-11-28：从 webpack 迁移到 vite，状态管理换成 pinia，使用 setup 语法糖
 

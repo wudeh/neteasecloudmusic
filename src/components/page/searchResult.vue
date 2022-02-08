@@ -1024,7 +1024,7 @@ const getDate = (i: number) => {
   return `${a.getFullYear()}.${a.getMonth() + 1}.${a.getDate()}`;
 };
 
-// 提示歌手还没做
+// 提示还没做
 const notDone = () => {
   Toast("敬请期待");
 };
