@@ -23,7 +23,7 @@
       <img @click.stop="router.push({ path: `/download` })" src="../../public/img/icons/download.svg" alt="" />
     </div>
     <van-pull-refresh v-model="info.loading" @refresh="onRefresh">
-      <van-list v-model:loading="info.listLoading" v-model:error="info.listError" :immediate-check="true" :finished="info.listFinish" error-text="请求失败，点击重新加载" finished-text="" @load="loadMore">
+      <van-list v-model:loading="info.listLoading" v-model:error="info.listError" :immediate-check="true" :finished="info.listFinish" error-text="请求失败，点击重新加载" finished-text="到底啦" @load="loadMore">
         <template v-slot:loading>
           <div style="display: flex; align-items: center; justify-content: center">
             <img width="18" src="../../public/img/icons/loading.svg" alt="" />
@@ -104,7 +104,7 @@
             </bsscroll>
           </div>
           <!-- 较长的区域 -->
-          <div class="long" v-if="info.long.uiElement.subTitle">
+          <div class="long" v-if="info.long.uiElement.subTitle.title">
             <div class="rec_title">
               <div class="rec_des">{{ info.long.uiElement.subTitle.title }}</div>
               <div class="rec_more" @click="add_song_list">
@@ -155,7 +155,7 @@
           </div>
 
           <!-- 雷达歌单 -->
-          <div class="recommend" v-if="info.HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle">
+          <div class="recommend" v-if="info.HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle.title">
             <div class="rec_title">
               <div class="rec_des">
                 {{ info.HOMEPAGE_BLOCK_MGC_PLAYLIST.uiElement.subTitle.title }}
@@ -179,7 +179,7 @@
             </bsscroll>
           </div>
           <!-- 视频合辑 -->
-          <div class="video" v-if="info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle">
+          <div class="video" v-if="info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle.title">
             <div class="rec_title">
               <div class="rec_des">
                 {{ info.HOMEPAGE_BLOCK_VIDEO_PLAYLIST.uiElement.subTitle.title }}
@@ -209,7 +209,7 @@
           </div>
 
           <!-- 专属场景歌单 -->
-          <div class="recommend" v-if="info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement">
+          <div class="recommend" v-if="info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.title">
             <div class="rec_title">
               <div class="rec_des">
                 {{ info.HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST.uiElement.subTitle.title }}
@@ -233,7 +233,7 @@
             </bsscroll>
           </div>
           <!-- 新歌，新碟，数字专辑 -->
-          <div class="new">
+          <div class="new" v-if="info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[0].length">
             <div class="rec_title">
               <div class="rec_des">
                 <span @click="change_new(0)" :class="{ notClick: info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index != 0 }">新歌</span>
@@ -316,32 +316,51 @@
               </div>
             </bsscroll>
           </div>
-          <!-- 播客合辑 -->
-          <div class="recommend" v-if="info.HOMEPAGE_VOICELIST_RCMD.uiElement">
+          <!-- 热门播客 -->
+          <div class="long" v-if="info.HOMEPAGE_VOICELIST_RCMD.creatives.length > 0">
             <div class="rec_title">
-              <div class="rec_des">
-                {{ info.HOMEPAGE_VOICELIST_RCMD.uiElement.subTitle.title }}
-              </div>
-              <div class="rec_more" @click="ballClick()">
-                <span>{{ info.HOMEPAGE_VOICELIST_RCMD.uiElement.button.text }}</span>
-                <img src="../../public/img/icons/more.svg" alt="" />
+              <div class="rec_des">{{ info.HOMEPAGE_VOICELIST_RCMD.creatives[0].uiElement.mainTitle.title }}</div>
+              <div class="rec_more" @click="ballClick">
+                <img src="../../public/img/icons/videoPlay.svg" alt="" />
+                <span>{{ info.HOMEPAGE_VOICELIST_RCMD.creatives[0].uiElement.button.text }}</span>
               </div>
             </div>
             <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_VOICELIST_RCMD.creatives" name="HOMEPAGE_VOICELIST_RCMD_scroll">
-              <div class="rec_song">
-                <div class="rec_item" v-for="item in info.HOMEPAGE_VOICELIST_RCMD.creatives" :key="item.creativeId" @click="router.push({ path: `/djProgram`, query: { id: item.creativeId } })">
-                  <van-image class="img" show-loading lazy-load radius="8" :src="item.uiElement.image.imageUrl" />
-                  <span>{{ item.uiElement.mainTitle.title }}</span>
-                  <div class="playCount">
-                    <img src="../../public/img/icons/play.svg" alt="" />
-                    <span>{{ numFilter(item.creativeExtInfoVO.playCount) }}</span>
+              <div class="swiper">
+                <div class="swiper_item" v-for="(item, index) in info.HOMEPAGE_VOICELIST_RCMD.creatives" :key="index">
+                  <div class="item" v-for="subItem in item.resources" :key="subItem.resourceId" @click="ballClick">
+                    <div class="img_wrapper">
+                      <van-image class="img" :src="subItem.uiElement.image.imageUrl">
+                        <template v-slot:loading>
+                          <van-loading type="spinner" size="20" />
+                        </template>
+                      </van-image>
+                    </div>
+                    <div class="info">
+                      <div class="song_title">
+                        <div class="song_name">
+                          {{ subItem.uiElement.mainTitle.title }}
+                        </div>
+                        <span style="color: #ccc; margin: 0 2px">-</span>
+                      </div>
+                      <div
+                        class="song_subTitle"
+                        :class="{
+                          percent: subItem.uiElement.subTitle.title.indexOf('%') != -1,
+                        }"
+                        v-if="subItem.uiElement.subTitle"
+                      >
+                        <span :class="subItem.uiElement.labelType">{{subItem.uiElement.labelTexts[0]}}</span>
+                        {{ subItem.uiElement.subTitle.title }}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </bsscroll>
           </div>
           <!-- 音乐日历 -->
-          <div class="calendar" v-if="info.HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle" @click="ballClick()">
+          <div class="calendar" v-if="info.HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle.title" @click="ballClick()">
             <div class="rec_title">
               <div class="rec_des">
                 {{ info.HOMEPAGE_MUSIC_CALENDAR.uiElement.subTitle.title }}
@@ -369,7 +388,7 @@
             </div>
           </div>
           <!-- 精选音乐视频 -->
-          <div class="recommend MUSIC_MLOG" v-if="info.HOMEPAGE_MUSIC_MLOG.uiElement.subTitle" @click="ballClick()">
+          <div class="recommend MUSIC_MLOG" v-if="info.HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title" @click="ballClick()">
             <div class="rec_title">
               <div class="rec_des">
                 {{ info.HOMEPAGE_MUSIC_MLOG.uiElement.subTitle.title }}
@@ -514,13 +533,9 @@ const info = reactive<any>({
       button: {},
     },
   },
-  // 播客合集
+  // 热门播客
   HOMEPAGE_VOICELIST_RCMD: {
     creatives: [],
-    uiElement: {
-      subTitle: { title: "" },
-      button: {},
-    },
   },
   // 24 小时播客
   HOMEPAGE_PODCAST24: {
@@ -568,6 +583,8 @@ onMounted(async () => {
 });
 
 const onRefresh = async () => {
+  info.cursor = '';
+  info.listFinish = false;
   // PC 推荐歌单
   let recommendSongListAll = await getRecommendSongList();
   recommendSongList.value = [].concat(recommendSongListAll.result);
@@ -575,6 +592,7 @@ const onRefresh = async () => {
   let discoverInfo = await getDiscoverInfo(info.cursor);
   // 分页数据
   info.cursor = discoverInfo.data.cursor;
+  info.listFinish = !discoverInfo.data.hasMore;
   // 分配数据
   discoverInfo.data.blocks.map((item: any) => {
     // 轮播图
@@ -632,6 +650,7 @@ const onRefresh = async () => {
     }
     if (item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
       // 播客合辑
+      console.log(item);
       info.HOMEPAGE_VOICELIST_RCMD = item;
     }
     if (item.blockCode == "HOMEPAGE_PODCAST24") {
@@ -649,6 +668,8 @@ const onRefresh = async () => {
 };
 
 const loadMore = async () => {
+  console.log('开始加载更多');
+  
   info.listLoading = true;
   let discoverInfo = await getDiscoverInfo(info.cursor);
 
@@ -665,7 +686,7 @@ const loadMore = async () => {
     info.listError = true;
     return;
   }
-  info.listFinish = true;
+  info.listFinish = !discoverInfo.data.hasMore;  
   // 分页数据
   info.cursor = discoverInfo.data.cursor;
   discoverInfo.data.blocks.map((item: any) => {
@@ -728,7 +749,10 @@ const loadMore = async () => {
     }
     if (item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
       // 播客合辑
-      info.HOMEPAGE_VOICELIST_RCMD = item;
+      console.log(item);
+      info.HOMEPAGE_VOICELIST_RCMD.creatives = item.creatives;
+      console.log(info.HOMEPAGE_VOICELIST_RCMD.creatives[0].resources[0].resourceExtInfo.djProgram.coverUrl);
+      
     }
     if (item.blockCode == "HOMEPAGE_PODCAST24") {
       // 24小时播客
@@ -1163,6 +1187,19 @@ const goToGithub = (): void => {
                 border: 1px solid rgb(0, 153, 255);
                 border-radius: 3px;
                 opacity: 0.6;
+              }
+              .yellow {
+                color: #ff6500;
+                background-color: #fddeb2;
+                border-radius: 3px;
+                opacity: 0.6;
+                padding: 2px;
+              }
+              .gray {
+                .yellow;
+                color: #ccc;
+                border: 1px solid #ccc;
+                background-color: #fff;
               }
             }
             .percent {

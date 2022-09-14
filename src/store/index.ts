@@ -104,7 +104,7 @@ export default defineStore({
       const data = await getLyric(this.song_info.id);
       // console.log(data);
       // console.log(data.lrc.lyric.split("["));
-      if (data.lrc?.lyric) {
+      if (data?.lrc?.lyric) {
         let i = data.lrc.lyric.split("[");
         i.forEach((item: any, index: number) => {
           let temp = {
@@ -125,7 +125,7 @@ export default defineStore({
         // console.log(lyric);
         // console.log("这是歌词");
         // 如果有翻译歌词
-        if (data.tlyric.lyric) {
+        if (data?.tlyric?.lyric) {
           let i = data.tlyric.lyric.split("[");
           i.forEach((item: any, index: number) => {
             let temp = {
