@@ -482,7 +482,7 @@ export default {
 
 <script lang="ts" setup>
 import { defineComponent, onBeforeMount, reactive, toRefs, ref, watch } from "vue";
-import { getSearchHot, getSuggest, getsearchResult } from "../../api/discover";
+import { getSearchHot, getSuggest, getsearchResult, getsearchResult2 } from "../../api/discover";
 import songStore from "../../store";
 import { useRouter, useRoute } from "vue-router";
 import { sendTimeConversion, numFilter } from "../../utils/num";
@@ -943,14 +943,19 @@ const loadMore = async () => {
       data.videoError = true;
     }
   }
+  // 综合搜索
   if (data.activeName == 1018) {
     try {
       data.allFinish = false;
       data.allLoading = true;
       let info = await getsearchResult(data.word, data.activeName, data.pageNo);
+      // 搜索中的综合在 n.xlz122.cn/api 中搜索不出来，更换为另一个api：music.qier222.com/api
+      if (!info.result?.song) {
+        info = await getsearchResult2(data.word, data.activeName, data.pageNo);
+      }
       data.allRefreshing = false;
       data.allLoading = false;
-      if (info.code != 200 || !info.result) {
+      if (info.code != 200 || !info.result?.song) {
         data.allError = true;
         return;
       }
