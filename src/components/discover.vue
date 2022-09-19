@@ -17,7 +17,6 @@
         <van-icon name="wap-nav" badge="" />
       </div>
       <div class="search">
-        <van-icon name="search" />
         <p>{{ info.searchWord }}</p>
       </div>
       <img @click.stop="router.push({ path: `/download` })" src="../../public/img/icons/download.svg" alt="" />
@@ -146,7 +145,7 @@
                         <span class="vip" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">vip</span>
                         <span class="hear_try" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">试听</span>
                         <span class="dujia" v-if="subItem.resourceExtInfo.songPrivilege.flag == 1092">独家</span>
-                        {{ subItem.uiElement.subTitle.title }}
+                        <span class="yellow">{{ subItem.uiElement.subTitle.title }}</span>
                       </div>
                     </div>
                   </div>
@@ -931,8 +930,12 @@ const goToGithub = (): void => {
     border-radius: 30px;
     display: flex;
     align-items: center;
+    justify-content: center;
     background-color: #fff;
     padding-left: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     .pop();
     p {
       margin-left: 5px;
