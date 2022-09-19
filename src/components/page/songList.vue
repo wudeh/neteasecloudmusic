@@ -81,7 +81,8 @@
             <span class="vip" v-if="item.vip">vip</span>
             <span class="hear_try" v-if="item.vip">试听</span>
             <span class="dujia" v-if="item.dujia">独家</span>
-            <span class="sq" v-if="item.sq">SQ</span>
+            <span class="sq" v-if="item.hr">Hi-Res</span>
+            <span class="sq" v-else="item.sq">SQ</span>
             {{ item.author }}
             -
             {{ item.des }}
@@ -152,6 +153,7 @@ interface song {
   Tv: string; // 歌曲可能会有剧名
   author: string;
   des: string;
+  hr: object;
   sq: boolean;
   vip: boolean;
   dujia: boolean;
@@ -241,11 +243,12 @@ onBeforeMount(async () => {
         ar: item.ar,
         al: item.al,
         mv: item.mv,
+        hr: item?.hr,
         sq: songListInfo.privileges[index].maxbr >= 999000,
         vip: songListInfo.privileges[index].fee == 1,
         dujia: songListInfo.privileges[index].flag == 1092
       };
-    });
+    });    
   }else if(type == 10) {
     data.navTitle = "专辑"
     data.type = 3;
@@ -282,6 +285,7 @@ onBeforeMount(async () => {
         des: item.al.name,
         ar: item.ar,
         al: item.al,
+        hr: item?.hr,
         sq: item.privilege.maxbr >= 999000,
         vip: item.privilege.fee == 1,
         dujia: item.privilege.flag == 1092,

@@ -42,7 +42,8 @@
                         <span v-word="data.word" class="origin" v-if="item.originCoverType == 1">原唱</span>
                         <span class="vip" v-if="item.fee == 1">VIP</span>
                         <span class="hear_try" v-if="item.fee == 1">试听</span>
-                        <span class="sq" v-if="item.privilege.maxbr >= 999000">SQ</span>
+                        <span class="sq" v-if="item.hr">Hi-Res</span>
+                        <span class="sq" v-else="item.privilege.maxbr >= 999000">SQ</span>
                         <span class="sq" v-if="item.privilege.flag >= 60 && item.privilege.flag < 70">独家</span>
                         <span v-word="data.word" class="singer" v-for="(it, i) in item.ar" :key="i"><span v-if="i > 0">/</span>{{ it.name }} </span>
                         -
@@ -211,7 +212,8 @@
                       <span class="sq" v-if="item.privilege.flag >= 60 && item.privilege.flag < 70">独家</span>
                       <span class="vip" v-if="item.fee == 1">VIP</span>
                       <span class="hear_try" v-if="item.fee == 1">试听</span>
-                      <span class="sq" v-if="item.privilege.maxbr >= 999000">SQ</span>
+                      <span class="sq" v-if="item.hr">Hi-Res</span>
+                      <span class="sq" v-else="item.privilege.maxbr >= 999000">SQ</span>
                       <span v-word="data.word" class="singer" v-for="(it, i) in item.ar" :key="i"><span v-if="i > 0">/</span>{{ it.name }} </span>
                       -
                       <span v-word="data.word" class="album">{{ item.al.name }}</span>

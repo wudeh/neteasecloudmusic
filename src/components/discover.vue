@@ -141,7 +141,8 @@
                         }"
                         v-if="subItem.uiElement.subTitle"
                       >
-                        <span class="SQ" v-if="subItem.resourceExtInfo.songPrivilege.maxbr >= 999000">SQ</span>
+                        <span class="SQ" v-if="subItem.resourceExtInfo.song.hr">Hi-Res</span>
+                        <span class="SQ" v-else="subItem.resourceExtInfo.songPrivilege.maxbr >= 999000">SQ</span>
                         <span class="vip" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">vip</span>
                         <span class="hear_try" v-if="subItem.resourceExtInfo.songPrivilege.fee == 1">试听</span>
                         <span class="dujia" v-if="subItem.resourceExtInfo.songPrivilege.flag == 1092">独家</span>
