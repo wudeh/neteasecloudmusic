@@ -101,11 +101,11 @@ export default defineComponent({
     }
 
     watch(
-      () => props.scrollData.length,
+      () => props.scrollData,
       () => {
         nextTick(() => {
           data.bs.refresh();
-          
+          // console.log('重新计算了');
         });
       }
     );

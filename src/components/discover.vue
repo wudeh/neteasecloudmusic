@@ -247,7 +247,7 @@
                 <span>更多</span>
               </div>
             </div>
-            <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData" name="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG_scroll">
+            <bsscroll :scrollX="true" :scrollData="info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index]" name="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG_scroll">
               <div class="swiper">
                 <div class="swiper_item" v-for="(item, index) in info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.arrData[info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index]" :key="index">
                   <div class="item" v-for="subItem in item.resources" :key="subItem.resourceId" @click="new_three(subItem)">
@@ -650,7 +650,7 @@ const onRefresh = async () => {
     }
     if (item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
       // 播客合辑
-      console.log(item);
+      // console.log(item);
       info.HOMEPAGE_VOICELIST_RCMD = item;
     }
     if (item.blockCode == "HOMEPAGE_PODCAST24") {
@@ -749,7 +749,6 @@ const loadMore = async () => {
     }
     if (item.blockCode == "HOMEPAGE_VOICELIST_RCMD") {
       // 播客合辑
-      console.log(item);
       info.HOMEPAGE_VOICELIST_RCMD.creatives = item.creatives;
       console.log(info.HOMEPAGE_VOICELIST_RCMD.creatives[0].resources[0].resourceExtInfo.djProgram.coverUrl);
       
@@ -784,13 +783,6 @@ const onChange = (index: number) => {
 function change_new(index: number): void {
   info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index = index;
 }
-// 监听索引变化，改变为对应新歌，新碟，数字专辑的数组数据
-watch(
-  () => info.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG.index,
-  (i) => {
-    console.log(i);
-  }
-);
 
 // 点击播放歌曲
 async function playMusicSingle(item: any): Promise<void> {
