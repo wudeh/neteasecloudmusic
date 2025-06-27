@@ -45,7 +45,7 @@
             <!-- 模糊背景图 -->
             <div class="top_blur" ref="topBg"></div>
             <!-- 圆形图标区域 -->
-            <div class="icon_top">
+            <!-- <div class="icon_top">
               <bsscroll :scrollX="true" :scrollData="info.icon" name="icon_scroll">
                 <div class="icon_wrapper">
                   <div class="icon_item" v-for="item in info.icon" :key="item.id" @click="ballClick()">
@@ -56,7 +56,7 @@
                   </div>
                 </div>
               </bsscroll>
-            </div>
+            </div> -->
           </div>
           <!-- APP 端推荐歌单，由于目前接口数据不刷新，先注释 -->
           <div class="recommend">
@@ -951,7 +951,7 @@ const goToGithub = (): void => {
     position: relative;
     padding-top: 40px;
     transition: all 0.5s;
-    height: 260px;
+    // height: 260px;
     box-sizing: border-box;
     z-index: 111;
     overflow: hidden;

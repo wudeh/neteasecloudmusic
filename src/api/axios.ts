@@ -11,8 +11,8 @@ axios.defaults.baseURL =  "https://n.xlz122.cn/api/";
 // axios.defaults.headers["Content-Type"] = "text/plain";
 // axios.defaults.timeout = 30000
 
-// https://netease-cloud-music-api-masterxing.vercel.app/    http://www.codeman.ink/api/playlist/    http://1.117.229.35:3000/
-// https://netease-cloud-music-api-jet.vercel.app/           https://n.xlz122.cn/api/
+// https://netease-cloud-music-api.fe-mm.com/homepage/dragon/ball
+// https://service-flgzov7m-1259174451.gz.apigw.tencentcs.com/homepage/dragon/ball
 
 // 请求拦截
 axios.interceptors.request.use(
